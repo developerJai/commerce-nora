@@ -1,30 +1,30 @@
 <% if cart.empty? %>
-  <p class="text-sm text-gray-500 p-4">Your cart is empty</p>
+  <p class="text-sm text-stone-500 p-4">Your bag is empty</p>
 <% else %>
   <div class="p-4 space-y-3 max-h-64 overflow-y-auto">
     <% cart.cart_items.includes(product_variant: :product).limit(3).each do |item| %>
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-gray-100 rounded flex-shrink-0">
+        <div class="w-12 h-12 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
           <% if item.product_variant.product.images.attached? %>
-            <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover rounded' %>
+            <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
           <% end %>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-900 truncate"><%= item.product_variant.product.name %></p>
-          <p class="text-xs text-gray-500">x<%= item.quantity %></p>
+          <p class="text-sm font-medium text-stone-900 truncate"><%= item.product_variant.product.name %></p>
+          <p class="text-xs text-stone-500">×<%= item.quantity %></p>
         </div>
-        <p class="text-sm font-medium"><%= format_price(item.total_price) %></p>
+        <p class="text-sm font-medium text-stone-900"><%= format_price(item.total_price) %></p>
       </div>
     <% end %>
     <% if cart.cart_items.count > 3 %>
-      <p class="text-xs text-gray-500 text-center">+ <%= cart.cart_items.count - 3 %> more items</p>
+      <p class="text-xs text-stone-500 text-center">+ <%= cart.cart_items.count - 3 %> more items</p>
     <% end %>
   </div>
-  <div class="border-t p-4">
+  <div class="border-t border-stone-200 p-4">
     <div class="flex justify-between mb-3">
-      <span class="text-sm text-gray-600">Subtotal</span>
-      <span class="font-semibold"><%= format_price(cart.subtotal) %></span>
+      <span class="text-sm text-stone-600">Subtotal</span>
+      <span class="font-semibold text-stone-900"><%= format_price(cart.subtotal) %></span>
     </div>
-    <%= link_to 'View Cart', cart_path, class: 'block w-full py-2 px-4 bg-indigo-600 text-white text-center text-sm font-medium rounded-md hover:bg-indigo-700' %>
+    <%= link_to 'View Bag', cart_path, class: 'block w-full py-2.5 px-4 bg-rose-800 text-white text-center text-sm font-medium rounded-lg hover:bg-rose-900 transition' %>
   </div>
 <% end %>

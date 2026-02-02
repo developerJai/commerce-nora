@@ -1,41 +1,45 @@
 <% content_for(:title) { "Checkout" } %>
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <h1 class="text-2xl font-bold text-gray-900 mb-8">Checkout</h1>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+  <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 mb-6 sm:mb-8">Checkout</h1>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <div class="lg:col-span-2">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+    <div class="lg:col-span-2 space-y-6">
       <!-- Shipping Address -->
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-gray-900">Shipping Address</h2>
-          <%= link_to 'Change', address_checkout_path, class: 'text-sm text-indigo-600 hover:text-indigo-800' %>
+          <h2 class="text-base font-serif font-semibold text-stone-900">Shipping Address</h2>
+          <%= link_to 'Change', address_checkout_path, class: 'text-sm text-rose-700 hover:text-rose-900 font-medium' %>
         </div>
 
         <% if @selected_address %>
-          <div class="p-4 bg-gray-50 rounded-lg">
-            <p class="font-medium text-gray-900"><%= @selected_address.full_name %></p>
-            <p class="text-gray-600"><%= @selected_address.full_address %></p>
+          <div class="p-4 bg-stone-50 rounded-lg">
+            <p class="font-medium text-stone-900"><%= @selected_address.full_name %></p>
+            <p class="text-stone-600 text-sm mt-1"><%= @selected_address.full_address %></p>
             <% if @selected_address.phone.present? %>
-              <p class="text-gray-600"><%= @selected_address.phone %></p>
+              <p class="text-stone-600 text-sm"><%= @selected_address.phone %></p>
             <% end %>
           </div>
         <% else %>
-          <p class="text-gray-500">No address selected.</p>
-          <%= link_to 'Add Address', address_checkout_path, class: 'mt-2 inline-block text-indigo-600 hover:text-indigo-800' %>
+          <div class="text-center py-6">
+            <p class="text-stone-500 mb-3">No address selected</p>
+            <%= link_to 'Add Address', address_checkout_path, class: 'inline-block px-4 py-2 bg-rose-800 text-white text-sm font-medium rounded-lg hover:bg-rose-900 transition' %>
+          </div>
         <% end %>
       </div>
 
       <!-- Payment Method -->
-      <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Method</h2>
-        <div class="p-4 bg-gray-50 rounded-lg flex items-center gap-3">
-          <svg class="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-          </svg>
+      <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+        <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Payment Method</h2>
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-3">
+          <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </div>
           <div>
-            <p class="font-medium text-gray-900">Cash on Delivery</p>
-            <p class="text-sm text-gray-500">Pay when you receive your order</p>
+            <p class="font-medium text-stone-900">Cash on Delivery</p>
+            <p class="text-sm text-stone-600">Pay when you receive your order</p>
           </div>
         </div>
       </div>
@@ -43,22 +47,22 @@
 
     <!-- Order Summary -->
     <div class="lg:col-span-1">
-      <div class="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+      <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 lg:sticky lg:top-24">
+        <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Summary</h2>
         
-        <div class="space-y-4 mb-6">
+        <div class="space-y-3 mb-5">
           <% current_cart.cart_items.each do |item| %>
             <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-gray-100 rounded flex-shrink-0">
+              <div class="w-12 h-12 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
                 <% if item.product_variant.product.images.attached? %>
-                  <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover rounded' %>
+                  <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
                 <% end %>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate"><%= item.product_variant.product.name %></p>
-                <p class="text-xs text-gray-500">x<%= item.quantity %></p>
+                <p class="text-sm font-medium text-stone-900 truncate"><%= item.product_variant.product.name %></p>
+                <p class="text-xs text-stone-500">x<%= item.quantity %></p>
               </div>
-              <p class="text-sm font-medium"><%= format_price(item.total_price) %></p>
+              <p class="text-sm font-medium text-stone-900"><%= format_price(item.total_price) %></p>
             </div>
           <% end %>
         </div>
@@ -68,31 +72,31 @@
         <% discount = coupon&.calculate_discount(subtotal) || 0 %>
         <% total = subtotal - discount %>
 
-        <div class="border-t border-gray-200 pt-4 space-y-2 text-sm">
+        <div class="border-t border-stone-200 pt-4 space-y-2 text-sm">
           <div class="flex justify-between">
-            <span class="text-gray-600">Subtotal</span>
-            <span><%= format_price(subtotal) %></span>
+            <span class="text-stone-600">Subtotal</span>
+            <span class="text-stone-900"><%= format_price(subtotal) %></span>
           </div>
           <% if discount > 0 %>
-            <div class="flex justify-between text-green-600">
+            <div class="flex justify-between text-emerald-600">
               <span>Discount (<%= coupon.code %>)</span>
               <span>-<%= format_price(discount) %></span>
             </div>
           <% end %>
           <div class="flex justify-between">
-            <span class="text-gray-600">Shipping</span>
-            <span>Free</span>
+            <span class="text-stone-600">Shipping</span>
+            <span class="text-emerald-600 font-medium">Free</span>
           </div>
-          <div class="border-t border-gray-200 pt-2 flex justify-between text-lg font-semibold">
-            <span>Total</span>
-            <span><%= format_price(total) %></span>
+          <div class="border-t border-stone-200 pt-2 flex justify-between">
+            <span class="font-semibold text-stone-900">Total</span>
+            <span class="font-semibold text-stone-900 text-lg"><%= format_price(total) %></span>
           </div>
         </div>
 
         <% if @selected_address %>
-          <%= link_to 'Continue to Review', confirm_checkout_path, class: 'mt-6 block w-full py-3 px-4 bg-indigo-600 text-white text-center font-semibold rounded-lg hover:bg-indigo-700 transition' %>
+          <%= link_to 'Continue to Review', confirm_checkout_path, class: 'mt-5 block w-full py-3 px-4 bg-rose-800 text-white text-center font-medium rounded-lg hover:bg-rose-900 transition' %>
         <% else %>
-          <%= link_to 'Select Address', address_checkout_path, class: 'mt-6 block w-full py-3 px-4 bg-indigo-600 text-white text-center font-semibold rounded-lg hover:bg-indigo-700 transition' %>
+          <%= link_to 'Select Address', address_checkout_path, class: 'mt-5 block w-full py-3 px-4 bg-rose-800 text-white text-center font-medium rounded-lg hover:bg-rose-900 transition' %>
         <% end %>
       </div>
     </div>

@@ -17,8 +17,7 @@ class CartsController < ApplicationController
           turbo_stream.update("cart-count", current_cart.item_count.to_s),
           turbo_stream.update("cart-controls-#{@variant.id}", 
             partial: "shared/cart_controls", 
-            locals: { variant: @variant, cart_item: @cart_item }),
-          turbo_stream.prepend("flash", partial: "shared/flash", locals: { notice: "Added to cart" })
+            locals: { variant: @variant, cart_item: @cart_item })
         ]
         render turbo_stream: streams
       end

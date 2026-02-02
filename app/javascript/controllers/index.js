@@ -13,6 +13,10 @@ import ModalController from "controllers/modal_controller"
 import SearchAutocompleteController from "controllers/search_autocomplete_controller"
 import CartControlsController from "controllers/cart_controls_controller"
 import DraftOrderController from "controllers/draft_order_controller"
+import ProductGalleryController from "controllers/product_gallery_controller"
+import ProductVariantController from "controllers/product_variant_controller"
+import TabsController from "controllers/tabs_controller"
+import QuantityController from "controllers/quantity_controller"
 
 application.register("sidebar", SidebarController)
 application.register("dropdown", DropdownController)
@@ -23,3 +27,7 @@ application.register("modal", ModalController)
 application.register("search-autocomplete", SearchAutocompleteController)
 application.register("cart-controls", CartControlsController)
 application.register("draft-order", DraftOrderController)
+application.register("product-gallery", ProductGalleryController)
+application.register("product-variant", ProductVariantController)
+application.register("tabs", TabsController)
+application.register("quantity", QuantityController)
