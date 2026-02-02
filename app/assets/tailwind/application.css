@@ -6,23 +6,23 @@
 }
 
 .pagy a, .pagy span {
-  @apply px-3 py-2 text-sm rounded-md;
+  @apply px-3 py-2 text-sm rounded-lg;
 }
 
 .pagy a {
-  @apply text-gray-700 hover:bg-gray-100;
+  @apply text-stone-600 hover:bg-rose-50 hover:text-rose-800 transition;
 }
 
 .pagy a.current, .pagy span.current {
-  @apply bg-indigo-600 text-white;
+  @apply bg-rose-800 text-white;
 }
 
 .pagy span.gap {
-  @apply text-gray-400;
+  @apply text-stone-400;
 }
 
 .pagy a[aria-disabled="true"] {
-  @apply text-gray-300 cursor-not-allowed hover:bg-transparent;
+  @apply text-stone-300 cursor-not-allowed hover:bg-transparent;
 }
 
 /* Line clamp utility */
@@ -35,5 +35,19 @@
 
 /* Form inputs focus style */
 input:focus, select:focus, textarea:focus {
-  @apply outline-none ring-2 ring-indigo-500 border-transparent;
+  @apply outline-none ring-2 ring-rose-400 border-transparent;
+}
+
+/* Scrollbar hide utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area padding for mobile bottom nav */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
 }
