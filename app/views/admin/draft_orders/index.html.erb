@@ -1,0 +1,61 @@
+<% content_for(:title) { "Draft Orders" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">Draft Orders</h1>
+    <%= link_to 'Create Draft Order', new_admin_draft_order_path, class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700' %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order #</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @draft_orders.each do |order| %>
+          <tr id="<%= dom_id(order) %>">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="font-mono text-sm font-medium text-gray-900"><%= order.order_number %></span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900"><%= order.customer&.full_name || 'Guest' %></div>
+              <div class="text-xs text-gray-500"><%= order.customer&.email %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <%= pluralize(order.order_items.count, 'item') %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              <%= format_price(order.total) %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <%= order.created_at.strftime('%b %d, %Y') %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+              <%= link_to 'Edit', edit_admin_draft_order_path(order), class: 'text-indigo-600 hover:text-indigo-900 mr-3' %>
+              <%= button_to 'Convert to Order', convert_to_order_admin_draft_order_path(order), method: :post, 
+                  class: 'text-green-600 hover:text-green-900 mr-3',
+                  form: { data: { turbo_confirm: 'Convert this draft to a placed order?' } } %>
+              <%= button_to 'Delete', admin_draft_order_path(order), method: :delete, 
+                  class: 'text-red-600 hover:text-red-900',
+                  form: { data: { turbo_confirm: 'Are you sure you want to delete this draft order?' } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @draft_orders.empty? %>
+      <div class="text-center py-12 text-gray-500">
+        No draft orders yet. <%= link_to 'Create one', new_admin_draft_order_path, class: 'text-indigo-600 hover:underline' %>
+      </div>
+    <% end %>
+  </div>
+
+  <%== pagy_nav(@pagy) if @pagy&.pages.to_i > 1 %>
+</div>

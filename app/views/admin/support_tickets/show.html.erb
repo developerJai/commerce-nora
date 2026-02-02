@@ -1,0 +1,136 @@
+<% content_for(:title) { "Ticket #{@support_ticket.ticket_number}" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @support_ticket.ticket_number %></h1>
+      <p class="text-sm text-gray-500"><%= @support_ticket.subject %></p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="px-3 py-1 text-sm font-medium rounded-full <%= ticket_status_badge_class(@support_ticket.status) %>">
+        <%= @support_ticket.status.titleize %>
+      </span>
+      <span class="px-3 py-1 text-sm font-medium rounded-full <%= priority_badge_class(@support_ticket.priority) %>">
+        <%= @support_ticket.priority.capitalize %>
+      </span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6">
+    <!-- Messages -->
+    <div class="col-span-2 space-y-6">
+      <div class="bg-white rounded-lg shadow-sm divide-y">
+        <% @support_ticket.ticket_messages.recent.each do |message| %>
+          <div class="p-4 <%= message.from_admin? ? 'bg-indigo-50' : '' %>">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="h-8 w-8 rounded-full <%= message.from_admin? ? 'bg-indigo-600' : 'bg-gray-400' %> flex items-center justify-center text-white text-sm">
+                  <%= message.sender_name.first.upcase %>
+                </span>
+                <div>
+                  <span class="text-sm font-medium text-gray-900"><%= message.sender_name %></span>
+                  <span class="text-xs text-gray-500 ml-2"><%= message.from_admin? ? 'Support' : 'Customer' %></span>
+                </div>
+              </div>
+              <span class="text-xs text-gray-500"><%= message.created_at.strftime('%b %d, %Y at %I:%M %p') %></span>
+            </div>
+            <div class="text-sm text-gray-700 whitespace-pre-wrap ml-10"><%= message.body %></div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Reply form -->
+      <% if @support_ticket.can_reply? %>
+        <div class="bg-white rounded-lg shadow-sm p-4">
+          <h3 class="text-sm font-medium text-gray-900 mb-3">Reply to Customer</h3>
+          <%= form_with model: [:admin, @support_ticket, TicketMessage.new], url: admin_support_ticket_ticket_messages_path(@support_ticket), class: 'space-y-4' do |f| %>
+            <%= f.text_area :body, rows: 4, required: true, placeholder: 'Type your response...',
+                class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+            <div class="flex justify-end">
+              <%= f.submit 'Send Reply', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Customer info -->
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <h3 class="text-sm font-medium text-gray-900 mb-4">Customer</h3>
+        <div class="space-y-3 text-sm">
+          <div>
+            <span class="text-gray-500">Name:</span>
+            <span class="ml-2 text-gray-900"><%= @support_ticket.customer.full_name %></span>
+          </div>
+          <div>
+            <span class="text-gray-500">Email:</span>
+            <span class="ml-2 text-gray-900"><%= @support_ticket.customer.email %></span>
+          </div>
+          <%= link_to 'View Customer', admin_customer_path(@support_ticket.customer), class: 'text-indigo-600 hover:underline text-sm' %>
+        </div>
+      </div>
+
+      <!-- Order info -->
+      <% if @support_ticket.order %>
+        <div class="bg-white rounded-lg shadow-sm p-4">
+          <h3 class="text-sm font-medium text-gray-900 mb-4">Related Order</h3>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="text-gray-500">Order:</span>
+              <span class="ml-2 font-mono text-gray-900"><%= @support_ticket.order.order_number %></span>
+            </div>
+            <div>
+              <span class="text-gray-500">Total:</span>
+              <span class="ml-2 text-gray-900"><%= format_price(@support_ticket.order.total) %></span>
+            </div>
+            <%= link_to 'View Order', admin_order_path(@support_ticket.order), class: 'text-indigo-600 hover:underline text-sm' %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Actions -->
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <h3 class="text-sm font-medium text-gray-900 mb-4">Actions</h3>
+        <div class="space-y-2">
+          <% if @support_ticket.open? %>
+            <%= button_to 'Mark In Progress', admin_support_ticket_path(@support_ticket, support_ticket: { status: 'in_progress' }), method: :patch, 
+                class: 'w-full px-4 py-2 text-sm bg-blue-100 text-blue-800 rounded hover:bg-blue-200' %>
+          <% end %>
+          <% if @support_ticket.open? || @support_ticket.in_progress? %>
+            <%= button_to 'Resolve Ticket', resolve_admin_support_ticket_path(@support_ticket), method: :patch, 
+                class: 'w-full px-4 py-2 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200' %>
+          <% end %>
+          <% if @support_ticket.resolved? %>
+            <%= button_to 'Close Ticket', close_admin_support_ticket_path(@support_ticket), method: :patch, 
+                class: 'w-full px-4 py-2 text-sm bg-gray-100 text-gray-800 rounded hover:bg-gray-200' %>
+            <%= button_to 'Reopen Ticket', reopen_admin_support_ticket_path(@support_ticket), method: :patch, 
+                class: 'w-full px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200' %>
+          <% end %>
+          <% if @support_ticket.closed? %>
+            <%= button_to 'Reopen Ticket', reopen_admin_support_ticket_path(@support_ticket), method: :patch, 
+                class: 'w-full px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200' %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <h3 class="text-sm font-medium text-gray-900 mb-4">Details</h3>
+        <div class="space-y-3 text-sm">
+          <div>
+            <span class="text-gray-500">Created:</span>
+            <span class="ml-2 text-gray-900"><%= @support_ticket.created_at.strftime('%b %d, %Y at %I:%M %p') %></span>
+          </div>
+          <% if @support_ticket.resolved_at %>
+            <div>
+              <span class="text-gray-500">Resolved:</span>
+              <span class="ml-2 text-gray-900"><%= @support_ticket.resolved_at.strftime('%b %d, %Y at %I:%M %p') %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

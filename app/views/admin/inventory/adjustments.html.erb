@@ -1,0 +1,89 @@
+<% content_for(:title) { "Stock Adjustment History" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Stock Adjustment History</h1>
+      <% if @variant %>
+        <p class="text-sm text-gray-500">Showing adjustments for: <%= @variant.display_name %></p>
+      <% end %>
+    </div>
+    <%= link_to '← Back to Inventory', admin_inventory_index_path, class: 'text-indigo-600 hover:text-indigo-800' %>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <%= form_with url: adjustments_admin_inventory_index_path, method: :get, class: 'flex gap-4' do |f| %>
+      <%= f.hidden_field :id, value: params[:id] %>
+      <%= f.select :reason, [['All Reasons', '']] + StockAdjustment::REASONS.map { |k, v| [v, k] }, 
+          { selected: params[:reason] },
+          class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <%= f.submit 'Filter', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+      <% if params[:id].present? || params[:reason].present? %>
+        <%= link_to 'Clear Filters', adjustments_admin_inventory_index_path, class: 'px-4 py-2 text-gray-600 hover:text-gray-800' %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Adjustments Table -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product / Variant</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Change</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Before → After</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Adjusted By</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @adjustments.each do |adj| %>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <%= adj.created_at.strftime('%b %d, %Y') %>
+              <br>
+              <span class="text-xs"><%= adj.created_at.strftime('%I:%M %p') %></span>
+            </td>
+            <td class="px-6 py-4">
+              <div class="text-sm font-medium text-gray-900"><%= adj.product_variant.product.name %></div>
+              <div class="text-sm text-gray-500"><%= adj.product_variant.name %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 py-1 text-xs font-medium rounded-full 
+                <%= case adj.reason
+                    when 'restock' then 'bg-green-100 text-green-800'
+                    when 'sale' then 'bg-blue-100 text-blue-800'
+                    when 'return' then 'bg-purple-100 text-purple-800'
+                    when 'damage', 'loss' then 'bg-red-100 text-red-800'
+                    else 'bg-gray-100 text-gray-800'
+                    end %>">
+                <%= adj.reason_label %>
+              </span>
+              <% if adj.notes.present? %>
+                <p class="text-xs text-gray-500 mt-1 max-w-xs truncate" title="<%= adj.notes %>"><%= adj.notes %></p>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+              <span class="text-lg font-bold <%= adj.increase? ? 'text-green-600' : 'text-red-600' %>">
+                <%= adj.increase? ? '+' : '' %><%= adj.quantity_change %>
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+              <%= adj.quantity_before %> → <%= adj.quantity_after %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <%= adj.adjuster_name %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @adjustments.empty? %>
+      <div class="text-center py-12 text-gray-500">No adjustments found</div>
+    <% end %>
+  </div>
+
+  <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+</div>

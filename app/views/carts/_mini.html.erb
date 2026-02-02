@@ -1,0 +1,30 @@
+<% if cart.empty? %>
+  <p class="text-sm text-gray-500 p-4">Your cart is empty</p>
+<% else %>
+  <div class="p-4 space-y-3 max-h-64 overflow-y-auto">
+    <% cart.cart_items.includes(product_variant: :product).limit(3).each do |item| %>
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-gray-100 rounded flex-shrink-0">
+          <% if item.product_variant.product.images.attached? %>
+            <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover rounded' %>
+          <% end %>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-gray-900 truncate"><%= item.product_variant.product.name %></p>
+          <p class="text-xs text-gray-500">x<%= item.quantity %></p>
+        </div>
+        <p class="text-sm font-medium"><%= format_price(item.total_price) %></p>
+      </div>
+    <% end %>
+    <% if cart.cart_items.count > 3 %>
+      <p class="text-xs text-gray-500 text-center">+ <%= cart.cart_items.count - 3 %> more items</p>
+    <% end %>
+  </div>
+  <div class="border-t p-4">
+    <div class="flex justify-between mb-3">
+      <span class="text-sm text-gray-600">Subtotal</span>
+      <span class="font-semibold"><%= format_price(cart.subtotal) %></span>
+    </div>
+    <%= link_to 'View Cart', cart_path, class: 'block w-full py-2 px-4 bg-indigo-600 text-white text-center text-sm font-medium rounded-md hover:bg-indigo-700' %>
+  </div>
+<% end %>

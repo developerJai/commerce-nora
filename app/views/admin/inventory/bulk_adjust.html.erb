@@ -1,0 +1,82 @@
+<% content_for(:title) { "Bulk Restock" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-4">
+        <h1 class="text-2xl font-bold text-gray-900">Bulk Restock</h1>
+        <%= render 'help_modal' %>
+      </div>
+      <p class="text-sm text-gray-500 mt-1">Quickly restock multiple items that need reordering</p>
+    </div>
+    <%= link_to '← Back to Inventory', admin_inventory_index_path, class: 'text-indigo-600 hover:text-indigo-800' %>
+  </div>
+
+  <% if @variants.any? %>
+    <%= form_with url: create_bulk_adjustment_admin_inventory_index_path, method: :post do |f| %>
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product / Variant</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SKU</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Current Stock</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Reorder Point</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Suggested Qty</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Restock Qty</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <% @variants.each do |variant| %>
+              <tr class="<%= variant.out_of_stock? ? 'bg-red-50' : 'bg-yellow-50' %>">
+                <td class="px-6 py-4">
+                  <div class="flex items-center">
+                    <% if variant.image.attached? %>
+                      <%= image_tag variant.image, class: 'h-10 w-10 rounded object-cover mr-3' %>
+                    <% end %>
+                    <div>
+                      <div class="text-sm font-medium text-gray-900"><%= variant.product.name %></div>
+                      <div class="text-sm text-gray-500"><%= variant.name %></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500"><%= variant.sku %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <span class="text-lg font-bold <%= variant.out_of_stock? ? 'text-red-600' : 'text-yellow-600' %>">
+                    <%= variant.stock_quantity %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                  <%= variant.reorder_point %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                  <%= variant.reorder_quantity %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <%= hidden_field_tag "adjustments[#{variant.id}][reason]", "restock" %>
+                  <%= number_field_tag "adjustments[#{variant.id}][quantity]", variant.reorder_quantity, 
+                      min: 0, 
+                      class: 'w-24 px-3 py-2 border border-gray-300 rounded-md text-center focus:ring-indigo-500 focus:border-indigo-500' %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-3">
+        <%= link_to 'Cancel', admin_inventory_index_path, class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50' %>
+        <%= f.submit 'Restock All', class: 'px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer' %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+      <svg class="mx-auto h-16 w-16 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <h3 class="mt-4 text-lg font-medium text-gray-900">All Stocked Up!</h3>
+      <p class="mt-2 text-gray-500">No items currently need reordering.</p>
+      <%= link_to 'Back to Inventory', admin_inventory_index_path, class: 'mt-4 inline-block text-indigo-600 hover:underline' %>
+    </div>
+  <% end %>
+</div>

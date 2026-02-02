@@ -1,0 +1,72 @@
+<% content_for(:title) { "Reports" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">Reports</h1>
+    
+    <!-- Date Filter -->
+    <%= form_with url: admin_reports_path, method: :get, class: 'flex items-center gap-4' do |f| %>
+      <%= f.date_field :start_date, value: @start_date, class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <span class="text-gray-500">to</span>
+      <%= f.date_field :end_date, value: @end_date, class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <%= f.submit 'Apply', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+    <% end %>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="flex gap-4">
+    <%= link_to 'Sales Report', admin_reports_sales_path(start_date: @start_date, end_date: @end_date), class: 'text-indigo-600 hover:text-indigo-800' %>
+    <%= link_to 'Products Report', admin_reports_products_path(start_date: @start_date, end_date: @end_date), class: 'text-indigo-600 hover:text-indigo-800' %>
+    <%= link_to 'Customers Report', admin_reports_customers_path(start_date: @start_date, end_date: @end_date), class: 'text-indigo-600 hover:text-indigo-800' %>
+  </div>
+
+  <!-- Overview Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <p class="text-sm text-gray-500 mb-1">Total Orders</p>
+      <p class="text-3xl font-bold text-gray-900"><%= @total_orders %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <p class="text-sm text-gray-500 mb-1">Total Revenue</p>
+      <p class="text-3xl font-bold text-gray-900">$<%= number_with_delimiter(@total_revenue.to_f.round(2)) %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <p class="text-sm text-gray-500 mb-1">Avg Order Value</p>
+      <p class="text-3xl font-bold text-gray-900">$<%= number_with_delimiter(@average_order_value.to_f.round(2)) %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <p class="text-sm text-gray-500 mb-1">Date Range</p>
+      <p class="text-lg font-medium text-gray-900"><%= @start_date.strftime('%b %d') %> - <%= @end_date.strftime('%b %d, %Y') %></p>
+    </div>
+  </div>
+
+  <!-- Orders by Status -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Orders by Status</h2>
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <% %w[pending confirmed processing shipped delivered cancelled].each do |status| %>
+        <div class="text-center p-4 bg-gray-50 rounded-lg">
+          <p class="text-2xl font-bold text-gray-900"><%= @orders_by_status[status] || 0 %></p>
+          <p class="text-sm text-gray-500"><%= status.titleize %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Daily Revenue Chart Data -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Daily Revenue</h2>
+    <div class="space-y-2">
+      <% @daily_revenue.sort.reverse.first(10).each do |date, revenue| %>
+        <div class="flex items-center gap-4">
+          <span class="w-24 text-sm text-gray-500"><%= date.strftime('%b %d') %></span>
+          <div class="flex-1 bg-gray-200 rounded-full h-4">
+            <% max_revenue = @daily_revenue.values.max || 1 %>
+            <div class="bg-indigo-600 h-4 rounded-full" style="width: <%= (revenue / max_revenue * 100).round %>%"></div>
+          </div>
+          <span class="w-24 text-right text-sm font-medium text-gray-900">$<%= number_with_delimiter(revenue.to_f.round(2)) %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

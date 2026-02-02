@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900">
+<head>
+  <title><%= content_for(:title) || "Admin Login" %> | Auracraft</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="h-full">
+  <div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+      <h1 class="text-center text-3xl font-bold text-white">Auracraft</h1>
+      <h2 class="mt-2 text-center text-xl text-slate-400">Admin Panel</h2>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div class="bg-white py-8 px-4 shadow-xl sm:rounded-lg sm:px-10">
+        <% if flash[:notice] %>
+          <div class="mb-4 rounded-md bg-green-50 p-4">
+            <p class="text-sm font-medium text-green-800"><%= flash[:notice] %></p>
+          </div>
+        <% end %>
+
+        <% if flash[:alert] %>
+          <div class="mb-4 rounded-md bg-red-50 p-4">
+            <p class="text-sm font-medium text-red-800"><%= flash[:alert] %></p>
+          </div>
+        <% end %>
+
+        <%= yield %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

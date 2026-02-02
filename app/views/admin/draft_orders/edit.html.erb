@@ -1,0 +1,6 @@
+<% content_for(:title) { "Edit Draft Order" } %>
+
+<div class="max-w-4xl">
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">Edit Draft Order - <%= @order.order_number %></h1>
+  <%= render 'form', order: @order %>
+</div>

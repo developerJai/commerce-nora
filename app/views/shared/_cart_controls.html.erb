@@ -1,0 +1,39 @@
+<%# locals: (variant:, cart_item:) %>
+<% in_cart = cart_item.present? && cart_item.quantity > 0 %>
+
+<div id="cart-controls-<%= variant.id %>">
+  <% if variant.out_of_stock? %>
+    <button disabled class="w-full py-2 px-3 bg-gray-100 text-gray-400 text-xs sm:text-sm font-medium rounded-lg cursor-not-allowed">
+      Out of Stock
+    </button>
+  <% elsif in_cart %>
+    <!-- Quantity Controls -->
+    <div class="flex items-center justify-center bg-teal-50 rounded-lg border border-teal-200">
+      <button type="button" 
+              onclick="cartControlUpdate('<%= update_item_cart_path(cart_item) %>', <%= cart_item.quantity - 1 %>)" 
+              class="w-9 h-9 flex items-center justify-center text-teal-600 hover:bg-teal-100 rounded-l-lg transition font-medium text-lg">
+        −
+      </button>
+      <span class="w-10 h-9 flex items-center justify-center text-sm font-semibold text-teal-700">
+        <%= cart_item.quantity %>
+      </span>
+      <button type="button" 
+              onclick="cartControlUpdate('<%= update_item_cart_path(cart_item) %>', <%= cart_item.quantity + 1 %>)"
+              <% if cart_item.quantity >= variant.stock_quantity %>disabled<% end %>
+              class="w-9 h-9 flex items-center justify-center text-teal-600 hover:bg-teal-100 rounded-r-lg transition font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed">
+        +
+      </button>
+    </div>
+    <p class="text-[10px] text-teal-600 text-center mt-1">✓ Added</p>
+  <% else %>
+    <!-- Add to Cart Button -->
+    <button type="button" 
+            onclick="cartControlAdd('<%= add_to_cart_path(variant.id) %>')"
+            class="w-full py-2 px-3 bg-teal-500 hover:bg-teal-600 text-white text-xs sm:text-sm font-medium rounded-lg transition flex items-center justify-center gap-1.5">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      </svg>
+      Add to Cart
+    </button>
+  <% end %>
+</div>

@@ -1,0 +1,179 @@
+<% content_for(:title) { @product.name } %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Breadcrumb -->
+  <nav class="flex mb-8" aria-label="Breadcrumb">
+    <ol class="flex items-center space-x-2 text-sm">
+      <li><%= link_to 'Home', root_path, class: 'text-gray-500 hover:text-gray-700' %></li>
+      <li><span class="text-gray-400">/</span></li>
+      <li><%= link_to 'Products', products_path, class: 'text-gray-500 hover:text-gray-700' %></li>
+      <% if @product.category %>
+        <li><span class="text-gray-400">/</span></li>
+        <li><%= link_to @product.category.name, category_path(@product.category.slug), class: 'text-gray-500 hover:text-gray-700' %></li>
+      <% end %>
+      <li><span class="text-gray-400">/</span></li>
+      <li class="text-gray-900 font-medium truncate max-w-xs"><%= @product.name %></li>
+    </ol>
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <!-- Product Images -->
+    <div>
+      <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
+        <% if @product.images.attached? %>
+          <%= image_tag @product.images.first, id: 'main-image', class: 'w-full h-full object-cover' %>
+        <% else %>
+          <div class="w-full h-full flex items-center justify-center">
+            <svg class="w-24 h-24 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+        <% end %>
+      </div>
+      <% if @product.images.attached? && @product.images.count > 1 %>
+        <div class="grid grid-cols-4 gap-4">
+          <% @product.images.each do |image| %>
+            <button class="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-transparent hover:border-indigo-500 focus:border-indigo-500">
+              <%= image_tag image, class: 'w-full h-full object-cover' %>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Product Info -->
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-4"><%= @product.name %></h1>
+      
+      <% if @product.average_rating > 0 %>
+        <div class="flex items-center gap-2 mb-4">
+          <%= star_rating(@product.average_rating) %>
+          <span class="text-sm text-gray-600">(<%= @product.ratings_count %> reviews)</span>
+        </div>
+      <% end %>
+
+      <% if @product.short_description.present? %>
+        <p class="text-gray-600 mb-6"><%= @product.short_description %></p>
+      <% end %>
+
+      <%= form_with url: add_to_cart_path(@variants.first), method: :post, id: 'add-to-cart-form' do |f| %>
+        <!-- Variants -->
+        <% if @variants.count > 1 %>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-3">Select Option</label>
+            <div class="space-y-2">
+              <% @variants.each_with_index do |variant, index| %>
+                <label class="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:border-indigo-500 <%= index == 0 ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200' %>" data-controller="variant-select">
+                  <div class="flex items-center">
+                    <input type="radio" name="variant_id" value="<%= variant.id %>" class="h-4 w-4 text-indigo-600" <%= 'checked' if index == 0 %>>
+                    <span class="ml-3 font-medium text-gray-900"><%= variant.name %></span>
+                    <% unless variant.in_stock? %>
+                      <span class="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-800 rounded">Out of Stock</span>
+                    <% end %>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-bold text-gray-900"><%= format_price(variant.price) %></span>
+                    <% if variant.on_sale? %>
+                      <span class="block text-sm text-gray-500 line-through"><%= format_price(variant.compare_at_price) %></span>
+                    <% end %>
+                  </div>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        <% else %>
+          <% variant = @variants.first %>
+          <input type="hidden" name="variant_id" value="<%= variant&.id %>">
+          <div class="mb-6">
+            <div class="flex items-baseline gap-3">
+              <span class="text-3xl font-bold text-gray-900"><%= format_price(variant&.price) %></span>
+              <% if variant&.on_sale? %>
+                <span class="text-xl text-gray-500 line-through"><%= format_price(variant.compare_at_price) %></span>
+                <span class="px-2 py-1 bg-red-100 text-red-800 text-sm font-medium rounded">Save <%= variant.discount_percentage %>%</span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Quantity -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+          <select name="quantity" class="w-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+            <% (1..10).each do |n| %>
+              <option value="<%= n %>"><%= n %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <!-- Add to Cart -->
+        <% if @product.in_stock? %>
+          <%= f.submit 'Add to Cart', class: 'w-full py-3 px-6 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition cursor-pointer' %>
+        <% else %>
+          <button disabled class="w-full py-3 px-6 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed">
+            Out of Stock
+          </button>
+        <% end %>
+      <% end %>
+
+      <!-- Description -->
+      <% if @product.description.present? %>
+        <div class="mt-8 pt-8 border-t border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Description</h2>
+          <div class="prose prose-sm text-gray-600">
+            <%= simple_format(@product.description) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <section class="mt-16 pt-8 border-t border-gray-200">
+    <h2 class="text-2xl font-bold text-gray-900 mb-8">Customer Reviews</h2>
+    
+    <% if @reviews.any? %>
+      <div class="space-y-6">
+        <% @reviews.each do |review| %>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <%= star_rating(review.rating) %>
+                  <% if review.title.present? %>
+                    <span class="font-semibold text-gray-900"><%= review.title %></span>
+                  <% end %>
+                </div>
+                <p class="text-sm text-gray-500">
+                  By <%= review.customer_name %> on <%= review.created_at.strftime('%B %d, %Y') %>
+                </p>
+              </div>
+            </div>
+            <% if review.body.present? %>
+              <p class="text-gray-600"><%= review.body %></p>
+            <% end %>
+            <% if review.has_admin_response? %>
+              <div class="mt-4 pl-4 border-l-4 border-indigo-200 bg-indigo-50 p-4 rounded-r">
+                <p class="text-sm font-medium text-indigo-800 mb-1">Response from Auracraft</p>
+                <p class="text-sm text-indigo-700"><%= review.admin_response %></p>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-500">No reviews yet. Be the first to review this product!</p>
+    <% end %>
+  </section>
+
+  <!-- Related Products -->
+  <% if @related_products.any? %>
+    <section class="mt-16 pt-8 border-t border-gray-200">
+      <h2 class="text-2xl font-bold text-gray-900 mb-8">Related Products</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <% @related_products.each do |product| %>
+          <%= render 'shared/product_card', product: product %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

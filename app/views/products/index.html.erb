@@ -1,0 +1,104 @@
+<% content_for(:title) { "Products" } %>
+
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+  <div class="flex flex-col lg:flex-row gap-4 sm:gap-8">
+    <!-- Filters Sidebar -->
+    <aside class="w-full lg:w-64 flex-shrink-0">
+      <!-- Mobile Filter Toggle -->
+      <button type="button" 
+              onclick="document.getElementById('filters-panel').classList.toggle('hidden')"
+              class="lg:hidden w-full flex items-center justify-between px-4 py-3 bg-white rounded-lg shadow-sm mb-4">
+        <span class="font-medium text-gray-900">Filters</span>
+        <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+        </svg>
+      </button>
+      
+      <div id="filters-panel" class="hidden lg:block bg-white rounded-xl shadow-sm p-4 sm:p-6">
+        <h2 class="font-semibold text-gray-900 mb-4">Filters</h2>
+        
+        <%= form_with url: products_path, method: :get, class: 'space-y-4 sm:space-y-6' do |f| %>
+          <!-- Search -->
+          <div>
+            <%= f.label :q, 'Search', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= f.search_field :q, value: @q, placeholder: 'Search products...', class: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500' %>
+          </div>
+
+          <!-- Category -->
+          <div>
+            <%= f.label :category_id, 'Category', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= f.select :category_id, options_from_collection_for_select(@categories, :id, :name, @category_id), 
+                { include_blank: 'All Categories' }, 
+                class: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500' %>
+          </div>
+
+          <!-- Price Range -->
+          <div>
+            <span class="block text-sm font-medium text-gray-700 mb-2">Price Range</span>
+            <div class="flex items-center gap-2">
+              <%= f.number_field :min_price, value: @min_price, placeholder: 'Min', min: 0, 
+                  class: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500' %>
+              <span class="text-gray-500">-</span>
+              <%= f.number_field :max_price, value: @max_price, placeholder: 'Max', min: 0,
+                  class: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500' %>
+            </div>
+          </div>
+
+          <!-- Sort -->
+          <div>
+            <%= f.label :sort, 'Sort By', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= f.select :sort, [
+                ['Newest', 'newest'],
+                ['Price: Low to High', 'price_low'],
+                ['Price: High to Low', 'price_high'],
+                ['Name', 'name'],
+                ['Rating', 'rating']
+              ], { selected: @sort },
+              class: 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500' %>
+          </div>
+
+          <%= f.submit 'Apply Filters', class: 'w-full py-2.5 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer text-sm' %>
+        <% end %>
+
+        <% if @q.present? || @category_id.present? || @min_price.present? || @max_price.present? %>
+          <%= link_to 'Clear Filters', products_path, class: 'block mt-4 text-center text-sm text-indigo-600 hover:text-indigo-800' %>
+        <% end %>
+      </div>
+    </aside>
+
+    <!-- Products Grid -->
+    <div class="flex-1">
+      <div class="flex items-center justify-between mb-4 sm:mb-6">
+        <h1 class="text-lg sm:text-2xl font-bold text-gray-900">
+          <% if @q.present? %>
+            <span class="hidden sm:inline">Search results for "</span><span class="sm:hidden">Results: </span><span class="text-indigo-600"><%= @q %></span><span class="hidden sm:inline">"</span>
+          <% else %>
+            All Products
+          <% end %>
+        </h1>
+        <span class="text-xs sm:text-sm text-gray-500 whitespace-nowrap"><%= @pagy.count %> products</span>
+      </div>
+
+      <% if @products.any? %>
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
+          <% @products.each do |product| %>
+            <%= render 'shared/product_card', product: product %>
+          <% end %>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-6 sm:mt-8">
+          <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+        </div>
+      <% else %>
+        <div class="text-center py-12 sm:py-16 bg-white rounded-xl">
+          <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+          <p class="text-gray-500 text-sm">Try adjusting your search or filters</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

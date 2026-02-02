@@ -1,0 +1,50 @@
+class Customer < ApplicationRecord
+  include SoftDeletable
+  has_secure_password
+
+  has_many :addresses, dependent: :destroy
+  has_many :carts, dependent: :destroy
+  has_many :orders, dependent: :nullify
+  has_many :reviews, dependent: :nullify
+  has_many :support_tickets, dependent: :destroy
+  has_many :ticket_messages, as: :sender, dependent: :nullify
+
+  validates :email, presence: true, uniqueness: { case_sensitive: false },
+            format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :first_name, :last_name, presence: true
+  validates :password, length: { minimum: 8 }, if: -> { new_record? || password.present? }
+
+  before_save :downcase_email
+
+  scope :active, -> { where(active: true) }
+
+  def self.authenticate(email, password)
+    customer = active.find_by(email: email.downcase)
+    customer&.authenticate(password)
+  end
+
+  def full_name
+    "#{first_name} #{last_name}"
+  end
+
+  def active_cart
+    carts.find_by(status: 'active') || carts.create!(token: SecureRandom.uuid)
+  end
+
+  def default_shipping_address
+    addresses.find_by(address_type: 'shipping', is_default: true) ||
+      addresses.find_by(address_type: 'shipping')
+  end
+
+  def default_billing_address
+    addresses.find_by(address_type: 'billing', is_default: true) ||
+      addresses.find_by(address_type: 'billing') ||
+      default_shipping_address
+  end
+
+  private
+
+  def downcase_email
+    self.email = email.downcase
+  end
+end

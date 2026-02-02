@@ -1,0 +1,28 @@
+<% coupon = session[:coupon_id] ? Coupon.find_by(id: session[:coupon_id]) : nil %>
+<% subtotal = cart.subtotal %>
+<% discount = coupon&.calculate_discount(subtotal) || 0 %>
+<% total = subtotal - discount %>
+
+<div class="space-y-2 text-sm">
+  <div class="flex justify-between">
+    <span class="text-gray-500">Subtotal</span>
+    <span class="text-gray-900"><%= format_price(subtotal) %></span>
+  </div>
+  
+  <% if discount > 0 %>
+    <div class="flex justify-between text-teal-600">
+      <span>Discount</span>
+      <span>-<%= format_price(discount) %></span>
+    </div>
+  <% end %>
+  
+  <div class="flex justify-between">
+    <span class="text-gray-500">Shipping</span>
+    <span class="text-gray-400 text-xs">At checkout</span>
+  </div>
+  
+  <div class="border-t border-gray-100 pt-2 mt-2 flex justify-between">
+    <span class="font-semibold text-gray-900">Total</span>
+    <span class="font-bold text-gray-900 text-base"><%= format_price(total) %></span>
+  </div>
+</div>

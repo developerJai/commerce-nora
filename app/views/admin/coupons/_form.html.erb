@@ -1,0 +1,93 @@
+<%= form_with model: [:admin, coupon], class: 'space-y-6' do |f| %>
+  <% if coupon.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <ul class="text-sm text-red-700 list-disc list-inside">
+        <% coupon.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-lg shadow-sm p-6 space-y-6">
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :code, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.text_field :code, required: true, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 uppercase' %>
+      </div>
+      <div>
+        <%= f.label :name, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.text_field :name, required: true, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :description, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+      <%= f.text_area :description, rows: 2, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :discount_type, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.select :discount_type, [['Percentage (%)', 'percentage'], ['Fixed Amount ($)', 'fixed']], {}, 
+            class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+      <div>
+        <%= f.label :discount_value, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.number_field :discount_value, step: 0.01, min: 0, required: true, 
+            class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :minimum_order_amount, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.number_field :minimum_order_amount, step: 0.01, min: 0, 
+            class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+      <div>
+        <%= f.label :maximum_discount, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.number_field :maximum_discount, step: 0.01, min: 0, 
+            class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        <p class="text-xs text-gray-500 mt-1">Max discount for percentage coupons</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :usage_limit, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.number_field :usage_limit, min: 0, 
+            class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        <p class="text-xs text-gray-500 mt-1">Leave blank for unlimited</p>
+      </div>
+      <div>
+        <%= f.label :usage_count, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.number_field :usage_count, min: 0, readonly: true,
+            class: 'w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50' %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :starts_at, 'Start Date', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.datetime_local_field :starts_at, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+      <div>
+        <%= f.label :expires_at, 'Expiry Date', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.datetime_local_field :expires_at, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+    </div>
+
+    <div class="flex items-center">
+      <label class="flex items-center">
+        <%= f.check_box :active, class: 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded' %>
+        <span class="ml-2 text-sm text-gray-700">Active</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to 'Cancel', admin_coupons_path, class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50' %>
+    <%= f.submit 'Save Coupon', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+  </div>
+<% end %>

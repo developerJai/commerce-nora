@@ -1,0 +1,117 @@
+<% content_for(:title) { @customer.full_name } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @customer.full_name %></h1>
+      <p class="text-sm text-gray-500">Customer since <%= @customer.created_at.strftime('%B %Y') %></p>
+    </div>
+    <div class="flex gap-3">
+      <%= button_to @customer.active? ? 'Disable Customer' : 'Enable Customer', toggle_status_admin_customer_path(@customer), 
+          method: :patch, 
+          class: "px-4 py-2 #{@customer.active? ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} text-white rounded-md" %>
+      <%= link_to 'Edit', edit_admin_customer_path(@customer), class: 'px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300' %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Customer Info -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Customer Information</h2>
+      <dl class="space-y-3 text-sm">
+        <div>
+          <dt class="text-gray-500">Email</dt>
+          <dd class="font-medium text-gray-900"><%= @customer.email %></dd>
+        </div>
+        <div>
+          <dt class="text-gray-500">Phone</dt>
+          <dd class="font-medium text-gray-900"><%= @customer.phone.presence || '-' %></dd>
+        </div>
+        <div>
+          <dt class="text-gray-500">Status</dt>
+          <dd>
+            <span class="px-2 py-1 rounded-full text-xs font-medium <%= @customer.active? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+              <%= @customer.active? ? 'Active' : 'Disabled' %>
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-gray-500">Last Login</dt>
+          <dd class="font-medium text-gray-900"><%= @customer.last_login_at&.strftime('%b %d, %Y %I:%M %p') || 'Never' %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Stats -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Statistics</h2>
+      <dl class="space-y-3 text-sm">
+        <div>
+          <dt class="text-gray-500">Total Orders</dt>
+          <dd class="text-2xl font-bold text-gray-900"><%= @customer.orders.placed.count %></dd>
+        </div>
+        <div>
+          <dt class="text-gray-500">Total Spent</dt>
+          <dd class="text-2xl font-bold text-gray-900">$<%= number_with_delimiter(@customer.orders.placed.sum(:total_amount).to_f.round(2)) %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Addresses -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Addresses</h2>
+      <% if @addresses.any? %>
+        <div class="space-y-4">
+          <% @addresses.each do |address| %>
+            <div class="text-sm">
+              <p class="font-medium text-gray-900"><%= address.full_name %></p>
+              <p class="text-gray-600"><%= address.full_address %></p>
+              <% if address.is_default? %>
+                <span class="text-xs text-indigo-600">Default</span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-gray-500 text-sm">No addresses on file</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Orders -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">Recent Orders</h2>
+    </div>
+    <% if @orders.any? %>
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% @orders.each do |order| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= order.order_number %></td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full <%= order_status_class(order.status) %>"><%= order.status.titleize %></span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$<%= order.total_amount %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= order.placed_at&.strftime('%b %d, %Y') %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <%= link_to 'View', admin_order_path(order), class: 'text-indigo-600 hover:text-indigo-900' %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="px-6 py-8 text-center text-gray-500">No orders yet</p>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,88 @@
+<% content_for(:title) { "Reviews" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">Reviews</h1>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <%= form_with url: admin_reviews_path, method: :get, class: 'flex gap-4' do |f| %>
+      <%= f.select :status, [['All', ''], ['Pending', 'pending'], ['Approved', 'approved']], 
+          { selected: params[:status] },
+          class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <%= f.submit 'Filter', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Review</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @reviews.each do |review| %>
+          <tr id="<%= dom_id(review) %>">
+            <td class="px-6 py-4">
+              <div class="flex items-center">
+                <% if review.product.images.attached? %>
+                  <%= image_tag review.product.images.first, class: 'h-10 w-10 rounded object-cover mr-3' %>
+                <% end %>
+                <div>
+                  <div class="text-sm font-medium text-gray-900"><%= review.product.name %></div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <%= review.customer_name %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <% review.rating.times do %>
+                  <svg class="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                <% end %>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <% if review.title.present? %>
+                <div class="text-sm font-medium text-gray-900"><%= review.title %></div>
+              <% end %>
+              <div class="text-sm text-gray-500 max-w-xs truncate"><%= review.body %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 py-1 text-xs font-medium rounded-full <%= review.approved? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                <%= review.approved? ? 'Approved' : 'Pending' %>
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+              <% unless review.approved? %>
+                <%= button_to 'Approve', approve_admin_review_path(review), method: :patch, 
+                    class: 'text-green-600 hover:text-green-900 mr-2',
+                    form: { data: { turbo_frame: dom_id(review) } } %>
+              <% end %>
+              <% if review.approved? %>
+                <%= button_to 'Reject', reject_admin_review_path(review), method: :patch, 
+                    class: 'text-yellow-600 hover:text-yellow-900 mr-2',
+                    form: { data: { turbo_frame: dom_id(review) } } %>
+              <% end %>
+              <%= button_to 'Delete', admin_review_path(review), method: :delete, 
+                  class: 'text-red-600 hover:text-red-900',
+                  form: { data: { turbo_confirm: 'Are you sure you want to delete this review?' } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+</div>

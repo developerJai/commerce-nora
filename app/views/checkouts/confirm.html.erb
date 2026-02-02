@@ -1,0 +1,94 @@
+<% content_for(:title) { "Confirm Order" } %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-8">Review Your Order</h1>
+
+  <%= form_with url: checkout_path, method: :post do |f| %>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Shipping Address -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-900">Shipping Address</h2>
+            <%= link_to 'Change', address_checkout_path, class: 'text-sm text-indigo-600 hover:text-indigo-800' %>
+          </div>
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="font-medium text-gray-900"><%= @address.full_name %></p>
+            <p class="text-gray-600"><%= @address.full_address %></p>
+            <% if @address.phone.present? %>
+              <p class="text-gray-600"><%= @address.phone %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Items</h2>
+          <ul class="divide-y divide-gray-200">
+            <% @cart.cart_items.each do |item| %>
+              <li class="py-4 flex items-center gap-4">
+                <div class="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                  <% if item.product_variant.product.images.attached? %>
+                    <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
+                  <% end %>
+                </div>
+                <div class="flex-1">
+                  <p class="font-medium text-gray-900"><%= item.product_variant.product.name %></p>
+                  <p class="text-sm text-gray-500"><%= item.product_variant.name %> x <%= item.quantity %></p>
+                </div>
+                <p class="font-medium text-gray-900"><%= format_price(item.total_price) %></p>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+
+        <!-- Order Notes -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Notes (Optional)</h2>
+          <%= f.text_area :notes, rows: 3, placeholder: 'Any special instructions for your order...', 
+              class: 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent' %>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-sm p-6 sticky top-24">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+          
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Subtotal</span>
+              <span><%= format_price(@subtotal) %></span>
+            </div>
+            <% if @discount > 0 %>
+              <div class="flex justify-between text-green-600">
+                <span>Discount (<%= @coupon.code %>)</span>
+                <span>-<%= format_price(@discount) %></span>
+              </div>
+            <% end %>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Shipping</span>
+              <span>Free</span>
+            </div>
+            <div class="border-t border-gray-200 pt-2 flex justify-between text-lg font-semibold">
+              <span>Total</span>
+              <span><%= format_price(@total) %></span>
+            </div>
+          </div>
+
+          <div class="mt-6 p-4 bg-yellow-50 rounded-lg">
+            <p class="text-sm text-yellow-800">
+              <strong>Cash on Delivery:</strong> Pay when you receive your order
+            </p>
+          </div>
+
+          <%= f.submit 'Place Order', class: 'mt-6 w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition cursor-pointer' %>
+          
+          <p class="mt-4 text-xs text-gray-500 text-center">
+            By placing this order, you agree to our Terms of Service and Privacy Policy
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

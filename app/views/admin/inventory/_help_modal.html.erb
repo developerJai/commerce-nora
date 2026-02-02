@@ -1,0 +1,476 @@
+<!-- Help Modal -->
+<div data-controller="modal" class="inline-block">
+  <button type="button" 
+          data-action="click->modal#open" 
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition">
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    How Inventory Works
+  </button>
+
+  <!-- Modal Backdrop -->
+  <div data-modal-target="backdrop" 
+       data-action="click->modal#close"
+       class="hidden fixed inset-0 bg-gray-900/50 z-50 transition-opacity"></div>
+
+  <!-- Modal Content -->
+  <div data-modal-target="dialog" 
+       class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex min-h-full items-center justify-center p-4">
+      <div class="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden" 
+           data-action="click->modal#stopPropagation">
+        
+        <!-- Header -->
+        <div class="sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-white">Inventory Management Guide</h2>
+            <p class="text-indigo-200 text-sm">Complete manual for managing your stock</p>
+          </div>
+          <button data-action="click->modal#close" class="text-white/80 hover:text-white">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div class="overflow-y-auto max-h-[calc(90vh-80px)] p-6">
+          
+          <!-- Table of Contents -->
+          <div class="bg-gray-50 rounded-xl p-4 mb-8">
+            <h3 class="font-semibold text-gray-900 mb-3">Quick Navigation</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+              <a href="#stock-levels" class="text-indigo-600 hover:underline">→ Stock Levels</a>
+              <a href="#auto-calculations" class="text-indigo-600 hover:underline">→ Auto Calculations</a>
+              <a href="#manual-adjustments" class="text-indigo-600 hover:underline">→ Manual Adjustments</a>
+              <a href="#reorder-process" class="text-indigo-600 hover:underline">→ Reorder Process</a>
+              <a href="#bulk-restock" class="text-indigo-600 hover:underline">→ Bulk Restock</a>
+              <a href="#adjustment-reasons" class="text-indigo-600 hover:underline">→ Adjustment Reasons</a>
+              <a href="#reports" class="text-indigo-600 hover:underline">→ Reports</a>
+              <a href="#best-practices" class="text-indigo-600 hover:underline">→ Best Practices</a>
+            </div>
+          </div>
+
+          <!-- Section 1: Stock Levels -->
+          <section id="stock-levels" class="mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+              Understanding Stock Levels
+            </h3>
+            
+            <div class="space-y-4">
+              <p class="text-gray-600">Each product variant has a stock status based on its current quantity and reorder point:</p>
+              
+              <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">In Stock</span>
+                  </div>
+                  <p class="text-sm text-green-800">Stock quantity is above the reorder point. No action needed.</p>
+                  <p class="text-xs text-green-600 mt-2">Example: Stock = 50, Reorder Point = 10</p>
+                </div>
+                
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Low Stock</span>
+                  </div>
+                  <p class="text-sm text-yellow-800">Stock is at or below reorder point but not zero. Consider reordering soon.</p>
+                  <p class="text-xs text-yellow-600 mt-2">Example: Stock = 8, Reorder Point = 10</p>
+                </div>
+                
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">Out of Stock</span>
+                  </div>
+                  <p class="text-sm text-red-800">Stock is zero. Customers cannot purchase this item. Urgent reorder needed!</p>
+                  <p class="text-xs text-red-600 mt-2">Example: Stock = 0</p>
+                </div>
+              </div>
+
+              <div class="bg-blue-50 rounded-lg p-4 mt-4">
+                <h4 class="font-medium text-blue-900 mb-2">📊 Key Settings Per Variant</h4>
+                <table class="w-full text-sm">
+                  <tr class="border-b border-blue-200">
+                    <td class="py-2 font-medium text-blue-800">Reorder Point</td>
+                    <td class="py-2 text-blue-700">When stock reaches this level, item appears in "Needs Reorder" list (Default: 10)</td>
+                  </tr>
+                  <tr class="border-b border-blue-200">
+                    <td class="py-2 font-medium text-blue-800">Reorder Quantity</td>
+                    <td class="py-2 text-blue-700">Suggested quantity to order when restocking (Default: 50)</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 font-medium text-blue-800">Track Inventory</td>
+                    <td class="py-2 text-blue-700">Whether this variant's stock should be tracked (Default: Yes)</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 2: Auto Calculations -->
+          <section id="auto-calculations" class="mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+              Automatic Stock Calculations
+            </h3>
+            
+            <p class="text-gray-600 mb-4">The system automatically adjusts stock levels in these situations:</p>
+            
+            <div class="space-y-4">
+              <div class="border rounded-lg overflow-hidden">
+                <div class="bg-gray-50 px-4 py-3 border-b">
+                  <h4 class="font-semibold text-gray-900">🛒 When Order is Placed</h4>
+                </div>
+                <div class="p-4">
+                  <div class="flex items-center gap-4 text-sm">
+                    <div class="flex-1">
+                      <p class="text-gray-600">When a customer places an order, stock is automatically decremented for each item.</p>
+                    </div>
+                    <div class="bg-red-50 text-red-700 px-3 py-2 rounded font-mono text-sm">
+                      Stock: 50 → 48 (-2)
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-2">Reason recorded: "Sale"</p>
+                </div>
+              </div>
+
+              <div class="border rounded-lg overflow-hidden">
+                <div class="bg-gray-50 px-4 py-3 border-b">
+                  <h4 class="font-semibold text-gray-900">↩️ When Order is Cancelled</h4>
+                </div>
+                <div class="p-4">
+                  <div class="flex items-center gap-4 text-sm">
+                    <div class="flex-1">
+                      <p class="text-gray-600">When an order is cancelled (before shipping), stock is automatically restored.</p>
+                    </div>
+                    <div class="bg-green-50 text-green-700 px-3 py-2 rounded font-mono text-sm">
+                      Stock: 48 → 50 (+2)
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-2">Reason recorded: "Order Cancelled"</p>
+                </div>
+              </div>
+
+              <div class="border rounded-lg overflow-hidden">
+                <div class="bg-gray-50 px-4 py-3 border-b">
+                  <h4 class="font-semibold text-gray-900">📦 When Return is Processed</h4>
+                </div>
+                <div class="p-4">
+                  <div class="flex items-center gap-4 text-sm">
+                    <div class="flex-1">
+                      <p class="text-gray-600">When a customer return is processed, stock is automatically incremented.</p>
+                    </div>
+                    <div class="bg-green-50 text-green-700 px-3 py-2 rounded font-mono text-sm">
+                      Stock: 48 → 49 (+1)
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-2">Reason recorded: "Customer Return"</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-amber-50 rounded-lg p-4 mt-4">
+              <div class="flex gap-3">
+                <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <div>
+                  <h4 class="font-medium text-amber-800">Important Note</h4>
+                  <p class="text-sm text-amber-700">All automatic adjustments are recorded in the adjustment history with timestamps, so you can always audit stock changes.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 3: Manual Adjustments -->
+          <section id="manual-adjustments" class="mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              Manual Stock Adjustments
+            </h3>
+            
+            <p class="text-gray-600 mb-4">You can manually adjust stock for various reasons:</p>
+            
+            <div class="bg-white border rounded-lg p-4 mb-4">
+              <h4 class="font-semibold text-gray-900 mb-3">Steps to Adjust Stock:</h4>
+              <ol class="space-y-3 text-sm">
+                <li class="flex gap-3">
+                  <span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs flex-shrink-0">1</span>
+                  <span>Go to <strong>Inventory</strong> in the admin sidebar</span>
+                </li>
+                <li class="flex gap-3">
+                  <span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs flex-shrink-0">2</span>
+                  <span>Find the product variant and click <strong>"Adjust"</strong></span>
+                </li>
+                <li class="flex gap-3">
+                  <span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs flex-shrink-0">3</span>
+                  <span>Select the <strong>reason</strong> for adjustment</span>
+                </li>
+                <li class="flex gap-3">
+                  <span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs flex-shrink-0">4</span>
+                  <span>Enter the quantity: <strong>positive (+)</strong> to add stock, <strong>negative (-)</strong> to remove</span>
+                </li>
+                <li class="flex gap-3">
+                  <span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs flex-shrink-0">5</span>
+                  <span>Add notes explaining the adjustment (recommended)</span>
+                </li>
+                <li class="flex gap-3">
+                  <span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs flex-shrink-0">6</span>
+                  <span>Click <strong>"Save Adjustment"</strong></span>
+                </li>
+              </ol>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h5 class="font-medium text-green-800 mb-2">➕ Adding Stock</h5>
+                <code class="text-sm bg-white px-2 py-1 rounded">Quantity: +50</code>
+                <p class="text-sm text-green-700 mt-2">Increases stock by 50 units</p>
+              </div>
+              <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <h5 class="font-medium text-red-800 mb-2">➖ Removing Stock</h5>
+                <code class="text-sm bg-white px-2 py-1 rounded">Quantity: -10</code>
+                <p class="text-sm text-red-700 mt-2">Decreases stock by 10 units</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 4: Reorder Process -->
+          <section id="reorder-process" class="mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">4</span>
+              Stock Refill / Reorder Process
+            </h3>
+            
+            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-4">
+              <h4 class="font-semibold text-gray-900 mb-4">📋 Complete Reorder Workflow</h4>
+              
+              <div class="space-y-4">
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm flex-shrink-0">
+                    <span class="text-indigo-600 font-bold">1</span>
+                  </div>
+                  <div>
+                    <h5 class="font-medium text-gray-900">Monitor Stock Levels</h5>
+                    <p class="text-sm text-gray-600">Check the "Needs Reorder" count on the inventory dashboard regularly. Items appear here when stock ≤ reorder point.</p>
+                  </div>
+                </div>
+
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm flex-shrink-0">
+                    <span class="text-indigo-600 font-bold">2</span>
+                  </div>
+                  <div>
+                    <h5 class="font-medium text-gray-900">Generate Reorder Report</h5>
+                    <p class="text-sm text-gray-600">Click "Reorder Report" to see all items needing restock. Download CSV to share with suppliers.</p>
+                  </div>
+                </div>
+
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm flex-shrink-0">
+                    <span class="text-indigo-600 font-bold">3</span>
+                  </div>
+                  <div>
+                    <h5 class="font-medium text-gray-900">Place Order with Supplier</h5>
+                    <p class="text-sm text-gray-600">Use the suggested quantities from the report. Adjust based on lead times and seasonal demand.</p>
+                  </div>
+                </div>
+
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm flex-shrink-0">
+                    <span class="text-indigo-600 font-bold">4</span>
+                  </div>
+                  <div>
+                    <h5 class="font-medium text-gray-900">Receive Shipment</h5>
+                    <p class="text-sm text-gray-600">When stock arrives, verify quantities match your purchase order.</p>
+                  </div>
+                </div>
+
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm flex-shrink-0">
+                    <span class="text-indigo-600 font-bold">5</span>
+                  </div>
+                  <div>
+                    <h5 class="font-medium text-gray-900">Update Inventory</h5>
+                    <p class="text-sm text-gray-600">Use "Bulk Restock" to quickly add received quantities. Include PO number in notes for tracking.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-blue-50 rounded-lg p-4">
+              <h4 class="font-medium text-blue-900 mb-2">💡 Pro Tip: Reorder Point Formula</h4>
+              <p class="text-sm text-blue-800 mb-2">Calculate your ideal reorder point:</p>
+              <code class="block bg-white p-3 rounded text-sm">
+                Reorder Point = (Daily Sales × Lead Time) + Safety Stock
+              </code>
+              <p class="text-xs text-blue-600 mt-2">Example: Sell 5/day × 7 days lead time + 10 safety = Reorder at 45 units</p>
+            </div>
+          </section>
+
+          <!-- Section 5: Bulk Restock -->
+          <section id="bulk-restock" class="mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">5</span>
+              Bulk Restock Feature
+            </h3>
+            
+            <p class="text-gray-600 mb-4">Quickly restock multiple items at once when receiving a shipment:</p>
+            
+            <div class="border rounded-lg overflow-hidden">
+              <div class="bg-gray-50 px-4 py-3 border-b">
+                <h4 class="font-semibold text-gray-900">How to Use Bulk Restock</h4>
+              </div>
+              <div class="p-4 space-y-3 text-sm">
+                <p>1. Go to <strong>Inventory → Bulk Restock</strong></p>
+                <p>2. You'll see all items that need reordering</p>
+                <p>3. Each item shows the <strong>suggested reorder quantity</strong> (pre-filled)</p>
+                <p>4. Adjust quantities as needed based on what you actually received</p>
+                <p>5. Click <strong>"Restock All"</strong> to update all items at once</p>
+              </div>
+            </div>
+
+            <div class="mt-4 p-4 bg-gray-100 rounded-lg">
+              <p class="text-sm text-gray-600">
+                <strong>Note:</strong> If no items need reordering, the bulk restock page will show a success message indicating all stock levels are healthy.
+              </p>
+            </div>
+          </section>
+
+          <!-- Section 6: Adjustment Reasons -->
+          <section id="adjustment-reasons" class="mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">6</span>
+              Adjustment Reasons Reference
+            </h3>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="px-4 py-3 text-left font-medium text-gray-900">Reason</th>
+                    <th class="px-4 py-3 text-left font-medium text-gray-900">When to Use</th>
+                    <th class="px-4 py-3 text-center font-medium text-gray-900">Direction</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y">
+                  <tr>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Restock</span></td>
+                    <td class="px-4 py-3 text-gray-600">Receiving new inventory from supplier</td>
+                    <td class="px-4 py-3 text-center text-green-600 font-medium">+ Add</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Sale</span></td>
+                    <td class="px-4 py-3 text-gray-600">Customer purchase (auto-recorded)</td>
+                    <td class="px-4 py-3 text-center text-red-600 font-medium">- Remove</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Return</span></td>
+                    <td class="px-4 py-3 text-gray-600">Customer returned item in sellable condition</td>
+                    <td class="px-4 py-3 text-center text-green-600 font-medium">+ Add</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Damage</span></td>
+                    <td class="px-4 py-3 text-gray-600">Product damaged, cannot be sold</td>
+                    <td class="px-4 py-3 text-center text-red-600 font-medium">- Remove</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Loss</span></td>
+                    <td class="px-4 py-3 text-gray-600">Product lost or stolen</td>
+                    <td class="px-4 py-3 text-center text-red-600 font-medium">- Remove</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Correction</span></td>
+                    <td class="px-4 py-3 text-gray-600">Physical count differs from system</td>
+                    <td class="px-4 py-3 text-center text-gray-600 font-medium">+/- Either</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">Initial</span></td>
+                    <td class="px-4 py-3 text-gray-600">Setting initial stock for new products</td>
+                    <td class="px-4 py-3 text-center text-green-600 font-medium">+ Add</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">Transfer</span></td>
+                    <td class="px-4 py-3 text-gray-600">Moving stock between locations</td>
+                    <td class="px-4 py-3 text-center text-gray-600 font-medium">+/- Either</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Section 7: Reports -->
+          <section id="reports" class="mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">7</span>
+              Available Reports
+            </h3>
+            
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="border rounded-lg p-4">
+                <h4 class="font-semibold text-gray-900 mb-2">📊 Reorder Report</h4>
+                <p class="text-sm text-gray-600 mb-3">Lists all items below reorder point with suggested quantities.</p>
+                <ul class="text-xs text-gray-500 space-y-1">
+                  <li>• Download as CSV for suppliers</li>
+                  <li>• Shows SKU, current stock, reorder qty</li>
+                  <li>• Estimated cost calculations</li>
+                </ul>
+              </div>
+              
+              <div class="border rounded-lg p-4">
+                <h4 class="font-semibold text-gray-900 mb-2">📜 Adjustment History</h4>
+                <p class="text-sm text-gray-600 mb-3">Complete audit trail of all stock changes.</p>
+                <ul class="text-xs text-gray-500 space-y-1">
+                  <li>• Filter by reason type</li>
+                  <li>• Filter by specific product</li>
+                  <li>• Shows who made each change</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 8: Best Practices -->
+          <section id="best-practices" class="mb-4">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">8</span>
+              Best Practices
+            </h3>
+            
+            <div class="space-y-3">
+              <div class="flex gap-3 p-3 bg-green-50 rounded-lg">
+                <span class="text-green-600">✓</span>
+                <p class="text-sm text-green-800"><strong>Regular Audits:</strong> Perform physical inventory counts monthly and use "Correction" adjustments for discrepancies.</p>
+              </div>
+              <div class="flex gap-3 p-3 bg-green-50 rounded-lg">
+                <span class="text-green-600">✓</span>
+                <p class="text-sm text-green-800"><strong>Add Notes:</strong> Always add notes to adjustments explaining why, e.g., "PO #12345" or "Damaged in shipping".</p>
+              </div>
+              <div class="flex gap-3 p-3 bg-green-50 rounded-lg">
+                <span class="text-green-600">✓</span>
+                <p class="text-sm text-green-800"><strong>Set Proper Reorder Points:</strong> Adjust based on your actual sales velocity and supplier lead times.</p>
+              </div>
+              <div class="flex gap-3 p-3 bg-green-50 rounded-lg">
+                <span class="text-green-600">✓</span>
+                <p class="text-sm text-green-800"><strong>Monitor Dashboard:</strong> Check the inventory dashboard daily for out-of-stock alerts.</p>
+              </div>
+              <div class="flex gap-3 p-3 bg-red-50 rounded-lg">
+                <span class="text-red-600">✗</span>
+                <p class="text-sm text-red-800"><strong>Avoid:</strong> Never make adjustments without selecting the proper reason - this helps with accurate reporting.</p>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="sticky bottom-0 bg-gray-50 px-6 py-4 border-t flex justify-end">
+          <button data-action="click->modal#close" 
+                  class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+            Got it, thanks!
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

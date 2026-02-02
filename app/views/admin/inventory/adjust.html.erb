@@ -1,0 +1,91 @@
+<% content_for(:title) { "Adjust Stock" } %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6 flex items-center justify-between">
+    <%= link_to '← Back to Inventory', admin_inventory_index_path, class: 'text-indigo-600 hover:text-indigo-800' %>
+    <%= render 'help_modal' %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Adjust Stock</h1>
+
+    <!-- Product Info -->
+    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg mb-6">
+      <% if @variant.image.attached? %>
+        <%= image_tag @variant.image, class: 'h-16 w-16 rounded object-cover' %>
+      <% elsif @variant.product.images.attached? %>
+        <%= image_tag @variant.product.images.first, class: 'h-16 w-16 rounded object-cover' %>
+      <% end %>
+      <div>
+        <h2 class="font-medium text-gray-900"><%= @variant.product.name %></h2>
+        <p class="text-sm text-gray-500"><%= @variant.name %></p>
+        <p class="text-sm font-mono text-gray-500">SKU: <%= @variant.sku %></p>
+      </div>
+      <div class="ml-auto text-right">
+        <p class="text-sm text-gray-500">Current Stock</p>
+        <p class="text-3xl font-bold <%= @variant.out_of_stock? ? 'text-red-600' : @variant.low_stock? ? 'text-yellow-600' : 'text-gray-900' %>">
+          <%= @variant.stock_quantity %>
+        </p>
+      </div>
+    </div>
+
+    <%= form_with url: create_adjustment_admin_inventory_path(@variant), method: :post, class: 'space-y-6' do |f| %>
+      <div>
+        <%= f.label :reason, 'Reason for Adjustment', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.select :reason, StockAdjustment::REASONS.map { |k, v| [v, k] }, {},
+            class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+
+      <div>
+        <%= f.label :quantity_change, 'Quantity Change', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <div class="flex items-center gap-4">
+          <div class="flex-1">
+            <%= f.number_field :quantity_change, required: true, placeholder: 'e.g., 50 or -10',
+                class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-lg' %>
+          </div>
+          <div class="text-sm text-gray-500">
+            <p>+ for adding stock</p>
+            <p>- for removing stock</p>
+          </div>
+        </div>
+        <p class="mt-1 text-xs text-gray-500">Enter a positive number to add stock, negative to remove</p>
+      </div>
+
+      <div>
+        <%= f.label :notes, 'Notes (optional)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.text_area :notes, rows: 3, placeholder: 'Add any additional notes about this adjustment...',
+            class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+
+      <div class="pt-4 border-t flex justify-end gap-3">
+        <%= link_to 'Cancel', admin_inventory_index_path, class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50' %>
+        <%= f.submit 'Save Adjustment', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Recent Adjustments for this variant -->
+  <div class="mt-6 bg-white rounded-lg shadow-sm p-6">
+    <h3 class="font-medium text-gray-900 mb-4">Recent Adjustments</h3>
+    <% recent = @variant.stock_adjustments.recent.limit(5) %>
+    <% if recent.any? %>
+      <div class="space-y-3">
+        <% recent.each do |adj| %>
+          <div class="flex items-center justify-between text-sm">
+            <div>
+              <span class="<%= adj.increase? ? 'text-green-600' : 'text-red-600' %> font-medium">
+                <%= adj.increase? ? '+' : '' %><%= adj.quantity_change %>
+              </span>
+              <span class="text-gray-500 ml-2"><%= adj.reason_label %></span>
+            </div>
+            <div class="text-gray-400">
+              <%= adj.created_at.strftime('%b %d, %Y %I:%M %p') %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-sm text-gray-500">No adjustments recorded yet</p>
+    <% end %>
+  </div>
+</div>
