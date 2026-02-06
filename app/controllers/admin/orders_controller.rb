@@ -1,18 +1,16 @@
 module Admin
   class OrdersController < BaseController
-    include Pagy::Backend
-
     before_action :set_order, only: [:show, :edit, :update, :confirm, :process_order, :ship, :deliver, :cancel]
 
     def index
       @status = params[:status]
       orders = Order.placed.includes(:customer).recent
       orders = orders.by_status(@status) if @status.present?
-      @pagy, @orders = pagy(orders, items: 20)
+      @pagy, @orders = pagy(orders, limit: 20)
     end
 
     def drafts
-      @pagy, @orders = pagy(Order.draft.includes(:customer).recent, items: 20)
+      @pagy, @orders = pagy(Order.draft.includes(:customer).recent, limit: 20)
     end
 
     def show

@@ -4,19 +4,23 @@ export default class extends Controller {
   static targets = ["min", "max", "minInput", "maxInput", "minLabel", "maxLabel"]
 
   connect() {
-    // Initialize without triggering change event
-    this.sync(null, true)
+    // Initialize labels and hidden fields without triggering form submission
+    this.update()
   }
 
   activateMin() {
-    this.updateThumbOrder(this.minTarget)
+    this.minTarget.classList.add("z-20")
+    this.maxTarget.classList.remove("z-20")
   }
 
   activateMax() {
-    this.updateThumbOrder(this.maxTarget)
+    this.maxTarget.classList.add("z-20")
+    this.minTarget.classList.remove("z-20")
   }
 
-  sync(event, skipDispatch = false) {
+  // Called on input (while dragging) – updates labels and hidden fields visually only.
+  // Does NOT dispatch any event, so the form will not auto-submit mid-drag.
+  update() {
     const min = parseFloat(this.minTarget.value)
     const max = parseFloat(this.maxTarget.value)
 
@@ -26,41 +30,32 @@ export default class extends Controller {
     this.minTarget.value = clampedMin
     this.maxTarget.value = clampedMax
 
-    this.updateThumbOrder(event?.target, clampedMin, clampedMax)
-
-    if (this.hasMinInputTarget) this.minInputTarget.value = clampedMin
-    if (this.hasMaxInputTarget) this.maxInputTarget.value = clampedMax
-
     if (this.hasMinLabelTarget) this.minLabelTarget.textContent = this.format(clampedMin)
     if (this.hasMaxLabelTarget) this.maxLabelTarget.textContent = this.format(clampedMax)
 
-    // Only dispatch change event on user interaction, not on initial connect
-    if (!skipDispatch) {
-      this.element.dispatchEvent(new Event("change", { bubbles: true }))
+    // Only populate hidden fields when the user has narrowed the range
+    // from the full catalog bounds. When at the extremes, leave blank
+    // so no price filter param is sent to the backend.
+    const catalogMin = parseFloat(this.minTarget.min)
+    const catalogMax = parseFloat(this.maxTarget.max)
+
+    if (this.hasMinInputTarget) {
+      this.minInputTarget.value = (clampedMin > catalogMin) ? clampedMin : ''
+    }
+    if (this.hasMaxInputTarget) {
+      this.maxInputTarget.value = (clampedMax < catalogMax) ? clampedMax : ''
     }
   }
 
-  updateThumbOrder(activeTarget, clampedMin = null, clampedMax = null) {
-    this.minTarget.classList.remove("z-20")
-    this.maxTarget.classList.remove("z-20")
-
-    if (activeTarget === this.minTarget) {
-      this.minTarget.classList.add("z-20")
-    } else if (activeTarget === this.maxTarget) {
-      this.maxTarget.classList.add("z-20")
-    } else {
-      const minVal = clampedMin ?? parseFloat(this.minTarget.value)
-      const maxVal = clampedMax ?? parseFloat(this.maxTarget.value)
-      if (minVal >= maxVal - 1) {
-        this.minTarget.classList.add("z-20")
-      } else {
-        this.maxTarget.classList.add("z-20")
-      }
-    }
+  // Called on change (mouseup / touchend) – syncs final values, then the
+  // native change event continues to bubble up to the form where the
+  // filters controller picks it up and schedules a submit.
+  commit() {
+    this.update()
   }
 
   format(value) {
     const rounded = Math.round(value)
-    return `$${rounded.toLocaleString()}`
+    return `₹${rounded.toLocaleString('en-IN')}`
   }
 }

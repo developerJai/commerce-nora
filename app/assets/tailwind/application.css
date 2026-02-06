@@ -52,16 +52,70 @@ input:focus, select:focus, textarea:focus {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Dual-range price slider */
+.range-slider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  transform: translateY(-50%);
+  background: #d6d3d1;
+  border-radius: 9999px;
+}
+
 .range-slider input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
   pointer-events: none;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  z-index: 2;
+}
+
+.range-slider input[type="range"],
+.range-slider input[type="range"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.range-slider input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
 }
 
 .range-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
   pointer-events: auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #9f1239;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  margin-top: -8px;
+  position: relative;
+}
+
+.range-slider input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: transparent;
+  border: none;
 }
 
 .range-slider input[type="range"]::-moz-range-thumb {
   pointer-events: auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #9f1239;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
 }
 
 /* Cart and Wishlist Badge Animations */

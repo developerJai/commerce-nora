@@ -46,7 +46,7 @@
     </div>
 
     <div class="mt-8">
-      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+      <%== @pagy.series_nav if @pagy.last > 1 %>
     </div>
   <% else %>
     <div class="text-center py-12 sm:py-16 bg-white rounded-xl border border-stone-200">

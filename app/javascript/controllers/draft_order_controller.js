@@ -85,7 +85,7 @@ export default class extends Controller {
       if (type === 'percentage') {
         info = `${value}% off your order`
       } else {
-        info = `$${value.toFixed(2)} off your order`
+        info = `₹${value.toFixed(2)} off your order`
       }
       
       if (this.hasCouponInfoTarget) {
@@ -167,9 +167,9 @@ export default class extends Controller {
   }
   
   formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR'
     }).format(amount)
   }
 }

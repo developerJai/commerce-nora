@@ -55,7 +55,7 @@
                 <%= order.payment_status.titleize %>
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">$<%= number_with_delimiter(order.total_amount.to_f.round(2)) %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= format_price(order.total_amount.to_f.round(2)) %></td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= order.placed_at&.strftime('%b %d, %Y') %></td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <%= link_to 'View', admin_order_path(order), class: 'text-indigo-600 hover:text-indigo-900' %>
@@ -66,5 +66,5 @@
     </table>
   </div>
 
-  <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+  <%== @pagy.series_nav if @pagy.last > 1 %>
 </div>

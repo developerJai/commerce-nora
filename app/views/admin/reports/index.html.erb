@@ -28,11 +28,11 @@
     </div>
     <div class="bg-white rounded-lg shadow-sm p-6">
       <p class="text-sm text-gray-500 mb-1">Total Revenue</p>
-      <p class="text-3xl font-bold text-gray-900">$<%= number_with_delimiter(@total_revenue.to_f.round(2)) %></p>
+      <p class="text-3xl font-bold text-gray-900"><%= format_price(@total_revenue.to_f.round(2)) %></p>
     </div>
     <div class="bg-white rounded-lg shadow-sm p-6">
       <p class="text-sm text-gray-500 mb-1">Avg Order Value</p>
-      <p class="text-3xl font-bold text-gray-900">$<%= number_with_delimiter(@average_order_value.to_f.round(2)) %></p>
+      <p class="text-3xl font-bold text-gray-900"><%= format_price(@average_order_value.to_f.round(2)) %></p>
     </div>
     <div class="bg-white rounded-lg shadow-sm p-6">
       <p class="text-sm text-gray-500 mb-1">Date Range</p>
@@ -64,7 +64,7 @@
             <% max_revenue = @daily_revenue.values.max || 1 %>
             <div class="bg-indigo-600 h-4 rounded-full" style="width: <%= (revenue / max_revenue * 100).round %>%"></div>
           </div>
-          <span class="w-24 text-right text-sm font-medium text-gray-900">$<%= number_with_delimiter(revenue.to_f.round(2)) %></span>
+          <span class="w-24 text-right text-sm font-medium text-gray-900"><%= format_price(revenue.to_f.round(2)) %></span>
         </div>
       <% end %>
     </div>

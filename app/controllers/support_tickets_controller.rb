@@ -3,7 +3,7 @@ class SupportTicketsController < ApplicationController
   before_action :set_ticket, only: [:show]
 
   def index
-    @pagy, @tickets = pagy(current_customer.support_tickets.recent.includes(:order), items: 10)
+    @pagy, @tickets = pagy(current_customer.support_tickets.recent.includes(:order), limit: 10)
   end
 
   def show

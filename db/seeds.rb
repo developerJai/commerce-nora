@@ -216,8 +216,8 @@ Coupon.find_or_create_by!(code: 'WELCOME10') do |c|
 end
 
 Coupon.find_or_create_by!(code: 'SAVE20') do |c|
-  c.name = 'Save $20'
-  c.description = '$20 off orders over $100'
+  c.name = 'Save ₹20'
+  c.description = '₹20 off orders over ₹100'
   c.discount_type = 'fixed'
   c.discount_value = 20
   c.minimum_order_amount = 100

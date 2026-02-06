@@ -1,7 +1,5 @@
 module Admin
   class InventoryController < BaseController
-    include Pagy::Backend
-
     def index
       @filter = params[:filter] || 'all'
       
@@ -26,7 +24,7 @@ module Admin
       end
 
       variants = variants.order('product_variants.stock_quantity ASC')
-      @pagy, @variants = pagy(variants, items: 25)
+      @pagy, @variants = pagy(variants, limit: 25)
 
       # Stats
       @total_variants = ProductVariant.active.count
@@ -42,7 +40,7 @@ module Admin
       adjustments = adjustments.where(product_variant_id: params[:id]) if params[:id].present?
       adjustments = adjustments.by_reason(params[:reason]) if params[:reason].present?
       
-      @pagy, @adjustments = pagy(adjustments, items: 30)
+      @pagy, @adjustments = pagy(adjustments, limit: 30)
     end
 
     def adjust

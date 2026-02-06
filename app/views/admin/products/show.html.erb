@@ -35,7 +35,7 @@
           </div>
           <div>
             <dt class="text-gray-500">Base Price</dt>
-            <dd class="font-medium text-gray-900">$<%= @product.price %></dd>
+            <dd class="font-medium text-gray-900"><%= format_price(@product.price) %></dd>
           </div>
           <div>
             <dt class="text-gray-500">Rating</dt>

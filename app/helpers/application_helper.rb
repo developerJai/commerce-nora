@@ -1,8 +1,7 @@
 module ApplicationHelper
-  include Pagy::Frontend
 
   def format_price(amount)
-    number_to_currency(amount || 0)
+    number_to_currency(amount || 0, unit: "₹", format: "%u%n")
   end
 
   def order_status_badge(status)

@@ -1,11 +1,9 @@
 module Admin
   class CouponsController < BaseController
-    include Pagy::Backend
-
     before_action :set_coupon, only: [:show, :edit, :update, :destroy, :toggle_status]
 
     def index
-      @pagy, @coupons = pagy(Coupon.order(created_at: :desc), items: 20)
+      @pagy, @coupons = pagy(Coupon.order(created_at: :desc), limit: 20)
     end
 
     def show

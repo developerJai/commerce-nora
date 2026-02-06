@@ -1,11 +1,9 @@
 module Admin
   class BannersController < BaseController
-    include Pagy::Backend
-    
     before_action :set_banner, only: [:show, :edit, :update, :destroy, :toggle_status]
 
     def index
-      @pagy, @banners = pagy(Banner.ordered, items: 20)
+      @pagy, @banners = pagy(Banner.ordered, limit: 20)
     end
 
     def show

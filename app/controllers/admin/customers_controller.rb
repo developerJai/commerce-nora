@@ -1,7 +1,5 @@
 module Admin
   class CustomersController < BaseController
-    include Pagy::Backend
-
     before_action :set_customer, only: [:show, :edit, :update, :destroy, :toggle_status]
 
     def index
@@ -9,7 +7,7 @@ module Admin
       customers = Customer.all
       customers = customers.where("email ILIKE :q OR first_name ILIKE :q OR last_name ILIKE :q", q: "%#{@q}%") if @q.present?
       customers = customers.order(created_at: :desc)
-      @pagy, @customers = pagy(customers, items: 20)
+      @pagy, @customers = pagy(customers, limit: 20)
     end
 
     def show

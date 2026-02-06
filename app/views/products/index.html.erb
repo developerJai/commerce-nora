@@ -17,7 +17,7 @@
       <div id="filters-panel" class="hidden lg:block bg-white rounded-lg shadow-sm border border-stone-200 p-4 sm:p-6 lg:sticky lg:top-[120px]">
         <h2 class="font-serif font-semibold text-stone-900 mb-4 pb-3 border-b border-stone-200">Filters</h2>
         
-        <%= form_with url: products_path, method: :get, class: 'space-y-4 sm:space-y-6', data: { controller: 'filters', action: 'change->filters#scheduleSubmit input->filters#scheduleSubmit' } do |f| %>
+        <%= form_with url: products_path, method: :get, class: 'space-y-4 sm:space-y-6', data: { controller: 'filters', action: 'change->filters#scheduleSubmit' } do |f| %>
           <%= hidden_field_tag :sort, @sort %>
 
           <!-- Categories (Multi-select) -->
@@ -38,8 +38,8 @@
           <div data-controller="price-range">
             <span class="block text-sm font-medium text-stone-700 mb-2">Price Range</span>
 
-            <%= hidden_field_tag :min_price, (@min_price.presence || @catalog_min_price), data: { price_range_target: 'minInput' } %>
-            <%= hidden_field_tag :max_price, (@max_price.presence || @catalog_max_price), data: { price_range_target: 'maxInput' } %>
+            <%= hidden_field_tag :min_price, @min_price, data: { price_range_target: 'minInput' } %>
+            <%= hidden_field_tag :max_price, @max_price, data: { price_range_target: 'maxInput' } %>
 
             <div class="flex items-center justify-between text-xs text-stone-500 mb-2">
               <span data-price-range-target="minLabel"></span>
@@ -51,19 +51,19 @@
                      min="<%= @catalog_min_price %>"
                      max="<%= @catalog_max_price %>"
                      step="1"
-                     value="<%= (@min_price.presence || @catalog_min_price).to_f %>"
+                     value="<%= (@min_price.presence || @catalog_min_price).to_i %>"
                      data-price-range-target="min"
-                     data-action="input->price-range#sync mousedown->price-range#activateMin touchstart->price-range#activateMin"
-                     class="absolute inset-0 w-full accent-rose-800 z-20">
+                     data-action="input->price-range#update change->price-range#commit mousedown->price-range#activateMin touchstart->price-range#activateMin"
+                     class="absolute inset-0 w-full z-20">
 
               <input type="range"
                      min="<%= @catalog_min_price %>"
                      max="<%= @catalog_max_price %>"
                      step="1"
-                     value="<%= (@max_price.presence || @catalog_max_price).to_f %>"
+                     value="<%= (@max_price.presence || @catalog_max_price).to_i %>"
                      data-price-range-target="max"
-                     data-action="input->price-range#sync mousedown->price-range#activateMax touchstart->price-range#activateMax"
-                     class="absolute inset-0 w-full accent-rose-800">
+                     data-action="input->price-range#update change->price-range#commit mousedown->price-range#activateMax touchstart->price-range#activateMax"
+                     class="absolute inset-0 w-full">
             </div>
           </div>
 

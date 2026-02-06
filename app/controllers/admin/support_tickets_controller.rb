@@ -1,7 +1,5 @@
 module Admin
   class SupportTicketsController < BaseController
-    include Pagy::Backend
-
     before_action :set_ticket, only: [:show, :edit, :update, :destroy, :resolve, :close, :reopen]
 
     def index
@@ -12,7 +10,7 @@ module Admin
       tickets = tickets.by_status(@status) if @status.present?
       tickets = tickets.by_priority(@priority) if @priority.present?
 
-      @pagy, @support_tickets = pagy(tickets, items: 20)
+      @pagy, @support_tickets = pagy(tickets, limit: 20)
     end
 
     def show

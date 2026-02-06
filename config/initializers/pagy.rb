@@ -1,6 +1,5 @@
 # Pagy initializer
-require 'pagy/extras/overflow'
-require 'pagy/extras/countless'
+# In Pagy v43, extras are integrated into core - no requires needed.
+# Overflow defaults to :empty_page (serves empty page for out-of-range requests).
 
-Pagy::DEFAULT[:items] = 20
-Pagy::DEFAULT[:overflow] = :last_page
+Pagy.options[:limit] = 20

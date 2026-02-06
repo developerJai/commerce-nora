@@ -1,13 +1,11 @@
 class SearchController < ApplicationController
-  include Pagy::Backend
-
   def index
     @q = params[:q]
     
     if @q.present?
       @pagy, @products = pagy(
         Product.active.search(@q).includes(:variants, images_attachments: :blob).ordered,
-        items: 12
+        limit: 12
       )
     else
       @products = []

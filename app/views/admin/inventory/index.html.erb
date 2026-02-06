@@ -142,5 +142,5 @@
     </div>
   </div>
 
-  <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+  <%== @pagy.series_nav if @pagy.last > 1 %>
 </div>

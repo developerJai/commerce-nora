@@ -2,7 +2,7 @@ class OrdersController < ApplicationController
   before_action :require_customer
 
   def index
-    @pagy, @orders = pagy(current_customer.orders.placed.recent.includes(:order_items), items: 10)
+    @pagy, @orders = pagy(current_customer.orders.placed.recent.includes(:order_items), limit: 10)
   end
 
   def show

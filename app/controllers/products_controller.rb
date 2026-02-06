@@ -6,8 +6,8 @@ class ProductsController < ApplicationController
     @sort = params[:sort].presence || 'rating'
 
     variants_scope = ProductVariant.where(active: true)
-    @catalog_min_price = variants_scope.minimum(:price).to_f
-    @catalog_max_price = variants_scope.maximum(:price).to_f
+    @catalog_min_price = variants_scope.minimum(:price).to_f.floor
+    @catalog_max_price = variants_scope.maximum(:price).to_f.ceil
 
     products = Product.active.includes(:category, :variants, images_attachments: :blob)
 
@@ -16,10 +16,12 @@ class ProductsController < ApplicationController
     end
 
     if @min_price.present? || @max_price.present?
-      variants = ProductVariant.where(active: true)
-      variants = variants.where("price >= ?", @min_price) if @min_price.present?
-      variants = variants.where("price <= ?", @max_price) if @max_price.present?
-      products = products.where(id: variants.select(:product_id))
+      # Filter by each product's minimum active variant price (the "starting at" price
+      # shown on the card), so displayed prices always fall within the slider range.
+      price_filter = ProductVariant.where(active: true).group(:product_id)
+      price_filter = price_filter.having("MIN(price) >= ?", @min_price.to_f) if @min_price.present?
+      price_filter = price_filter.having("MIN(price) <= ?", @max_price.to_f) if @max_price.present?
+      products = products.where(id: price_filter.select(:product_id))
     end
 
     products = case @sort
@@ -33,7 +35,7 @@ class ProductsController < ApplicationController
       products.order(created_at: :desc)
     end
 
-    @pagy, @products = pagy(products, items: 16)
+    @pagy, @products = pagy(products, limit: 16)
     @categories = Category.active.ordered
 
     respond_to do |format|

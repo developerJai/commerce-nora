@@ -1,11 +1,9 @@
 module Admin
   class DraftOrdersController < BaseController
-    include Pagy::Backend
-
     before_action :set_order, only: [:show, :edit, :update, :destroy, :convert_to_order]
 
     def index
-      @pagy, @draft_orders = pagy(Order.draft.includes(:customer).recent, items: 20)
+      @pagy, @draft_orders = pagy(Order.draft.includes(:customer).recent, limit: 20)
     end
 
     def show

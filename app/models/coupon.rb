@@ -78,7 +78,7 @@ class Coupon < ApplicationRecord
     if percentage?
       "#{discount_value}%"
     else
-      "$#{discount_value}"
+      "₹#{discount_value}"
     end
   end
 

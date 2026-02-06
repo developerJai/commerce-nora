@@ -23,11 +23,11 @@ export default class extends Controller {
 
       // Update price display
       if (this.hasPriceTarget) {
-        this.priceTarget.textContent = `$${variant.price}`
+        this.priceTarget.textContent = `₹${variant.price}`
       }
 
       if (this.hasComparePriceTarget && variant.compare_at_price) {
-        this.comparePriceTarget.textContent = `$${variant.compare_at_price}`
+        this.comparePriceTarget.textContent = `₹${variant.compare_at_price}`
         this.comparePriceTarget.classList.remove('hidden')
       } else if (this.hasComparePriceTarget) {
         this.comparePriceTarget.classList.add('hidden')

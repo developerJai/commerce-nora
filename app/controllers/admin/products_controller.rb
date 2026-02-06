@@ -1,7 +1,5 @@
 module Admin
   class ProductsController < BaseController
-    include Pagy::Backend
-
     before_action :set_product, only: [:show, :edit, :update, :destroy]
 
     def index
@@ -13,7 +11,7 @@ module Admin
       products = products.with_category(@category_id) if @category_id.present?
       products = products.order(created_at: :desc)
 
-      @pagy, @products = pagy(products, items: 20)
+      @pagy, @products = pagy(products, limit: 20)
       @categories = Category.active.ordered
     end
 

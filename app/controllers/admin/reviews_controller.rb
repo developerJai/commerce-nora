@@ -1,7 +1,5 @@
 module Admin
   class ReviewsController < BaseController
-    include Pagy::Backend
-
     before_action :set_review, only: [:show, :edit, :update, :destroy, :approve, :reject, :respond]
 
     def index
@@ -9,7 +7,7 @@ module Admin
       reviews = Review.includes(:product, :customer).recent
       reviews = reviews.approved if @status == 'approved'
       reviews = reviews.pending if @status == 'pending'
-      @pagy, @reviews = pagy(reviews, items: 20)
+      @pagy, @reviews = pagy(reviews, limit: 20)
     end
 
     def show

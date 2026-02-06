@@ -57,5 +57,5 @@
     <% end %>
   </div>
 
-  <%== pagy_nav(@pagy) if @pagy&.pages.to_i > 1 %>
+  <%== @pagy.series_nav if @pagy&.last.to_i > 1 %>
 </div>
