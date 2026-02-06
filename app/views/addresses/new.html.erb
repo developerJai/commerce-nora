@@ -1,0 +1,22 @@
+<% content_for(:title) { "Add New Address" } %>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm text-stone-500 mb-6">
+    <%= link_to 'Account', account_path, class: 'hover:text-rose-700' %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+    <%= link_to 'Addresses', addresses_path, class: 'hover:text-rose-700' %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+    <span class="text-stone-900">Add New</span>
+  </nav>
+
+  <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 mb-6">Add New Address</h1>
+
+  <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+    <%= render 'form', address: @address %>
+  </div>
+</div>

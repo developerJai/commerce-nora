@@ -8,6 +8,8 @@ class Customer < ApplicationRecord
   has_many :reviews, dependent: :nullify
   has_many :support_tickets, dependent: :destroy
   has_many :ticket_messages, as: :sender, dependent: :nullify
+  has_many :wishlist_items, dependent: :destroy, class_name: 'Wishlist'
+  has_many :wished_products, through: :wishlist_items, source: :product
 
   validates :email, presence: true, uniqueness: { case_sensitive: false },
             format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -40,6 +42,14 @@ class Customer < ApplicationRecord
     addresses.find_by(address_type: 'billing', is_default: true) ||
       addresses.find_by(address_type: 'billing') ||
       default_shipping_address
+  end
+
+  def wishlist_count
+    wishlist_items.count
+  end
+
+  def product_in_wishlist?(product)
+    wishlist_items.exists?(product_id: product.id)
   end
 
   private

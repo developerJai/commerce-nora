@@ -3,6 +3,8 @@ class Product < ApplicationRecord
   belongs_to :category, optional: true
   has_many :variants, class_name: 'ProductVariant', dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :wishlist_items, dependent: :destroy, class_name: 'Wishlist'
+  has_many :wishing_customers, through: :wishlist_items, source: :customer
   has_many_attached :images
 
   validates :name, presence: true

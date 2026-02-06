@@ -1,5 +1,5 @@
 <% content_for(:title) { @product.name } %>
-<% default_variant = @variants.first %>
+<% default_variant = @selected_variant %>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-controller="product-gallery product-variant">
   <!-- Breadcrumb -->
@@ -17,82 +17,78 @@
     </ol>
   </nav>
 
-  <div class="lg:flex lg:gap-10">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
     <!-- Product Images - Vertical Thumbnails on Left -->
-    <div class="lg:flex-1 lg:max-w-[55%]">
-      <div class="flex flex-row gap-3">
-        <!-- Vertical Thumbnails (Left Side) -->
-        <% if @product.images.attached? && @product.images.count > 1 %>
-          <div class="hidden sm:block w-20 flex-shrink-0">
-            <div class="flex flex-col gap-2 sticky top-24">
-              <% @product.images.each_with_index do |image, index| %>
-                <button type="button"
-                        data-action="click->product-gallery#selectImage"
-                        data-product-gallery-index-param="<%= index %>"
-                        class="w-20 h-20 bg-stone-100 rounded-lg overflow-hidden border-2 transition <%= index == 0 ? 'border-rose-500' : 'border-stone-200 hover:border-rose-300' %>"
-                        data-product-gallery-target="thumbnail">
-                  <%= image_tag image, class: 'w-full h-full object-cover' %>
-                </button>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- Main Image -->
-        <div class="flex-1 min-w-0">
-          <div class="aspect-square bg-stone-100 rounded-xl overflow-hidden relative">
-            <% if @product.images.attached? %>
-              <% @product.images.each_with_index do |image, index| %>
-                <div class="absolute inset-0 transition-opacity duration-300 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>" data-product-gallery-target="slide">
-                  <%= image_tag image, class: 'w-full h-full object-cover' %>
-                </div>
-              <% end %>
-            <% else %>
-              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-50 to-amber-50">
-                <svg class="w-20 h-20 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
-                </svg>
-              </div>
-            <% end %>
-            
-            <!-- Badges -->
-            <div class="absolute top-3 left-3 flex flex-col gap-1">
-              <% if @product.featured? %>
-                <span class="px-2.5 py-1 bg-rose-800 text-white text-xs font-medium rounded">Bestseller</span>
-              <% end %>
-              <% if default_variant&.on_sale? %>
-                <span class="px-2.5 py-1 bg-amber-500 text-white text-xs font-bold rounded"><%= default_variant.discount_percentage %>% OFF</span>
-              <% end %>
-            </div>
-
-            <!-- Wishlist -->
-            <button type="button" class="absolute top-3 right-3 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm transition">
-              <svg class="w-5 h-5 text-stone-600 hover:text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Mobile Thumbnails (Horizontal - Below Image) -->
+    <div class="lg:col-span-7">
+      <div class="lg:sticky lg:top-24">
+        <div class="flex flex-row gap-3">
+          <!-- Vertical Thumbnails (Left Side) -->
           <% if @product.images.attached? && @product.images.count > 1 %>
-            <div class="sm:hidden flex gap-2 mt-3 overflow-x-auto pb-1">
-              <% @product.images.each_with_index do |image, index| %>
-                <button type="button"
-                        data-action="click->product-gallery#selectImage"
-                        data-product-gallery-index-param="<%= index %>"
-                        class="w-16 h-16 flex-shrink-0 bg-stone-100 rounded-lg overflow-hidden border-2 transition <%= index == 0 ? 'border-rose-500' : 'border-stone-200' %>"
-                        data-product-gallery-target="thumbnail">
-                  <%= image_tag image, class: 'w-full h-full object-cover' %>
-                </button>
-              <% end %>
+            <div class="hidden sm:block w-20 flex-shrink-0">
+              <div class="flex flex-col gap-2">
+                <% @product.images.each_with_index do |image, index| %>
+                  <button type="button"
+                          data-action="click->product-gallery#selectImage"
+                          data-product-gallery-index-param="<%= index %>"
+                          class="w-20 h-20 bg-stone-100 rounded-lg overflow-hidden border-2 transition <%= index == 0 ? 'border-rose-500' : 'border-stone-200 hover:border-rose-300' %>"
+                          data-product-gallery-target="thumbnail">
+                    <%= image_tag image, class: 'w-full h-full object-cover' %>
+                  </button>
+                <% end %>
+              </div>
             </div>
           <% end %>
+
+          <!-- Main Image -->
+          <div class="flex-1 min-w-0">
+            <div class="aspect-square bg-stone-100 rounded-xl overflow-hidden relative">
+              <% if @product.images.attached? %>
+                <% @product.images.each_with_index do |image, index| %>
+                  <div class="absolute inset-0 transition-opacity duration-300 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>" data-product-gallery-target="slide">
+                    <%= image_tag image, class: 'w-full h-full object-cover' %>
+                  </div>
+                <% end %>
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-50 to-amber-50">
+                  <svg class="w-20 h-20 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                  </svg>
+                </div>
+              <% end %>
+              
+              <!-- Badges -->
+              <div class="absolute top-3 left-3 flex flex-col gap-1">
+                <% if @product.featured? %>
+                  <span class="px-2.5 py-1 bg-rose-800 text-white text-xs font-medium rounded">Bestseller</span>
+                <% end %>
+                <% if default_variant&.on_sale? %>
+                  <span class="px-2.5 py-1 bg-amber-500 text-white text-xs font-bold rounded"><%= default_variant.discount_percentage %>% OFF</span>
+                <% end %>
+              </div>
+            </div>
+
+            <!-- Mobile Thumbnails (Horizontal - Below Image) -->
+            <% if @product.images.attached? && @product.images.count > 1 %>
+              <div class="sm:hidden flex gap-2 mt-3 overflow-x-auto pb-1">
+                <% @product.images.each_with_index do |image, index| %>
+                  <button type="button"
+                          data-action="click->product-gallery#selectImage"
+                          data-product-gallery-index-param="<%= index %>"
+                          class="w-16 h-16 flex-shrink-0 bg-stone-100 rounded-lg overflow-hidden border-2 transition <%= index == 0 ? 'border-rose-500' : 'border-stone-200' %>"
+                          data-product-gallery-target="thumbnail">
+                    <%= image_tag image, class: 'w-full h-full object-cover' %>
+                  </button>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Product Info -->
-    <div class="lg:flex-1 mt-6 lg:mt-0">
+    <div class="lg:col-span-5">
+      <div class="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 lg:sticky lg:top-24">
       <!-- Title -->
       <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 leading-tight"><%= @product.name %></h1>
       
@@ -139,18 +135,12 @@
             Select: <span class="text-stone-900" data-product-variant-target="selectedName"><%= default_variant&.name %></span>
           </p>
           <div class="flex flex-wrap gap-2">
-            <% @variants.each_with_index do |variant, index| %>
+            <% @variants.each do |variant| %>
               <button type="button"
                       data-action="click->product-variant#selectVariant"
                       data-product-variant-target="option"
-                      data-variant-id="<%= variant.id %>"
-                      data-variant-name="<%= variant.name %>"
-                      data-variant-price="<%= format_price(variant.price) %>"
-                      data-variant-compare-price="<%= variant.on_sale? ? format_price(variant.compare_at_price) : '' %>"
-                      data-variant-discount="<%= variant.on_sale? ? "Save #{variant.discount_percentage}%" : '' %>"
-                      data-variant-in-stock="<%= variant.in_stock? %>"
-                      data-variant-stock="<%= variant.stock_quantity %>"
-                      class="px-4 py-2 text-sm font-medium rounded-lg border-2 transition <%= index == 0 ? 'border-rose-500 bg-rose-50 text-rose-800' : 'border-stone-200 text-stone-700 hover:border-rose-300' %> <%= variant.in_stock? ? '' : 'opacity-50' %>">
+                      data-variant-slug="<%= variant.name.parameterize %>"
+                      class="px-4 py-2 text-sm font-medium rounded-lg border-2 transition <%= variant.id == @selected_variant.id ? 'border-rose-500 bg-rose-50 text-rose-800' : 'border-stone-200 text-stone-700 hover:border-rose-300' %> <%= variant.in_stock? ? '' : 'opacity-50' %>">
                 <%= variant.name %>
                 <% unless variant.in_stock? %>
                   <span class="block text-[10px] text-stone-500 font-normal">Out of Stock</span>
@@ -184,61 +174,25 @@
         <% end %>
       </div>
 
-      <!-- Quantity Selection -->
-      <div class="mt-5">
-        <label class="text-sm font-medium text-stone-700 mb-2 block">Quantity</label>
-        <div class="inline-flex items-center border border-stone-300 rounded-lg" data-controller="quantity">
-          <button type="button" 
-                  data-action="click->quantity#decrease"
-                  class="w-11 h-11 flex items-center justify-center text-stone-600 hover:bg-stone-100 rounded-l-lg transition">
-            <span class="text-xl font-light">−</span>
-          </button>
-          <input type="number" 
-                 id="quantity-input" 
-                 value="1" 
-                 min="1" 
-                 max="10" 
-                 data-quantity-target="input"
-                 class="w-14 h-11 text-center border-x border-stone-300 text-sm font-medium text-stone-900 focus:outline-none"
-                 readonly>
-          <button type="button" 
-                  data-action="click->quantity#increase"
-                  class="w-11 h-11 flex items-center justify-center text-stone-600 hover:bg-stone-100 rounded-r-lg transition">
-            <span class="text-xl font-light">+</span>
-          </button>
-        </div>
-      </div>
-
       <!-- Action Buttons -->
-      <%= form_with url: add_to_cart_path(default_variant), method: :post, id: 'add-to-cart-form', class: 'mt-5', data: { product_variant_target: 'form' } do |f| %>
-        <input type="hidden" name="variant_id" value="<%= default_variant&.id %>" data-product-variant-target="variantInput">
-        <input type="hidden" name="quantity" id="form-quantity" value="1">
-        
-        <div class="flex gap-3">
-          <% if @product.in_stock? %>
-            <button type="submit" 
-                    class="flex-1 py-3.5 px-6 bg-rose-800 text-white font-medium rounded-lg hover:bg-rose-900 transition flex items-center justify-center gap-2"
-                    data-product-variant-target="addToCartBtn">
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-              </svg>
-              Add to Bag
-            </button>
-            <button type="button" 
-                    onclick="this.form.action='<%= checkout_path %>'; this.form.submit();"
-                    class="flex-1 py-3.5 px-6 border-2 border-stone-900 text-stone-900 font-medium rounded-lg hover:bg-stone-900 hover:text-white transition">
-              Buy Now
-            </button>
+      <div class="mt-6">
+        <div class="flex items-center gap-3">
+          <% if @selected_variant&.in_stock? %>
+            <div id="product-cart-controls-<%= @selected_variant.id %>" class="flex-1">
+              <%= render 'products/cart_controls', variant: @selected_variant, cart_item: @cart_item %>
+            </div>
           <% else %>
-            <button disabled class="flex-1 py-3.5 px-6 bg-stone-200 text-stone-500 font-medium rounded-lg cursor-not-allowed">
+            <button disabled class="flex-1 h-12 px-6 bg-stone-200 text-stone-500 font-medium rounded-lg cursor-not-allowed">
               Out of Stock
             </button>
-            <button disabled class="flex-1 py-3.5 px-6 border-2 border-stone-200 text-stone-400 font-medium rounded-lg cursor-not-allowed">
-              Buy Now
-            </button>
           <% end %>
+
+          <!-- Wishlist (outside cart form to avoid nested forms) -->
+          <div id="wishlist-toggle-<%= @product.id %>">
+            <%= render 'shared/wishlist_toggle', product: @product, icon_only: true %>
+          </div>
         </div>
-      <% end %>
+      </div>
 
       <!-- Trust Badges -->
       <div class="mt-6 grid grid-cols-2 gap-3">
@@ -271,11 +225,13 @@
           </div>
         </div>
       </div>
+
+      </div>
     </div>
   </div>
 
   <!-- Product Details Tabs -->
-  <div class="mt-10 sm:mt-12" data-controller="tabs">
+  <div class="mt-10 sm:mt-12 bg-white rounded-2xl border border-stone-200 p-5 sm:p-6" data-controller="tabs">
     <div class="border-b border-stone-200">
       <nav class="flex gap-6 sm:gap-8 overflow-x-auto">
         <button type="button" data-action="click->tabs#select" data-tabs-target="tab" data-tab="description"
@@ -293,7 +249,7 @@
       </nav>
     </div>
 
-    <div class="py-6">
+    <div class="pt-6">
       <div data-tabs-target="panel" data-tab="description">
         <% if @product.description.present? %>
           <div class="prose prose-sm prose-stone max-w-none text-stone-600">
@@ -343,7 +299,7 @@
   </div>
 
   <!-- Reviews Section -->
-  <section id="reviews" class="mt-8 sm:mt-10 pt-8 border-t border-stone-200">
+  <section id="reviews" class="mt-8 sm:mt-10 bg-white rounded-2xl border border-stone-200 p-5 sm:p-6">
     <div class="sm:flex sm:items-start sm:justify-between mb-6">
       <div>
         <h2 class="text-lg sm:text-xl font-serif font-semibold text-stone-900">Customer Reviews</h2>
@@ -392,7 +348,7 @@
             <% end %>
             <% if review.has_admin_response? %>
               <div class="mt-4 ml-4 pl-4 border-l-2 border-rose-200 py-2">
-                <p class="text-xs font-medium text-rose-800 mb-1">Response from Auracraft</p>
+                <p class="text-xs font-medium text-rose-800 mb-1">Response from Noralooks</p>
                 <p class="text-sm text-rose-700"><%= review.admin_response %></p>
               </div>
             <% end %>
@@ -412,7 +368,7 @@
 
   <!-- Related Products -->
   <% if @related_products.any? %>
-    <section class="mt-10 sm:mt-12 pt-8 border-t border-stone-200">
+    <section class="mt-10 sm:mt-12 bg-white rounded-2xl border border-stone-200 p-5 sm:p-6">
       <h2 class="text-lg sm:text-xl font-serif font-semibold text-stone-900 mb-6">You May Also Like</h2>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
         <% @related_products.each do |product| %>

@@ -1,0 +1,13 @@
+<%= turbo_stream.update "wishlist-toggle-#{@product.id}" do %>
+  <%= render 'shared/wishlist_toggle', product: @product, icon_only: @icon_only %>
+<% end %>
+
+<%= turbo_stream.update 'wishlist-count' do %>
+  <%= render 'shared/wishlist_count_badge' %>
+<% end %>
+
+<script>
+  if (window.animateWishlistIcon) {
+    window.animateWishlistIcon();
+  }
+</script>

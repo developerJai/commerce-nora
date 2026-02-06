@@ -3,7 +3,7 @@
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
   <div class="flex flex-col lg:flex-row gap-4 sm:gap-8">
     <!-- Filters Sidebar -->
-    <aside class="w-full lg:w-64 flex-shrink-0">
+    <aside class="w-full lg:w-72 flex-shrink-0">
       <!-- Mobile Filter Toggle -->
       <button type="button" 
               onclick="document.getElementById('filters-panel').classList.toggle('hidden')"
@@ -14,53 +14,63 @@
         </svg>
       </button>
       
-      <div id="filters-panel" class="hidden lg:block bg-white rounded-xl border border-stone-200 p-4 sm:p-6">
-        <h2 class="font-serif font-semibold text-stone-900 mb-4">Filters</h2>
+      <div id="filters-panel" class="hidden lg:block bg-white rounded-lg shadow-sm border border-stone-200 p-4 sm:p-6 lg:sticky lg:top-[120px]">
+        <h2 class="font-serif font-semibold text-stone-900 mb-4 pb-3 border-b border-stone-200">Filters</h2>
         
-        <%= form_with url: products_path, method: :get, class: 'space-y-4 sm:space-y-6' do |f| %>
-          <!-- Search -->
-          <div>
-            <%= f.label :q, 'Search', class: 'block text-sm font-medium text-stone-700 mb-2' %>
-            <%= f.search_field :q, value: @q, placeholder: 'Search jewellery...', class: 'w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-rose-500 focus:border-rose-500' %>
-          </div>
+        <%= form_with url: products_path, method: :get, class: 'space-y-4 sm:space-y-6', data: { controller: 'filters', action: 'change->filters#scheduleSubmit input->filters#scheduleSubmit' } do |f| %>
+          <%= hidden_field_tag :sort, @sort %>
 
-          <!-- Category -->
+          <!-- Categories (Multi-select) -->
           <div>
-            <%= f.label :category_id, 'Category', class: 'block text-sm font-medium text-stone-700 mb-2' %>
-            <%= f.select :category_id, options_from_collection_for_select(@categories, :id, :name, @category_id), 
-                { include_blank: 'All Categories' }, 
-                class: 'w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-rose-500 focus:border-rose-500' %>
-          </div>
-
-          <!-- Price Range -->
-          <div>
-            <span class="block text-sm font-medium text-stone-700 mb-2">Price Range</span>
-            <div class="flex items-center gap-2">
-              <%= f.number_field :min_price, value: @min_price, placeholder: 'Min', min: 0, 
-                  class: 'w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-rose-500 focus:border-rose-500' %>
-              <span class="text-stone-400">-</span>
-              <%= f.number_field :max_price, value: @max_price, placeholder: 'Max', min: 0,
-                  class: 'w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-rose-500 focus:border-rose-500' %>
+            <span class="block text-sm font-medium text-stone-700 mb-2">Categories</span>
+            <div class="max-h-56 overflow-auto pr-1 space-y-2">
+              <% @categories.each do |category| %>
+                <label class="flex items-center gap-2 text-sm text-stone-700 cursor-pointer hover:text-stone-900 transition">
+                  <%= check_box_tag 'category_ids[]', category.id, @category_ids.include?(category.id.to_s),
+                      class: 'h-4 w-4 rounded border-2 border-stone-300 text-rose-800 focus:ring-2 focus:ring-rose-500 focus:ring-offset-0 checked:border-rose-800 checked:bg-rose-800' %>
+                  <span class="leading-snug"><%= category.name %></span>
+                </label>
+              <% end %>
             </div>
           </div>
 
-          <!-- Sort -->
-          <div>
-            <%= f.label :sort, 'Sort By', class: 'block text-sm font-medium text-stone-700 mb-2' %>
-            <%= f.select :sort, [
-                ['Newest', 'newest'],
-                ['Price: Low to High', 'price_low'],
-                ['Price: High to Low', 'price_high'],
-                ['Name', 'name'],
-                ['Rating', 'rating']
-              ], { selected: @sort },
-              class: 'w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-rose-500 focus:border-rose-500' %>
+          <!-- Price Range Slider -->
+          <div data-controller="price-range">
+            <span class="block text-sm font-medium text-stone-700 mb-2">Price Range</span>
+
+            <%= hidden_field_tag :min_price, (@min_price.presence || @catalog_min_price), data: { price_range_target: 'minInput' } %>
+            <%= hidden_field_tag :max_price, (@max_price.presence || @catalog_max_price), data: { price_range_target: 'maxInput' } %>
+
+            <div class="flex items-center justify-between text-xs text-stone-500 mb-2">
+              <span data-price-range-target="minLabel"></span>
+              <span data-price-range-target="maxLabel"></span>
+            </div>
+
+            <div class="range-slider relative h-8">
+              <input type="range"
+                     min="<%= @catalog_min_price %>"
+                     max="<%= @catalog_max_price %>"
+                     step="1"
+                     value="<%= (@min_price.presence || @catalog_min_price).to_f %>"
+                     data-price-range-target="min"
+                     data-action="input->price-range#sync mousedown->price-range#activateMin touchstart->price-range#activateMin"
+                     class="absolute inset-0 w-full accent-rose-800 z-20">
+
+              <input type="range"
+                     min="<%= @catalog_min_price %>"
+                     max="<%= @catalog_max_price %>"
+                     step="1"
+                     value="<%= (@max_price.presence || @catalog_max_price).to_f %>"
+                     data-price-range-target="max"
+                     data-action="input->price-range#sync mousedown->price-range#activateMax touchstart->price-range#activateMax"
+                     class="absolute inset-0 w-full accent-rose-800">
+            </div>
           </div>
 
-          <%= f.submit 'Apply Filters', class: 'w-full py-2.5 px-4 bg-rose-800 text-white font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer text-sm' %>
+          <%= f.submit 'Apply Filters', class: 'hidden' %>
         <% end %>
 
-        <% if @q.present? || @category_id.present? || @min_price.present? || @max_price.present? %>
+        <% if @category_ids.any? || @min_price.present? || @max_price.present? %>
           <%= link_to 'Clear Filters', products_path, class: 'block mt-4 text-center text-sm text-rose-700 hover:text-rose-900' %>
         <% end %>
       </div>
@@ -68,27 +78,64 @@
 
     <!-- Products Grid -->
     <div class="flex-1">
-      <div class="flex items-center justify-between mb-4 sm:mb-6">
-        <h1 class="text-lg sm:text-2xl font-serif font-semibold text-stone-900">
-          <% if @q.present? %>
-            <span class="hidden sm:inline">Results for "</span><span class="text-rose-800"><%= @q %></span><span class="hidden sm:inline">"</span>
-          <% else %>
-            All Jewellery
-          <% end %>
-        </h1>
-        <span class="text-xs sm:text-sm text-stone-500 whitespace-nowrap"><%= @pagy.count %> pieces</span>
+      <!-- Header: Results Counter and Sort -->
+      <div class="sticky top-[104px] sm:top-[112px] z-10 bg-white shadow-sm mb-4 sm:mb-6">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 py-3 border-b border-stone-200">
+          <!-- Results Counter -->
+          <div id="results-counter" class="flex items-center">
+            <%= render 'results_counter' %>
+          </div>
+
+          <!-- Sort By Dropdown (Mobile) and Tabs (Desktop) -->
+          <div class="flex items-center gap-2">
+            <label class="text-sm font-medium text-stone-700 flex-shrink-0">Sort by:</label>
+            
+            <!-- Mobile: Dropdown Select -->
+            <div class="sm:hidden flex-1">
+              <% tabs = [
+                ['Popularity', 'rating'],
+                ['Price: Low to High', 'price_low'],
+                ['Price: High to Low', 'price_high'],
+                ['Newest Arrivals', 'newest']
+              ] %>
+              <select onchange="window.location.href=this.value" 
+                      class="w-full px-3 py-2 text-sm border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white">
+                <% tabs.each do |label, value| %>
+                  <% active = (@sort == value) || (@sort.blank? && value == 'rating') %>
+                  <option value="<%= url_for(params.permit!.to_h.merge(sort: value, page: nil)) %>" <%= 'selected' if active %>>
+                    <%= label %>
+                  </option>
+                <% end %>
+              </select>
+            </div>
+
+            <!-- Desktop: Tab Navigation -->
+            <div class="hidden sm:flex items-center gap-1 bg-stone-50 rounded-lg p-1">
+              <% tabs.each do |label, value| %>
+                <% active = (@sort == value) || (@sort.blank? && value == 'rating') %>
+                <%= link_to label,
+                    url_for(params.permit!.to_h.merge(sort: value, page: nil)),
+                    class: "px-3 py-1.5 text-xs font-medium rounded-md transition whitespace-nowrap #{active ? 'bg-white text-rose-800 shadow-sm' : 'text-stone-600 hover:text-stone-900 hover:bg-white/50'}" %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        </div>
       </div>
 
       <% if @products.any? %>
-        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-          <% @products.each do |product| %>
-            <%= render 'shared/product_card', product: product %>
-          <% end %>
-        </div>
-
-        <!-- Pagination -->
-        <div class="mt-6 sm:mt-8">
-          <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+        <div id="infinite-scroll-wrapper" data-controller="infinite-scroll">
+          <div id="products-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+            <%= render 'cards', products: @products %>
+          </div>
+          
+          <div id="infinite-scroll-pagination" 
+               data-next-url="<%= @pagy.next ? url_for(params.permit!.to_h.merge(page: @pagy.next)) : '' %>"
+               data-has-next="<%= @pagy.next.present? %>"
+               data-updated="<%= Time.current.to_i %>"
+               data-infinite-scroll-target="pagination"
+               style="display: none;"></div>
         </div>
       <% else %>
         <div class="text-center py-12 sm:py-16 bg-white rounded-xl border border-stone-200">

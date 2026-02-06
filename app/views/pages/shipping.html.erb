@@ -1,0 +1,92 @@
+<% content_for(:title) { "Shipping Information" } %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+  <h1 class="text-2xl sm:text-3xl font-serif font-semibold text-stone-900 mb-8">Shipping Information</h1>
+
+  <div class="bg-white rounded-xl border border-stone-200 p-6 sm:p-8 space-y-8">
+    <!-- Free Shipping -->
+    <section>
+      <div class="flex items-start gap-4 mb-4">
+        <div class="w-12 h-12 flex-shrink-0 bg-rose-100 rounded-full flex items-center justify-center">
+          <svg class="w-6 h-6 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-serif font-semibold text-stone-900 mb-2">Free Shipping</h2>
+          <p class="text-stone-600">We offer free standard shipping on all orders above ₹999. Orders below this amount will incur a flat shipping charge of ₹99.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="border-stone-200">
+
+    <!-- Delivery Times -->
+    <section>
+      <h2 class="text-xl font-serif font-semibold text-stone-900 mb-4">Delivery Times</h2>
+      <div class="space-y-4">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-rose-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <div>
+            <h3 class="font-medium text-stone-900">Metro Cities</h3>
+            <p class="text-sm text-stone-600 mt-1">Delivery within 2-3 business days</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-rose-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <div>
+            <h3 class="font-medium text-stone-900">Other Cities</h3>
+            <p class="text-sm text-stone-600 mt-1">Delivery within 4-7 business days</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-rose-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <div>
+            <h3 class="font-medium text-stone-900">Remote Areas</h3>
+            <p class="text-sm text-stone-600 mt-1">Delivery within 7-10 business days</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="border-stone-200">
+
+    <!-- Order Processing -->
+    <section>
+      <h2 class="text-xl font-serif font-semibold text-stone-900 mb-4">Order Processing</h2>
+      <p class="text-stone-600 mb-3">All orders are processed within 1-2 business days. Orders placed on weekends or holidays will be processed on the next business day.</p>
+      <p class="text-stone-600">You will receive a confirmation email with tracking information once your order ships.</p>
+    </section>
+
+    <hr class="border-stone-200">
+
+    <!-- Tracking -->
+    <section>
+      <h2 class="text-xl font-serif font-semibold text-stone-900 mb-4">Order Tracking</h2>
+      <p class="text-stone-600 mb-3">Once your order is shipped, you'll receive an email with a tracking number. You can also track your order status by visiting your <%= link_to 'Orders', orders_path, class: 'text-rose-700 hover:text-rose-900 font-medium' %> page.</p>
+    </section>
+
+    <hr class="border-stone-200">
+
+    <!-- International Shipping -->
+    <section>
+      <h2 class="text-xl font-serif font-semibold text-stone-900 mb-4">International Shipping</h2>
+      <p class="text-stone-600">Currently, we only ship within India. We're working on expanding our shipping options to international destinations. Please check back soon!</p>
+    </section>
+
+    <hr class="border-stone-200">
+
+    <!-- Contact -->
+    <section class="bg-stone-50 rounded-lg p-5">
+      <h3 class="font-medium text-stone-900 mb-2">Need Help?</h3>
+      <p class="text-sm text-stone-600 mb-3">If you have any questions about shipping, please don't hesitate to contact us.</p>
+      <%= link_to 'Contact Support', support_tickets_path, class: 'inline-flex items-center gap-2 text-sm text-rose-700 hover:text-rose-900 font-medium' %>
+    </section>
+  </div>
+</div>

@@ -29,21 +29,26 @@
                 <p class="text-xs text-stone-500 mt-0.5"><%= item.product_variant.name %></p>
                 <p class="text-sm font-medium text-stone-900 mt-1"><%= format_price(item.unit_price) %></p>
               </div>
-              <button type="button" 
-                      onclick="removeCartItem('<%= remove_from_cart_path(item) %>')"
-                      class="text-stone-400 hover:text-rose-600 p-1" 
-                      title="Remove">
+              <%= button_to remove_from_cart_path(item), 
+                            method: :delete,
+                            class: "text-stone-400 hover:text-rose-600 p-1",
+                            title: "Remove",
+                            form: { data: { turbo_confirm: "Remove this item from your bag?" } } do %>
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
-              </button>
+              <% end %>
             </div>
 
             <!-- Quantity & Total -->
             <div class="flex items-center justify-between mt-3">
-              <div class="inline-flex items-center border border-stone-200 rounded-lg">
+              <div class="inline-flex items-center border border-stone-200 rounded-lg"
+                   data-controller="cart-controls"
+                   data-cart-controls-update-url-value="<%= update_item_cart_path(item) %>"
+                   data-cart-controls-current-quantity-value="<%= item.quantity %>"
+                   data-cart-controls-max-stock-value="<%= item.available_quantity %>">
                 <button type="button" 
-                        onclick="updateCartQuantity('<%= update_item_cart_path(item) %>', <%= item.quantity - 1 %>)" 
+                        data-action="click->cart-controls#decrement"
                         class="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-50 rounded-l-lg transition">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
@@ -51,7 +56,7 @@
                 </button>
                 <span class="w-10 text-center text-sm font-medium text-stone-800"><%= item.quantity %></span>
                 <button type="button" 
-                        onclick="updateCartQuantity('<%= update_item_cart_path(item) %>', <%= item.quantity + 1 %>)"
+                        data-action="click->cart-controls#increment"
                         <% if item.quantity >= item.available_quantity %>disabled<% end %>
                         class="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-50 rounded-r-lg transition disabled:opacity-40">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

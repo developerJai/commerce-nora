@@ -1,0 +1,16 @@
+<%= turbo_stream.append 'products-grid' do %>
+  <%= render 'cards', products: @products %>
+<% end %>
+
+<%= turbo_stream.replace 'results-counter' do %>
+  <%= render 'results_counter' %>
+<% end %>
+
+<%= turbo_stream.replace 'infinite-scroll-pagination' do %>
+  <div id="infinite-scroll-pagination" 
+       data-next-url="<%= @pagy.next ? url_for(params.permit!.to_h.merge(page: @pagy.next)) : '' %>"
+       data-has-next="<%= @pagy.next.present? %>"
+       data-updated="<%= Time.current.to_i %>"
+       data-infinite-scroll-target="pagination"
+       style="display: none;"></div>
+<% end %>

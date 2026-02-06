@@ -1,4 +1,4 @@
-# Auracraft E-Commerce Platform
+# Noralooks E-Commerce Platform
 
 A modern, full-featured e-commerce MVP built with Ruby on Rails 8, featuring a customer storefront and admin panel.
 
@@ -47,8 +47,8 @@ A modern, full-featured e-commerce MVP built with Ruby on Rails 8, featuring a c
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/auracraft.git
-cd auracraft
+git clone https://github.com/your-username/noralooks.git
+cd noralooks
 ```
 
 ### 2. Install Dependencies
@@ -106,7 +106,7 @@ The application will be available at:
 ### Default Admin Credentials
 
 After seeding the database:
-- **Email**: admin@auracraft.com
+- **Email**: admin@noralooks.com
 - **Password**: password123
 
 ## Environment Variables
@@ -154,8 +154,8 @@ bin/rubocop -A
 
 Edit `config/deploy.yml`:
 ```yaml
-service: auracraft
-image: your-dockerhub-username/auracraft
+service: noralooks
+image: your-dockerhub-username/noralooks
 
 servers:
   web:
@@ -175,7 +175,7 @@ Edit `.kamal/secrets`:
 ```bash
 KAMAL_REGISTRY_PASSWORD=your-docker-registry-token
 RAILS_MASTER_KEY=your-master-key
-AURACRAFT_DATABASE_PASSWORD=your-db-password
+NORALOOKS_DATABASE_PASSWORD=your-db-password
 ```
 
 3. **Deploy**
@@ -198,7 +198,7 @@ bin/kamal console
 
 ```bash
 # Build image
-docker build -t auracraft .
+docker build -t noralooks .
 
 # Run container
 docker run -d \
@@ -206,7 +206,7 @@ docker run -d \
   -e RAILS_ENV=production \
   -e RAILS_MASTER_KEY=your-key \
   -e DATABASE_URL=postgres://user:pass@host/db \
-  auracraft
+  noralooks
 ```
 
 ### Database Setup (Production)
@@ -316,7 +316,7 @@ end
 pg_isready
 
 # Check database exists
-psql -l | grep auracraft
+psql -l | grep noralooks
 ```
 
 ### Asset Issues
@@ -351,4 +351,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Support
 
-For support, email support@auracraft.com or open an issue in the repository.
+For support, email support@noralooks.com or open an issue in the repository.

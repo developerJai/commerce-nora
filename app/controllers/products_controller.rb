@@ -1,37 +1,45 @@
 class ProductsController < ApplicationController
   def index
-    @q = params[:q]
-    @category_id = params[:category_id]
+    @category_ids = Array(params[:category_ids]).reject(&:blank?)
     @min_price = params[:min_price]
     @max_price = params[:max_price]
-    @sort = params[:sort] || 'newest'
+    @sort = params[:sort].presence || 'rating'
+
+    variants_scope = ProductVariant.where(active: true)
+    @catalog_min_price = variants_scope.minimum(:price).to_f
+    @catalog_max_price = variants_scope.maximum(:price).to_f
 
     products = Product.active.includes(:category, :variants, images_attachments: :blob)
-    products = products.search(@q) if @q.present?
-    products = products.with_category(@category_id) if @category_id.present?
-    
+
+    if @category_ids.any?
+      products = products.where(category_id: @category_ids)
+    end
+
     if @min_price.present? || @max_price.present?
-      products = products.joins(:variants).where(product_variants: { active: true })
-      products = products.where("product_variants.price >= ?", @min_price) if @min_price.present?
-      products = products.where("product_variants.price <= ?", @max_price) if @max_price.present?
-      products = products.distinct
+      variants = ProductVariant.where(active: true)
+      variants = variants.where("price >= ?", @min_price) if @min_price.present?
+      variants = variants.where("price <= ?", @max_price) if @max_price.present?
+      products = products.where(id: variants.select(:product_id))
     end
 
     products = case @sort
     when 'price_low'
-      products.left_joins(:variants).group(:id).order('MIN(product_variants.price) ASC')
+      products.left_joins(:variants).where(product_variants: { active: true }).group(:id).order('MIN(product_variants.price) ASC')
     when 'price_high'
-      products.left_joins(:variants).group(:id).order('MIN(product_variants.price) DESC')
-    when 'name'
-      products.order(:name)
+      products.left_joins(:variants).where(product_variants: { active: true }).group(:id).order('MIN(product_variants.price) DESC')
     when 'rating'
       products.order(average_rating: :desc)
     else
       products.order(created_at: :desc)
     end
 
-    @pagy, @products = pagy(products, items: 12)
+    @pagy, @products = pagy(products, items: 16)
     @categories = Category.active.ordered
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def show
@@ -42,5 +50,15 @@ class ProductsController < ApplicationController
                                .where.not(id: @product.id)
                                .includes(:variants, images_attachments: :blob)
                                .limit(4)
+    
+    # Get the selected variant (from URL param or default to first)
+    @selected_variant = if params[:variant].present?
+      @variants.find { |v| v.name.parameterize == params[:variant] } || @variants.first
+    else
+      @variants.first
+    end
+    
+    # Get cart item for the selected variant if it exists
+    @cart_item = @selected_variant ? current_cart.cart_items.find_by(product_variant: @selected_variant) : nil
   end
 end

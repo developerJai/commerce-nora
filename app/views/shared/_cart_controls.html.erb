@@ -7,37 +7,52 @@
       Sold Out
     </button>
   <% elsif in_cart %>
-    <!-- Quantity Controls - Standard Layout -->
-    <div class="flex items-center justify-center gap-3">
+    <!-- Quantity Controls with Stimulus -->
+    <div data-controller="cart-controls"
+         data-cart-controls-update-url-value="<%= update_item_cart_path(cart_item) %>"
+         data-cart-controls-current-quantity-value="<%= cart_item.quantity %>"
+         data-cart-controls-max-stock-value="<%= variant.stock_quantity %>">
+      
+      <div class="flex items-center justify-center gap-3">
+        <!-- Decrease Button -->
+        <button type="button" 
+                data-action="click->cart-controls#decrement"
+                class="w-8 h-8 flex items-center justify-center bg-stone-100 hover:bg-rose-100 text-stone-700 hover:text-rose-800 rounded-full transition">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+          </svg>
+        </button>
+        
+        <!-- Quantity Display -->
+        <span class="w-8 text-center text-sm font-semibold text-stone-900">
+          <%= cart_item.quantity %>
+        </span>
+        
+        <!-- Increase Button -->
+        <button type="button" 
+                data-action="click->cart-controls#increment"
+                <% if cart_item.quantity >= variant.stock_quantity %>disabled<% end %>
+                class="w-8 h-8 flex items-center justify-center bg-stone-100 hover:bg-rose-100 text-stone-700 hover:text-rose-800 rounded-full transition disabled:opacity-40 disabled:cursor-not-allowed">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+        </button>
+      </div>
+      
+      <p class="text-[10px] text-rose-700 text-center mt-1.5 font-medium">Added to bag</p>
+    </div>
+  <% else %>
+    <!-- Add to Cart Button with Stimulus -->
+    <div data-controller="cart-controls"
+         data-cart-controls-add-url-value="<%= add_to_cart_path(variant.id) %>">
       <button type="button" 
-              onclick="cartControlUpdate('<%= update_item_cart_path(cart_item) %>', <%= cart_item.quantity - 1 %>)" 
-              class="w-8 h-8 flex items-center justify-center bg-stone-100 hover:bg-rose-100 text-stone-700 hover:text-rose-800 rounded-full transition">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+              data-action="click->cart-controls#add"
+              class="w-full py-2.5 px-3 bg-rose-800 hover:bg-rose-900 text-white text-xs sm:text-sm font-medium rounded-lg transition flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
         </svg>
-      </button>
-      <span class="w-8 text-center text-sm font-semibold text-stone-900">
-        <%= cart_item.quantity %>
-      </span>
-      <button type="button" 
-              onclick="cartControlUpdate('<%= update_item_cart_path(cart_item) %>', <%= cart_item.quantity + 1 %>)"
-              <% if cart_item.quantity >= variant.stock_quantity %>disabled<% end %>
-              class="w-8 h-8 flex items-center justify-center bg-stone-100 hover:bg-rose-100 text-stone-700 hover:text-rose-800 rounded-full transition disabled:opacity-40 disabled:cursor-not-allowed">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-        </svg>
+        Add to Bag
       </button>
     </div>
-    <p class="text-[10px] text-rose-700 text-center mt-1.5 font-medium">Added to bag</p>
-  <% else %>
-    <!-- Add to Cart Button -->
-    <button type="button" 
-            onclick="cartControlAdd('<%= add_to_cart_path(variant.id) %>')"
-            class="w-full py-2.5 px-3 bg-rose-800 hover:bg-rose-900 text-white text-xs sm:text-sm font-medium rounded-lg transition flex items-center justify-center gap-2">
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-      </svg>
-      Add to Bag
-    </button>
   <% end %>
 </div>

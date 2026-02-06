@@ -5,6 +5,18 @@ module ApplicationHelper
     number_to_currency(amount || 0)
   end
 
+  def order_status_badge(status)
+    case status
+    when 'pending' then 'bg-amber-100 text-amber-800'
+    when 'confirmed' then 'bg-sky-100 text-sky-800'
+    when 'processing' then 'bg-rose-100 text-rose-800'
+    when 'shipped' then 'bg-violet-100 text-violet-800'
+    when 'delivered' then 'bg-emerald-100 text-emerald-800'
+    when 'cancelled' then 'bg-red-100 text-red-800'
+    else 'bg-stone-100 text-stone-800'
+    end
+  end
+
   def star_rating(rating, max: 5)
     full_stars = rating.to_i
     half_star = (rating - full_stars) >= 0.5

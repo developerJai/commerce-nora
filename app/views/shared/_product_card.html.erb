@@ -27,7 +27,15 @@
 
       <!-- Stock Badge -->
       <% if variant %>
-        <div class="absolute top-2 right-2">
+        <div class="absolute top-2 right-2 flex flex-col gap-1 items-end">
+          <% if customer_logged_in? && current_customer.product_in_wishlist?(product) %>
+            <span class="px-2 py-0.5 bg-rose-100 text-rose-800 text-[10px] font-medium rounded-full">
+              <svg class="w-3 h-3 inline mr-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+              In Wishlist
+            </span>
+          <% end %>
           <% if variant.out_of_stock? %>
             <span class="px-2 py-0.5 bg-stone-800/80 text-white text-[10px] font-medium rounded-full">Sold Out</span>
           <% elsif variant.low_stock? %>
@@ -36,12 +44,6 @@
         </div>
       <% end %>
 
-      <!-- Wishlist button -->
-      <button class="absolute bottom-2 right-2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition">
-        <svg class="w-4 h-4 text-stone-500 hover:text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-        </svg>
-      </button>
     </div>
   <% end %>
 
@@ -52,8 +54,8 @@
     <% end %>
 
     <!-- Rating -->
-    <% if product.average_rating > 0 %>
-      <div class="flex items-center gap-1.5 mt-1.5">
+    <div class="flex items-center gap-2 mt-1.5">
+      <% if product.average_rating.to_f > 0 %>
         <div class="flex items-center gap-0.5">
           <% 5.times do |i| %>
             <svg class="w-3 h-3 <%= i < product.average_rating.round ? 'text-amber-400' : 'text-stone-200' %>" fill="currentColor" viewBox="0 0 20 20">
@@ -61,9 +63,12 @@
             </svg>
           <% end %>
         </div>
+        <span class="text-[10px] font-medium text-stone-700"><%= product.average_rating.round(1) %></span>
         <span class="text-[10px] text-stone-500">(<%= product.ratings_count %>)</span>
-      </div>
-    <% end %>
+      <% else %>
+        <span class="text-[10px] text-stone-400">No reviews yet</span>
+      <% end %>
+    </div>
 
     <!-- Price -->
     <div class="mt-2">

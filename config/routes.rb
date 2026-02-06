@@ -115,7 +115,9 @@ Rails.application.routes.draw do
 
   # Products
   resources :products, only: [:index, :show], param: :slug
-  resources :categories, only: [:show], param: :slug
+  
+  # Categories redirect to products with category filter
+  get 'categories/:slug', to: 'categories#show', as: :category
 
   # Cart
   resource :cart, only: [:show] do
@@ -142,6 +144,13 @@ Rails.application.routes.draw do
   # Addresses
   resources :addresses
 
+  # Wishlist
+  resources :wishlists, only: [:index, :create, :destroy] do
+    collection do
+      delete :clear
+    end
+  end
+
   # Support
   resources :support_tickets, path: 'support' do
     resources :messages, controller: 'customer_ticket_messages', only: [:create]
@@ -150,6 +159,13 @@ Rails.application.routes.draw do
   # Search
   get 'search', to: 'search#index'
   get 'search/suggestions', to: 'search#suggestions'
+
+  # Static Pages
+  get 'shipping', to: 'pages#shipping'
+  get 'returns', to: 'pages#returns'
+  get 'about', to: 'pages#about'
+  get 'privacy', to: 'pages#privacy'
+  get 'terms', to: 'pages#terms'
 
   # Health check
   get 'up' => 'rails/health#show', as: :rails_health_check

@@ -121,6 +121,10 @@ class Order < ApplicationRecord
     self.total_amount = subtotal - discount_amount + shipping_amount + tax_amount
   end
 
+  def items_count
+    order_items.sum(:quantity)
+  end
+
   private
 
   def generate_order_number

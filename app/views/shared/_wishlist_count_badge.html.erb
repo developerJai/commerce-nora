@@ -1,0 +1,5 @@
+<% if customer_logged_in? && current_customer.wishlist_count > 0 %>
+  <span data-wishlist-badge class="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-700 text-white text-[9px] font-bold flex items-center justify-center shadow-sm">
+    <%= current_customer.wishlist_count %>
+  </span>
+<% end %>

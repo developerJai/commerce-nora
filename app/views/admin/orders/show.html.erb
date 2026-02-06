@@ -66,9 +66,9 @@
           <% if @order.shipping_address %>
             <div class="text-sm text-gray-700">
               <p class="font-medium"><%= @order.shipping_address.full_name %></p>
-              <p><%= @order.shipping_address.address_line1 %></p>
-              <% if @order.shipping_address.address_line2.present? %>
-                <p><%= @order.shipping_address.address_line2 %></p>
+              <p><%= @order.shipping_address.street_address %></p>
+              <% if @order.shipping_address.apartment.present? %>
+                <p><%= @order.shipping_address.apartment %></p>
               <% end %>
               <p><%= @order.shipping_address.city %>, <%= @order.shipping_address.state %> <%= @order.shipping_address.postal_code %></p>
               <p><%= @order.shipping_address.country %></p>
@@ -86,9 +86,9 @@
           <% if @order.billing_address %>
             <div class="text-sm text-gray-700">
               <p class="font-medium"><%= @order.billing_address.full_name %></p>
-              <p><%= @order.billing_address.address_line1 %></p>
-              <% if @order.billing_address.address_line2.present? %>
-                <p><%= @order.billing_address.address_line2 %></p>
+              <p><%= @order.billing_address.street_address %></p>
+              <% if @order.billing_address.apartment.present? %>
+                <p><%= @order.billing_address.apartment %></p>
               <% end %>
               <p><%= @order.billing_address.city %>, <%= @order.billing_address.state %> <%= @order.billing_address.postal_code %></p>
               <p><%= @order.billing_address.country %></p>

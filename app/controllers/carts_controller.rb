@@ -9,18 +9,15 @@ class CartsController < ApplicationController
 
   def add
     @cart_item = current_cart.add_item(@variant, params[:quantity]&.to_i || 1)
+    @from_product_page = params[:from_product_page].to_s == "1"
+    @show_toast = params[:show_toast].to_s == "1"
+    
+    # Clear memoized cart so item_count returns fresh data
+    @current_cart = nil
     
     respond_to do |format|
       format.html { redirect_to cart_path, notice: "Added to cart" }
-      format.turbo_stream do
-        streams = [
-          turbo_stream.update("cart-count", current_cart.item_count.to_s),
-          turbo_stream.update("cart-controls-#{@variant.id}", 
-            partial: "shared/cart_controls", 
-            locals: { variant: @variant, cart_item: @cart_item })
-        ]
-        render turbo_stream: streams
-      end
+      format.turbo_stream
     end
   end
 
@@ -29,7 +26,6 @@ class CartsController < ApplicationController
     @variant = @cart_item.product_variant
     
     if quantity <= 0
-      # Remove item when quantity is 0 or less
       @cart_item.destroy
       @cart_item = nil
     else
@@ -37,27 +33,14 @@ class CartsController < ApplicationController
       @cart_item = current_cart.cart_items.find_by(product_variant: @variant)
     end
     
+    # Clear memoized cart so item_count/subtotal return fresh data
+    @current_cart = nil
+    
     respond_to do |format|
       format.html { redirect_to cart_path }
       format.turbo_stream do
         @cart = current_cart
         @cart_items = @cart.cart_items.includes(product_variant: [:product, image_attachment: :blob])
-        
-        streams = [
-          turbo_stream.update("cart-count", current_cart.item_count.to_s),
-          turbo_stream.update("cart-item-count", current_cart.item_count.to_s),
-          turbo_stream.update("cart-controls-#{@variant.id}", 
-            partial: "shared/cart_controls", 
-            locals: { variant: @variant, cart_item: @cart_item }),
-          turbo_stream.update("cart-items", 
-            partial: "carts/items", 
-            locals: { cart_items: @cart_items }),
-          turbo_stream.update("cart-summary", 
-            partial: "carts/summary", 
-            locals: { cart: @cart })
-        ]
-        
-        render turbo_stream: streams
       end
     end
   end
@@ -66,6 +49,9 @@ class CartsController < ApplicationController
     @variant = @cart_item.product_variant
     @cart_item.destroy
     
+    # Clear memoized cart so item_count/subtotal return fresh data
+    @current_cart = nil
+    
     respond_to do |format|
       format.html { redirect_to cart_path, notice: "Item removed from cart" }
       format.turbo_stream do
@@ -73,18 +59,20 @@ class CartsController < ApplicationController
         @cart_items = @cart.cart_items.includes(product_variant: [:product, image_attachment: :blob])
         
         streams = [
-          turbo_stream.update("cart-count", current_cart.item_count.to_s),
-          turbo_stream.update("cart-item-count", current_cart.item_count.to_s),
-          turbo_stream.update("cart-controls-#{@variant.id}", 
+          turbo_stream.replace("cart-controls-#{@variant.id}", 
             partial: "shared/cart_controls", 
             locals: { variant: @variant, cart_item: nil }),
+          turbo_stream.update("product-cart-controls-#{@variant.id}",
+            partial: "products/cart_controls",
+            locals: { variant: @variant, cart_item: nil }),
+          turbo_stream.update("cart-count", partial: "shared/cart_count_badge"),
+          turbo_stream.update("cart-item-count", current_cart.item_count.to_s),
           turbo_stream.update("cart-items", 
             partial: "carts/items", 
             locals: { cart_items: @cart_items }),
           turbo_stream.update("cart-summary", 
             partial: "carts/summary", 
-            locals: { cart: @cart }),
-          turbo_stream.prepend("flash", partial: "shared/flash", locals: { notice: "Item removed" })
+            locals: { cart: @cart })
         ]
         
         render turbo_stream: streams

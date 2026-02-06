@@ -1,0 +1,23 @@
+<%# shared/_cart_controls has its own <div id="cart-controls-*"> wrapper, so use REPLACE %>
+<%= turbo_stream.replace "cart-controls-#{@variant.id}" do %>
+  <%= render 'shared/cart_controls', variant: @variant, cart_item: @cart_item %>
+<% end %>
+
+<% if @from_product_page %>
+  <%# products/_cart_controls has NO wrapper, so use UPDATE to keep the outer div %>
+  <%= turbo_stream.update "product-cart-controls-#{@variant.id}" do %>
+    <%= render 'products/cart_controls', variant: @variant, cart_item: @cart_item %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.update "cart-count" do %>
+  <%= render 'shared/cart_count_badge' %>
+<% end %>
+
+<%= turbo_stream.update "cart-item-count", current_cart.item_count.to_s %>
+
+<% if @show_toast %>
+  <%= turbo_stream.update "toasts" do %>
+    <%= render 'shared/toast', message: 'Added to bag', variant: :success %>
+  <% end %>
+<% end %>

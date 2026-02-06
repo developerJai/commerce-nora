@@ -1,0 +1,5 @@
+<% if @pagy.next %>
+  <%= link_to 'Next', url_for(params.permit!.to_h.merge(page: @pagy.next)),
+      class: 'hidden',
+      data: { 'infinite-scroll-target': 'nextLink' } %>
+<% end %>

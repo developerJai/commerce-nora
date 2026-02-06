@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_01_175807) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_06_165447) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -334,6 +334,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_01_175807) do
     t.index ["support_ticket_id"], name: "index_ticket_messages_on_support_ticket_id"
   end
 
+  create_table "wishlists", force: :cascade do |t|
+    t.bigint "customer_id", null: false
+    t.bigint "product_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_id", "product_id"], name: "index_wishlists_on_customer_id_and_product_id", unique: true
+    t.index ["customer_id"], name: "index_wishlists_on_customer_id"
+    t.index ["product_id"], name: "index_wishlists_on_product_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "customers"
@@ -356,4 +366,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_01_175807) do
   add_foreign_key "support_tickets", "customers"
   add_foreign_key "support_tickets", "orders"
   add_foreign_key "ticket_messages", "support_tickets"
+  add_foreign_key "wishlists", "customers"
+  add_foreign_key "wishlists", "products"
 end

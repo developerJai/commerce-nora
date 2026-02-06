@@ -1,0 +1,129 @@
+<% content_for(:title) { "Write Review" } %>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm text-stone-500 mb-6">
+    <%= link_to 'Orders', orders_path, class: 'hover:text-rose-700' %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+    <%= link_to @order.order_number, order_path(@order), class: 'hover:text-rose-700' %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+    <span class="text-stone-900">Write Review</span>
+  </nav>
+
+  <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 mb-6">Write a Review</h1>
+
+  <!-- Product Info -->
+  <div class="bg-white rounded-xl border border-stone-200 p-5 mb-6">
+    <div class="flex items-center gap-4">
+      <div class="w-20 h-20 flex-shrink-0 bg-stone-50 rounded-lg overflow-hidden">
+        <% if @product.images.attached? %>
+          <%= image_tag @product.images.first, class: 'w-full h-full object-cover' %>
+        <% else %>
+          <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-50 to-amber-50">
+            <svg class="w-8 h-8 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+            </svg>
+          </div>
+        <% end %>
+      </div>
+      <div>
+        <h3 class="font-medium text-stone-900"><%= @product.name %></h3>
+        <p class="text-sm text-stone-500 mt-1">Order #<%= @order.order_number %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Form -->
+  <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+    <%= form_with(model: @review, url: order_reviews_path(@order), class: 'space-y-5') do |f| %>
+      <%= f.hidden_field :product_id, value: @product.id %>
+
+      <% if @review.errors.any? %>
+        <div class="rounded-lg bg-red-50 border border-red-200 p-4">
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+              <svg class="h-4 w-4 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+              <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                <% @review.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Rating -->
+      <div>
+        <%= f.label :rating, "Your Rating *", class: 'block text-sm font-medium text-stone-700 mb-3' %>
+        <div class="flex items-center gap-2" data-controller="rating">
+          <% 5.times do |i| %>
+            <label class="cursor-pointer">
+              <%= f.radio_button :rating, i + 1, class: 'sr-only', data: { rating_target: 'input' } %>
+              <svg class="w-10 h-10 transition <%= i < (@review.rating || 0) ? 'text-amber-400' : 'text-stone-200' %> hover:text-amber-300" 
+                   fill="currentColor" viewBox="0 0 20 20"
+                   data-action="click->rating#select"
+                   data-rating-value="<%= i + 1 %>">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+            </label>
+          <% end %>
+        </div>
+        <p class="text-xs text-stone-500 mt-2">Click on a star to rate</p>
+      </div>
+
+      <!-- Review Title -->
+      <div>
+        <%= f.label :title, "Review Title *", class: 'block text-sm font-medium text-stone-700 mb-2' %>
+        <%= f.text_field :title, required: true, placeholder: 'Summarize your experience', class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+      </div>
+
+      <!-- Review Body -->
+      <div>
+        <%= f.label :body, "Your Review *", class: 'block text-sm font-medium text-stone-700 mb-2' %>
+        <%= f.text_area :body, required: true, rows: 6, placeholder: 'Share your thoughts about this product. What did you like or dislike?', class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm resize-none' %>
+        <p class="text-xs text-stone-500 mt-2">Write at least 50 characters to help others make informed decisions</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3 pt-2">
+        <%= f.submit "Submit Review", class: 'px-6 py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition cursor-pointer' %>
+        <%= link_to 'Cancel', order_path(@order), class: 'px-6 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition' %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  // Simple rating controller
+  document.addEventListener('turbo:load', () => {
+    const stars = document.querySelectorAll('[data-rating-value]');
+    stars.forEach(star => {
+      star.addEventListener('click', (e) => {
+        const value = parseInt(e.currentTarget.dataset.ratingValue);
+        const radio = document.querySelector(`input[type="radio"][value="${value}"]`);
+        if (radio) radio.checked = true;
+        
+        // Update star colors
+        stars.forEach((s, i) => {
+          if (i < value) {
+            s.classList.remove('text-stone-200');
+            s.classList.add('text-amber-400');
+          } else {
+            s.classList.remove('text-amber-400');
+            s.classList.add('text-stone-200');
+          }
+        });
+      });
+    });
+  });
+</script>
