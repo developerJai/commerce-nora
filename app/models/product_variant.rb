@@ -13,6 +13,8 @@ class ProductVariant < ApplicationRecord
 
   before_validation :generate_sku, if: -> { sku.blank? }
 
+  validate :validate_image
+
   scope :active, -> { where(active: true) }
   scope :in_stock, -> { where("stock_quantity > 0") }
   scope :out_of_stock, -> { where(stock_quantity: 0) }
@@ -114,6 +116,29 @@ class ProductVariant < ApplicationRecord
   private
 
   def generate_sku
-    self.sku = "#{product&.sku || 'PRD'}-#{SecureRandom.hex(4).upcase}"
+    base = product&.sku.presence || "PRD"
+
+    sku_candidate = nil
+    20.times do
+      candidate = "#{base}-#{SecureRandom.hex(3).upcase}"
+      next if ProductVariant.exists?(sku: candidate)
+      sku_candidate = candidate
+      break
+    end
+
+    self.sku = sku_candidate || "#{base}-#{SecureRandom.hex(4).upcase}"
+  end
+
+  def validate_image
+    return unless image.attached?
+    return unless image.blob
+
+    unless image.blob.content_type.to_s.start_with?("image/")
+      errors.add(:image, "must be an image")
+    end
+
+    if image.blob.byte_size.to_i > 2.megabytes
+      errors.add(:image, "must be smaller than 2 MB")
+    end
   end
 end

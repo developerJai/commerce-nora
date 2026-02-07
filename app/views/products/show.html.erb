@@ -22,11 +22,16 @@
     <div class="lg:col-span-7">
       <div class="lg:sticky lg:top-24">
         <div class="flex flex-row gap-3">
+          <% variant_image = default_variant&.image&.attached? ? default_variant.image : nil %>
+          <% gallery_images = [] %>
+          <% gallery_images << variant_image if variant_image %>
+          <% gallery_images.concat(@product.images.to_a) if @product.images.attached? %>
+
           <!-- Vertical Thumbnails (Left Side) -->
-          <% if @product.images.attached? && @product.images.count > 1 %>
+          <% if gallery_images.count > 1 %>
             <div class="hidden sm:block w-20 flex-shrink-0">
               <div class="flex flex-col gap-2">
-                <% @product.images.each_with_index do |image, index| %>
+                <% gallery_images.each_with_index do |image, index| %>
                   <button type="button"
                           data-action="click->product-gallery#selectImage"
                           data-product-gallery-index-param="<%= index %>"
@@ -42,8 +47,8 @@
           <!-- Main Image -->
           <div class="flex-1 min-w-0">
             <div class="aspect-square bg-stone-100 rounded-xl overflow-hidden relative">
-              <% if @product.images.attached? %>
-                <% @product.images.each_with_index do |image, index| %>
+              <% if gallery_images.any? %>
+                <% gallery_images.each_with_index do |image, index| %>
                   <div class="absolute inset-0 transition-opacity duration-300 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>" data-product-gallery-target="slide">
                     <%= image_tag image, class: 'w-full h-full object-cover' %>
                   </div>
@@ -68,9 +73,9 @@
             </div>
 
             <!-- Mobile Thumbnails (Horizontal - Below Image) -->
-            <% if @product.images.attached? && @product.images.count > 1 %>
+            <% if gallery_images.count > 1 %>
               <div class="sm:hidden flex gap-2 mt-3 overflow-x-auto pb-1">
-                <% @product.images.each_with_index do |image, index| %>
+                <% gallery_images.each_with_index do |image, index| %>
                   <button type="button"
                           data-action="click->product-gallery#selectImage"
                           data-product-gallery-index-param="<%= index %>"

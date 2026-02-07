@@ -4,7 +4,7 @@ class SearchController < ApplicationController
     
     if @q.present?
       @pagy, @products = pagy(
-        Product.active.search(@q).includes(:variants, images_attachments: :blob).ordered,
+        Product.active.search(@q).includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).ordered,
         limit: 12
       )
     else

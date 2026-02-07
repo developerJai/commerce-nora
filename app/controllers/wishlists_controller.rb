@@ -2,7 +2,7 @@ class WishlistsController < ApplicationController
   before_action :require_customer
 
   def index
-    @wishlist_items = current_customer.wishlist_items.includes(:product).order(created_at: :desc)
+    @wishlist_items = current_customer.wishlist_items.includes(product: [{ variants: { image_attachment: :blob } }, { images_attachments: :blob }]).order(created_at: :desc)
   end
 
   def create

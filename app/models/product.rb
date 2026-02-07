@@ -9,8 +9,12 @@ class Product < ApplicationRecord
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
+  validates :sku, uniqueness: true, allow_blank: true
 
   before_validation :generate_slug, if: -> { slug.blank? && name.present? }
+  before_validation :generate_sku, if: -> { sku.blank? && name.present? }
+
+  validate :validate_images
 
   scope :active, -> { where(active: true) }
   scope :featured, -> { where(featured: true) }
@@ -69,5 +73,37 @@ class Product < ApplicationRecord
       counter += 1
     end
     self.slug = slug_candidate
+  end
+
+  def generate_sku
+    base = name.parameterize.upcase.gsub("-", "")
+    base = base[0, 12] if base.length > 12
+    prefix = base.presence || "PRD"
+
+    sku_candidate = nil
+    20.times do
+      candidate = "#{prefix}-#{SecureRandom.hex(2).upcase}"
+      next if Product.exists?(sku: candidate)
+      sku_candidate = candidate
+      break
+    end
+
+    self.sku = sku_candidate || "#{prefix}-#{SecureRandom.hex(3).upcase}"
+  end
+
+  def validate_images
+    return unless images.attached?
+
+    images.each do |img|
+      next unless img.blob
+
+      unless img.blob.content_type.to_s.start_with?("image/")
+        errors.add(:images, "must be an image")
+      end
+
+      if img.blob.byte_size.to_i > 2.megabytes
+        errors.add(:images, "must be smaller than 2 MB")
+      end
+    end
   end
 end

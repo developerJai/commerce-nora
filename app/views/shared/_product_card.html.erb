@@ -6,7 +6,9 @@
      id="product-card-<%= product.id %>">
   <%= link_to product_path(product.slug) do %>
     <div class="aspect-square bg-stone-50 relative overflow-hidden">
-      <% if product.images.attached? %>
+      <% if variant&.image&.attached? %>
+        <%= image_tag variant.image, class: 'w-full h-full object-cover group-hover:scale-105 transition duration-500', loading: 'lazy' %>
+      <% elsif product.images.attached? %>
         <%= image_tag product.images.first, class: 'w-full h-full object-cover group-hover:scale-105 transition duration-500', loading: 'lazy' %>
       <% else %>
         <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-50 to-amber-50">

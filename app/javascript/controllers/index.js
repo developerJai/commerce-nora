@@ -17,6 +17,8 @@ import ProductGalleryController from "controllers/product_gallery_controller"
 import ProductVariantController from "controllers/product_variant_controller"
 import TabsController from "controllers/tabs_controller"
 import QuantityController from "controllers/quantity_controller"
+import ImagePreviewController from "controllers/image_preview_controller"
+import MultiImagePreviewController from "controllers/multi_image_preview_controller"
 
 application.register("sidebar", SidebarController)
 application.register("dropdown", DropdownController)
@@ -31,3 +33,5 @@ application.register("product-gallery", ProductGalleryController)
 application.register("product-variant", ProductVariantController)
 application.register("tabs", TabsController)
 application.register("quantity", QuantityController)
+application.register("image-preview", ImagePreviewController)
+application.register("multi-image-preview", MultiImagePreviewController)

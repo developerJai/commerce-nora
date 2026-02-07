@@ -9,7 +9,11 @@ class ProductsController < ApplicationController
     @catalog_min_price = variants_scope.minimum(:price).to_f.floor
     @catalog_max_price = variants_scope.maximum(:price).to_f.ceil
 
-    products = Product.active.includes(:category, :variants, images_attachments: :blob)
+    products = Product.active.includes(
+      :category,
+      { variants: { image_attachment: :blob } },
+      images_attachments: :blob
+    )
 
     if @category_ids.any?
       products = products.where(category_id: @category_ids)
@@ -45,12 +49,16 @@ class ProductsController < ApplicationController
   end
 
   def show
-    @product = Product.active.includes(:variants, :category, images_attachments: :blob).find_by!(slug: params[:slug])
+    @product = Product.active.includes(
+      :category,
+      { variants: { image_attachment: :blob } },
+      images_attachments: :blob
+    ).find_by!(slug: params[:slug])
     @variants = @product.variants.active.ordered
     @reviews = @product.approved_reviews.includes(:customer).recent.limit(10)
     @related_products = Product.active.where(category_id: @product.category_id)
                                .where.not(id: @product.id)
-                               .includes(:variants, images_attachments: :blob)
+                               .includes({ variants: { image_attachment: :blob } }, images_attachments: :blob)
                                .limit(4)
     
     # Get the selected variant (from URL param or default to first)
