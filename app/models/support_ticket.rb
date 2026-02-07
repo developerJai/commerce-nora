@@ -14,10 +14,25 @@ class SupportTicket < ApplicationRecord
 
   before_validation :generate_ticket_number, if: -> { ticket_number.blank? }
 
+  # Use ticket_number in storefront URLs instead of numeric ID
+  def to_param
+    ticket_number
+  end
+
   scope :open_tickets, -> { where(status: %w[open in_progress]) }
   scope :by_status, ->(status) { where(status: status) if status.present? }
   scope :by_priority, ->(priority) { where(priority: priority) if priority.present? }
   scope :recent, -> { order(created_at: :desc) }
+
+  scope :unread_for_customer, -> {
+    where(last_message_sender_type: 'AdminUser')
+      .where("customer_last_seen_at IS NULL OR last_message_at IS NULL OR customer_last_seen_at < last_message_at")
+  }
+
+  scope :unread_for_admin, -> {
+    where(last_message_sender_type: 'Customer')
+      .where("admin_last_seen_at IS NULL OR last_message_at IS NULL OR admin_last_seen_at < last_message_at")
+  }
 
   def open?
     status == 'open'
@@ -56,11 +71,36 @@ class SupportTicket < ApplicationRecord
   end
 
   def add_message(sender:, body:)
-    ticket_messages.create!(
-      sender_type: sender.class.name,
-      sender_id: sender.id,
-      body: body
-    )
+    transaction do
+      message = ticket_messages.create!(
+        sender_type: sender.class.name,
+        sender_id: sender.id,
+        body: body
+      )
+
+      update_columns(
+        last_message_at: message.created_at,
+        last_message_sender_type: message.sender_type,
+        updated_at: Time.current
+      )
+
+      now = Time.current
+      if message.sender_type == 'Customer'
+        update_columns(customer_last_seen_at: now)
+      elsif message.sender_type == 'AdminUser'
+        update_columns(admin_last_seen_at: now)
+      end
+
+      message
+    end
+  end
+
+  def unread_for_customer?
+    last_message_sender_type == 'AdminUser' && last_message_at.present? && (customer_last_seen_at.nil? || customer_last_seen_at < last_message_at)
+  end
+
+  def unread_for_admin?
+    last_message_sender_type == 'Customer' && last_message_at.present? && (admin_last_seen_at.nil? || admin_last_seen_at < last_message_at)
   end
 
   private

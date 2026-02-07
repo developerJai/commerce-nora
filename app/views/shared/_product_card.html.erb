@@ -1,5 +1,6 @@
 <% variant = product.default_variant %>
 <% cart_item = current_cart.cart_items.find_by(product_variant_id: variant&.id) if variant %>
+<% badge_side = local_assigns.fetch(:badge_side, :right) %>
 
 <div class="group bg-white rounded-lg border border-stone-200 overflow-hidden hover:shadow-lg hover:border-stone-300 transition-all duration-200 flex flex-col"
      id="product-card-<%= product.id %>">
@@ -27,7 +28,7 @@
 
       <!-- Stock Badge -->
       <% if variant %>
-        <div class="absolute top-2 right-2 flex flex-col gap-1 items-end">
+        <div class="absolute top-2 <%= badge_side.to_s == 'left' ? 'left-2 mt-6 items-start' : 'right-2 items-end' %> flex flex-col gap-1">
           <% if customer_logged_in? && current_customer.product_in_wishlist?(product) %>
             <span class="px-2 py-0.5 bg-rose-100 text-rose-800 text-[10px] font-medium rounded-full">
               <svg class="w-3 h-3 inline mr-0.5" fill="currentColor" viewBox="0 0 24 24">

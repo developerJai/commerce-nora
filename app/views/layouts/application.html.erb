@@ -159,13 +159,20 @@
     <nav class="border-t border-stone-100">
       <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="flex items-center gap-1 sm:gap-4 h-10 overflow-x-auto scrollbar-hide">
-          <%= link_to products_path, class: 'px-3 py-1.5 text-sm text-stone-600 hover:text-rose-800 whitespace-nowrap transition' do %>
-            All Jewellery
+          <% active_class = 'px-3 py-1.5 text-sm text-rose-700 font-medium whitespace-nowrap' %>
+          <% inactive_class = 'px-3 py-1.5 text-sm text-stone-600 hover:text-rose-800 whitespace-nowrap transition' %>
+          <% selected_category_ids = Array(params[:category_ids]).reject(&:blank?).map(&:to_s) %>
+          <% collections_active = params[:featured].present? && ActiveModel::Type::Boolean.new.cast(params[:featured]) %>
+          <% all_active = selected_category_ids.empty? && !collections_active %>
+
+          <%= link_to products_path, class: (all_active ? active_class : inactive_class) do %>
+            All
           <% end %>
+          <%= link_to 'Collections', products_path(featured: true), class: (collections_active ? active_class : inactive_class) %>
           <% Category.active.root.ordered.limit(6).each do |category| %>
-            <%= link_to category.name, category_path(category.slug), class: 'px-3 py-1.5 text-sm text-stone-600 hover:text-rose-800 whitespace-nowrap transition' %>
+            <% category_active = selected_category_ids.include?(category.id.to_s) %>
+            <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
           <% end %>
-          <%= link_to 'Collections', products_path(featured: true), class: 'px-3 py-1.5 text-sm text-rose-700 font-medium whitespace-nowrap' %>
         </div>
       </div>
     </nav>

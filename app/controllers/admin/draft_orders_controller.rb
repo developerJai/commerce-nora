@@ -60,7 +60,7 @@ module Admin
     private
 
     def set_order
-      @order = Order.draft.find(params[:id])
+      @order = Order.draft.find_by!(order_number: params[:order_number])
     end
 
     def draft_order_params

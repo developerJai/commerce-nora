@@ -1,129 +1,204 @@
 <% content_for(:title) { "Order #{@order.order_number}" } %>
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-  <!-- Header -->
-  <div class="flex flex-wrap items-center justify-between gap-4 mb-6 sm:mb-8">
-    <div>
-      <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Order <%= @order.order_number %></h1>
-      <p class="text-sm text-stone-500">Placed on <%= @order.placed_at&.strftime('%B %d, %Y at %I:%M %p') %></p>
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+  <div class="flex flex-col lg:flex-row gap-6">
+    <div class="w-full lg:w-64 flex-shrink-0">
+      <%= render 'shared/account_sidebar', active_page: 'orders' %>
     </div>
-    <span class="px-4 py-2 rounded-full text-sm font-medium <%= order_status_badge(@order.status) %>">
-      <%= @order.status.titleize %>
-    </span>
-  </div>
 
-  <!-- Order Timeline -->
-  <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 mb-6">
-    <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Status</h2>
-    <div class="flex items-center justify-between">
-      <% statuses = ['confirmed', 'processing', 'shipped', 'delivered'] %>
-      <% current_index = statuses.index(@order.status) || -1 %>
-      <% statuses.each_with_index do |status, index| %>
-        <div class="flex flex-col items-center flex-1 <%= index < statuses.length - 1 ? 'relative' : '' %>">
-          <div class="w-8 h-8 rounded-full flex items-center justify-center <%= index <= current_index ? 'bg-rose-800 text-white' : 'bg-stone-200 text-stone-500' %>">
-            <% if index < current_index %>
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-              </svg>
-            <% else %>
-              <%= index + 1 %>
-            <% end %>
+    <div class="flex-1">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+        <div>
+          <h1 class="text-2xl font-serif font-semibold text-stone-900">Order Details</h1>
+          <div class="flex flex-wrap items-center gap-3 mt-1">
+            <p class="text-sm text-stone-600"><%= @order.order_number %></p>
+            <span class="text-stone-300">•</span>
+            <p class="text-sm text-stone-500">Placed on <%= @order.placed_at&.strftime('%B %d, %Y at %I:%M %p') %></p>
+            <span class="px-3 py-1 rounded-full text-xs font-medium <%= order_status_badge(@order.status) %>">
+              <%= @order.status.titleize %>
+            </span>
           </div>
-          <p class="mt-2 text-xs text-center font-medium <%= index <= current_index ? 'text-rose-800' : 'text-stone-500' %>"><%= status.titleize %></p>
-          <% if index < statuses.length - 1 %>
-            <div class="absolute top-4 left-1/2 w-full h-0.5 <%= index < current_index ? 'bg-rose-800' : 'bg-stone-200' %>"></div>
-          <% end %>
         </div>
-      <% end %>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 space-y-6">
-      <!-- Order Items -->
-      <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
-        <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Items</h2>
-        <ul class="divide-y divide-stone-100">
-          <% @order_items.each do |item| %>
-            <li class="py-4">
-              <div class="flex items-start gap-4">
-                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
-                  <% if item.product_variant&.product&.images&.attached? %>
-                    <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
-                  <% end %>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="font-medium text-stone-900"><%= item.product_name %></p>
-                  <p class="text-sm text-stone-500"><%= item.variant_name %></p>
-                  <p class="text-sm text-stone-500">Qty: <%= item.quantity %> × <%= format_price(item.unit_price) %></p>
-                </div>
-                <p class="font-semibold text-stone-900"><%= format_price(item.total_price) %></p>
-              </div>
-              
-              <% if @can_review && item.product_variant && !@reviewed_variants.include?(item.product_variant.product_id) %>
-                <div class="mt-3">
-                  <%= link_to 'Write a Review', new_order_review_path(@order, product_id: item.product_variant.product_id), 
-                      class: 'text-sm text-rose-700 hover:text-rose-900 font-medium' %>
-                </div>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
-      </div>
-
-      <!-- Shipping Address -->
-      <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
-        <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Shipping Address</h2>
-        <% if @order.shipping_address %>
-          <p class="font-medium text-stone-900"><%= @order.shipping_address.full_name %></p>
-          <p class="text-stone-600 text-sm mt-1"><%= @order.shipping_address.full_address %></p>
-          <% if @order.shipping_address.phone.present? %>
-            <p class="text-stone-600 text-sm"><%= @order.shipping_address.phone %></p>
-          <% end %>
+        <%= link_to orders_path, class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition' do %>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to orders
         <% end %>
       </div>
-    </div>
 
-    <div class="lg:col-span-1">
-      <!-- Order Summary -->
-      <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 lg:sticky lg:top-24">
-        <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Summary</h2>
-        <div class="space-y-2 text-sm">
-          <div class="flex justify-between">
-            <span class="text-stone-600">Subtotal</span>
-            <span class="text-stone-900"><%= format_price(@order.subtotal) %></span>
-          </div>
-          <% if @order.discount_amount > 0 %>
-            <div class="flex justify-between text-emerald-600">
-              <span>Discount</span>
-              <span>-<%= format_price(@order.discount_amount) %></span>
+      <!-- Order Timeline -->
+      <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 mb-6">
+        <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Status</h2>
+        <div class="flex items-center justify-between">
+          <% statuses = ['confirmed', 'processing', 'shipped', 'delivered'] %>
+          <% current_index = statuses.index(@order.status) || -1 %>
+          <% statuses.each_with_index do |status, index| %>
+            <div class="flex flex-col items-center flex-1 <%= index < statuses.length - 1 ? 'relative' : '' %>">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center <%= index <= current_index ? 'bg-rose-800 text-white' : 'bg-stone-200 text-stone-500' %>">
+                <% if index < current_index %>
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                <% else %>
+                  <%= index + 1 %>
+                <% end %>
+              </div>
+              <p class="mt-2 text-xs text-center font-medium <%= index <= current_index ? 'text-rose-800' : 'text-stone-500' %>"><%= status.titleize %></p>
+              <% if index < statuses.length - 1 %>
+                <div class="absolute top-4 left-1/2 w-full h-0.5 <%= index < current_index ? 'bg-rose-800' : 'bg-stone-200' %>"></div>
+              <% end %>
             </div>
           <% end %>
-          <div class="flex justify-between">
-            <span class="text-stone-600">Shipping</span>
-            <span class="<%= @order.shipping_amount > 0 ? 'text-stone-900' : 'text-emerald-600 font-medium' %>"><%= @order.shipping_amount > 0 ? format_price(@order.shipping_amount) : 'Free' %></span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Order Items -->
+          <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+            <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Items</h2>
+            <ul class="divide-y divide-stone-100">
+              <% @order_items.each do |item| %>
+                <li class="py-4">
+                  <div class="flex items-start gap-4">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
+                      <% if item.product_variant&.product&.images&.attached? %>
+                        <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
+                      <% end %>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="font-medium text-stone-900"><%= item.product_name %></p>
+                      <p class="text-sm text-stone-500"><%= item.variant_name %></p>
+                      <p class="text-sm text-stone-500">Qty: <%= item.quantity %> × <%= format_price(item.unit_price) %></p>
+                    </div>
+                    <p class="font-semibold text-stone-900"><%= format_price(item.total_price) %></p>
+                  </div>
+                  
+                  <% if @can_review && item.product_variant && !@reviewed_variants.include?(item.product_variant.product_id) %>
+                    <div class="mt-3">
+                      <%= link_to 'Write a Review', new_order_review_path(@order, product_id: item.product_variant.product_id), 
+                          class: 'text-sm text-rose-700 hover:text-rose-900 font-medium' %>
+                    </div>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
           </div>
-          <div class="border-t border-stone-200 pt-2 flex justify-between">
-            <span class="font-semibold text-stone-900">Total</span>
-            <span class="font-semibold text-stone-900 text-lg"><%= format_price(@order.total_amount) %></span>
+
+          <!-- Shipping Address -->
+          <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+            <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Shipping Address</h2>
+            <% if @order.shipping_address %>
+              <p class="font-medium text-stone-900"><%= @order.shipping_address.full_name %></p>
+              <p class="text-stone-600 text-sm mt-1"><%= @order.shipping_address.full_address %></p>
+              <% if @order.shipping_address.phone.present? %>
+                <p class="text-stone-600 text-sm"><%= @order.shipping_address.phone %></p>
+              <% end %>
+            <% end %>
           </div>
         </div>
 
-        <div class="mt-5 p-4 bg-stone-50 rounded-lg">
-          <p class="text-sm text-stone-600">
-            <span class="font-medium">Payment Method:</span> Cash on Delivery
-          </p>
-          <p class="text-sm text-stone-600 mt-1">
-            <span class="font-medium">Payment Status:</span> <%= @order.payment_status.titleize %>
-          </p>
-        </div>
+        <div class="lg:col-span-1">
+          <!-- Order Summary -->
+          <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 lg:sticky lg:top-24">
+            <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Summary</h2>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-stone-600">Subtotal</span>
+                <span class="text-stone-900"><%= format_price(@order.subtotal) %></span>
+              </div>
+              <% if @order.discount_amount > 0 %>
+                <div class="flex justify-between text-emerald-600">
+                  <span>Discount</span>
+                  <span>-<%= format_price(@order.discount_amount) %></span>
+                </div>
+              <% end %>
+              <div class="flex justify-between">
+                <span class="text-stone-600">Shipping</span>
+                <span class="<%= @order.shipping_amount > 0 ? 'text-stone-900' : 'text-emerald-600 font-medium' %>"><%= @order.shipping_amount > 0 ? format_price(@order.shipping_amount) : 'Free' %></span>
+              </div>
+              <div class="border-t border-stone-200 pt-2 flex justify-between">
+                <span class="font-semibold text-stone-900">Total</span>
+                <span class="font-semibold text-stone-900 text-lg"><%= format_price(@order.total_amount) %></span>
+              </div>
+            </div>
 
-        <% if @order.can_cancel? %>
-          <div class="mt-5 pt-5 border-t border-stone-200">
-            <p class="text-sm text-stone-500 mb-2">Need help with this order?</p>
-            <%= link_to 'Contact Support', new_support_ticket_path(order_id: @order.id), class: 'text-rose-700 hover:text-rose-900 text-sm font-medium' %>
+            <div class="mt-5 p-4 bg-stone-50 rounded-lg">
+              <p class="text-sm text-stone-600">
+                <span class="font-medium">Payment Method:</span> Cash on Delivery
+              </p>
+              <p class="text-sm text-stone-600 mt-1">
+                <span class="font-medium">Payment Status:</span> <%= @order.payment_status.titleize %>
+              </p>
+            </div>
+
+            <% if @order.shipped_at.present? %>
+              <div class="mt-5 pt-5 border-t border-stone-200">
+                <p class="text-sm font-medium text-stone-700 mb-3">Shipment Details</p>
+                <div class="space-y-2 text-sm">
+                  <% if @order.shipping_carrier.present? %>
+                    <div class="flex justify-between">
+                      <span class="text-stone-500">Carrier</span>
+                      <span class="text-stone-700"><%= @order.shipping_carrier %></span>
+                    </div>
+                  <% end %>
+                  <% if @order.tracking_number.present? %>
+                    <div class="flex justify-between">
+                      <span class="text-stone-500">Tracking #</span>
+                      <span class="text-stone-700"><%= @order.tracking_number %></span>
+                    </div>
+                  <% end %>
+                  <% if @order.tracking_url.present? %>
+                    <div class="flex justify-between">
+                      <span class="text-stone-500">Tracking</span>
+                      <%= link_to 'Track package', @order.tracking_url, target: '_blank', rel: 'noopener', class: 'text-rose-700 hover:text-rose-900 font-medium' %>
+                    </div>
+                  <% end %>
+                  <div class="flex justify-between">
+                    <span class="text-stone-500">Shipped</span>
+                    <span class="text-stone-700"><%= @order.shipped_at.strftime('%B %d, %Y') %></span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @order.cancelled? && @order.cancellation_reason.present? %>
+              <div class="mt-5 pt-5 border-t border-stone-200">
+                <p class="text-sm font-medium text-stone-700 mb-1">Cancellation Reason</p>
+                <p class="text-sm text-stone-600"><%= @order.cancellation_reason %></p>
+                <% if @order.cancelled_at.present? %>
+                  <p class="text-xs text-stone-400 mt-1">Cancelled on <%= @order.cancelled_at.strftime('%B %d, %Y at %I:%M %p') %></p>
+                <% end %>
+              </div>
+            <% end %>
+
+            <% if @order.can_cancel? %>
+              <div class="mt-5 pt-5 border-t border-stone-200">
+                <%= form_with url: cancel_order_path(@order), method: :patch, data: { turbo_confirm: "Are you sure you want to cancel this order? This action cannot be undone." } do |f| %>
+                  <label for="cancellation_reason" class="block text-sm font-medium text-stone-700 mb-2">Reason for cancellation</label>
+                  <select name="cancellation_reason" id="cancellation_reason" required
+                          class="w-full px-3 py-2 text-sm border border-stone-300 rounded-lg bg-white text-stone-700 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 mb-3">
+                    <option value="" disabled selected>Select a reason...</option>
+                    <% Order::CANCELLATION_REASONS.each do |reason| %>
+                      <option value="<%= reason %>"><%= reason %></option>
+                    <% end %>
+                  </select>
+                  <button type="submit"
+                          class="w-full px-4 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition cursor-pointer">
+                    Cancel Order
+                  </button>
+                <% end %>
+                <p class="text-xs text-stone-500 mt-2 text-center">You can cancel before the order is shipped</p>
+              </div>
+            <% end %>
+
+            <div class="mt-5 pt-5 border-t border-stone-200">
+              <p class="text-sm text-stone-500 mb-2">Need help with this order?</p>
+              <%= link_to 'Contact Support', new_support_ticket_path(order_id: @order.id), class: 'text-rose-700 hover:text-rose-900 text-sm font-medium' %>
+            </div>
           </div>
-        <% end %>
+        </div>
       </div>
     </div>
   </div>

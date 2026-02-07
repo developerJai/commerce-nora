@@ -24,7 +24,7 @@ class OrderReviewsController < ApplicationController
   private
 
   def set_order
-    @order = current_customer.orders.find(params[:order_id])
+    @order = current_customer.orders.find_by!(order_number: params[:order_order_number])
   end
 
   def check_can_review

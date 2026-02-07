@@ -8,6 +8,7 @@ class SupportTicketsController < ApplicationController
 
   def show
     @messages = @ticket.ticket_messages.recent.includes(:sender)
+    @ticket.update_column(:customer_last_seen_at, Time.current)
   end
 
   def new
@@ -34,7 +35,7 @@ class SupportTicketsController < ApplicationController
   private
 
   def set_ticket
-    @ticket = current_customer.support_tickets.find(params[:id])
+    @ticket = current_customer.support_tickets.find_by!(ticket_number: params[:ticket_number])
   end
 
   def ticket_params

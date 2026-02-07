@@ -1,10 +1,12 @@
 module Admin
   class OrdersController < BaseController
-    before_action :set_order, only: [:show, :edit, :update, :confirm, :process_order, :ship, :deliver, :cancel]
+    before_action :set_order, only: [:show, :edit, :update, :confirm, :process_order, :ship, :deliver, :cancel, :rollback]
 
     def index
       @status = params[:status]
+      @not_shipped = params[:not_shipped]
       orders = Order.placed.includes(:customer).recent
+      orders = orders.where(status: %w[confirmed processing]) if @not_shipped.present?
       orders = orders.by_status(@status) if @status.present?
       @pagy, @orders = pagy(orders, limit: 20)
     end
@@ -39,8 +41,11 @@ module Admin
     end
 
     def ship
+      @order.assign_attributes(shipment_params)
       @order.ship!
       redirect_to admin_order_path(@order), notice: "Order shipped"
+    rescue ActiveRecord::RecordInvalid => e
+      redirect_to admin_order_path(@order), alert: e.record.errors.full_messages.join(", ")
     end
 
     def deliver
@@ -56,14 +61,26 @@ module Admin
       end
     end
 
+    def rollback
+      @order.rollback!
+      redirect_to admin_order_path(@order), notice: "Order moved back"
+    rescue ActiveRecord::RecordInvalid
+      redirect_to admin_order_path(@order), alert: "Cannot move order back from this status"
+    end
+
     private
 
     def set_order
-      @order = Order.find(params[:id])
+      @order = Order.find_by!(order_number: params[:order_number])
     end
 
     def order_params
       params.require(:order).permit(:admin_notes, :status, :payment_status)
+    end
+
+    def shipment_params
+      return {} unless params[:order].present?
+      params.require(:order).permit(:shipping_carrier, :tracking_number, :tracking_url, :shipper_name)
     end
   end
 end

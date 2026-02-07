@@ -1,6 +1,6 @@
 <% content_for(:title) { "Review Order" } %>
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
   <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 mb-6 sm:mb-8">Review Your Order</h1>
 
   <%= form_with url: checkout_path, method: :post do |f| %>
@@ -68,7 +68,11 @@
             <% end %>
             <div class="flex justify-between">
               <span class="text-stone-600">Shipping</span>
-              <span class="text-emerald-600 font-medium">Free</span>
+              <span class="<%= @shipping.to_f > 0 ? 'text-stone-900' : 'text-emerald-600 font-medium' %>"><%= @shipping.to_f > 0 ? format_price(@shipping) : 'Free' %></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-600">Tax</span>
+              <span class="text-stone-900"><%= format_price(@tax) %></span>
             </div>
             <div class="border-t border-stone-200 pt-2 flex justify-between">
               <span class="font-semibold text-stone-900">Total</span>

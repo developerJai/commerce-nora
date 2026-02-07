@@ -13,8 +13,8 @@ class CheckoutsController < ApplicationController
   end
 
   def save_address
-    if params[:address_id].present?
-      @address = current_customer.addresses.find(params[:address_id])
+    if params[:address_token].present?
+      @address = current_customer.addresses.find_by!(token: params[:address_token])
       session[:checkout_address_id] = @address.id
       redirect_to confirm_checkout_path
     else
@@ -42,8 +42,10 @@ class CheckoutsController < ApplicationController
     @cart = current_cart
     @subtotal = @cart.subtotal
     @discount = @coupon&.calculate_discount(@subtotal) || 0
-    @shipping = 0 # Free shipping for now
-    @total = @subtotal - @discount + @shipping
+    discounted_subtotal = @subtotal - @discount
+    @shipping = Order.calculate_shipping_amount(discounted_subtotal)
+    @tax = Order.calculate_tax_amount(discounted_subtotal + @shipping)
+    @total = discounted_subtotal + @shipping + @tax
   end
 
   def create

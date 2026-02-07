@@ -26,7 +26,7 @@ class WishlistsController < ApplicationController
   end
 
   def destroy
-    wishlist_item = current_customer.wishlist_items.find(params[:id])
+    wishlist_item = current_customer.wishlist_items.find_by!(product_id: params[:product_id])
     product = wishlist_item.product
     @product = product
     @icon_only = params[:icon_only].to_s == "true"

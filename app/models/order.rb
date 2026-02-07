@@ -1,7 +1,38 @@
 class Order < ApplicationRecord
+  # ── Value object returned by shipping_address / billing_address ──
+  # Mirrors the Address model interface so views work without changes.
+  class AddressSnapshot
+    attr_reader :first_name, :last_name, :phone,
+                :street_address, :apartment, :city, :state, :postal_code, :country
+
+    def initialize(data)
+      data = (data || {}).with_indifferent_access
+      @first_name     = data[:first_name]
+      @last_name      = data[:last_name]
+      @phone          = data[:phone]
+      @street_address = data[:street_address]
+      @apartment      = data[:apartment]
+      @city           = data[:city]
+      @state          = data[:state]
+      @postal_code    = data[:postal_code]
+      @country        = data[:country]
+    end
+
+    def full_name
+      [first_name, last_name].compact_blank.join(" ")
+    end
+
+    def full_address
+      [street_address, apartment, city, state, postal_code, country].compact_blank.join(", ")
+    end
+
+    def one_line
+      "#{full_name}, #{full_address}"
+    end
+  end
+
+  # ── Associations ──
   belongs_to :customer, optional: true
-  belongs_to :shipping_address, class_name: 'Address', optional: true
-  belongs_to :billing_address, class_name: 'Address', optional: true
   belongs_to :coupon, optional: true
   has_many :order_items, dependent: :destroy
   has_many :reviews, dependent: :nullify
@@ -10,15 +41,72 @@ class Order < ApplicationRecord
   accepts_nested_attributes_for :order_items, allow_destroy: true, reject_if: :all_blank
 
   STATUSES = %w[pending confirmed processing shipped delivered cancelled].freeze
+
+  SHIPPING_FREE_THRESHOLD = 999
+  SHIPPING_FLAT_FEE = 99
+  TAX_RATE = 0.18
   PAYMENT_STATUSES = %w[pending paid failed refunded].freeze
   PAYMENT_METHODS = %w[cod].freeze
+  CANCELLATION_REASONS = [
+    'Changed my mind',
+    'Found a better price elsewhere',
+    'Ordered by mistake',
+    'Delivery time is too long',
+    'Want to change shipping address',
+    'Want to change items in order',
+    'Other'
+  ].freeze
 
   validates :order_number, presence: true, uniqueness: true
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :payment_status, presence: true, inclusion: { in: PAYMENT_STATUSES }
   validates :payment_method, presence: true, inclusion: { in: PAYMENT_METHODS }
 
+  validates :shipper_name, :shipping_carrier, :tracking_number, presence: true, if: :shipped?
+
   before_validation :generate_order_number, if: -> { order_number.blank? }
+  before_save :ensure_address_snapshots
+
+  # ── Address getters ──
+  # Return an AddressSnapshot (preferred) or fall back to the Address record
+  # for legacy orders that haven't been backfilled yet.
+
+  def shipping_address
+    if shipping_address_snapshot.present?
+      AddressSnapshot.new(shipping_address_snapshot)
+    elsif shipping_address_id.present?
+      Address.unscoped.find_by(id: shipping_address_id)
+    end
+  end
+
+  def billing_address
+    if billing_address_snapshot.present?
+      AddressSnapshot.new(billing_address_snapshot)
+    elsif billing_address_id.present?
+      Address.unscoped.find_by(id: billing_address_id)
+    end
+  end
+
+  # ── Address setters ──
+  # Accept an Address object, store the ID as a historical reference
+  # and snapshot the data so the order is self-contained.
+
+  def shipping_address=(address)
+    return unless address.is_a?(Address)
+    self.shipping_address_id = address.id
+    self.shipping_address_snapshot = address_to_snapshot(address)
+  end
+
+  def billing_address=(address)
+    return unless address.is_a?(Address)
+    self.billing_address_id = address.id
+    self.billing_address_snapshot = address_to_snapshot(address)
+  end
+
+  # Use order_number in storefront URLs instead of numeric ID
+  def to_param
+    order_number
+  end
 
   scope :active, -> { where.not(status: 'cancelled') }
   scope :draft, -> { where(is_draft: true) }
@@ -59,15 +147,32 @@ class Order < ApplicationRecord
   end
 
   def ship!
-    update!(status: 'shipped', shipped_at: Time.current)
+    assign_attributes(status: 'shipped', shipped_at: Time.current)
+    save!
   end
 
   def deliver!
     update!(status: 'delivered', delivered_at: Time.current, payment_status: 'paid')
   end
 
-  def cancel!
-    return false if delivered?
+  def rollback!
+    case status
+    when 'confirmed'
+      update!(status: 'pending')
+    when 'processing'
+      update!(status: 'confirmed')
+    when 'shipped'
+      update!(status: 'processing', shipped_at: nil)
+    when 'delivered'
+      update!(status: 'shipped', delivered_at: nil)
+    else
+      errors.add(:status, 'cannot be rolled back')
+      raise ActiveRecord::RecordInvalid.new(self)
+    end
+  end
+
+  def cancel!(reason: nil)
+    return false if shipped? || delivered? || cancelled?
 
     transaction do
       # Restore stock
@@ -78,7 +183,7 @@ class Order < ApplicationRecord
       # Decrement coupon usage
       coupon&.decrement_usage!
 
-      update!(status: 'cancelled', cancelled_at: Time.current)
+      update!(status: 'cancelled', cancelled_at: Time.current, cancellation_reason: reason)
     end
     true
   end
@@ -108,7 +213,7 @@ class Order < ApplicationRecord
   end
 
   def can_cancel?
-    !delivered? && !cancelled?
+    !shipped? && !delivered? && !cancelled?
   end
 
   def can_review?
@@ -118,7 +223,22 @@ class Order < ApplicationRecord
   def calculate_totals!
     self.subtotal = order_items.sum(&:total_price)
     self.discount_amount = coupon&.calculate_discount(subtotal) || 0
+
+    discounted_subtotal = subtotal - discount_amount
+    self.shipping_amount = self.class.calculate_shipping_amount(discounted_subtotal)
+    self.tax_amount = self.class.calculate_tax_amount(discounted_subtotal + shipping_amount.to_f)
+
     self.total_amount = subtotal - discount_amount + shipping_amount + tax_amount
+  end
+
+  def self.calculate_shipping_amount(discounted_subtotal)
+    amount = discounted_subtotal.to_f
+    return 0 if amount >= SHIPPING_FREE_THRESHOLD
+    SHIPPING_FLAT_FEE
+  end
+
+  def self.calculate_tax_amount(taxable_amount)
+    (taxable_amount.to_f * TAX_RATE).round(2)
   end
 
   def items_count
@@ -132,5 +252,39 @@ class Order < ApplicationRecord
       self.order_number = "ORD-#{Time.current.strftime('%Y%m%d')}-#{SecureRandom.hex(4).upcase}"
       break unless Order.exists?(order_number: order_number)
     end
+  end
+
+  # When address IDs are set directly (e.g. admin draft orders), automatically
+  # snapshot the address data so the order is always self-contained.
+  def ensure_address_snapshots
+    %i[shipping billing].each do |type|
+      id_attr       = :"#{type}_address_id"
+      snapshot_attr = :"#{type}_address_snapshot"
+
+      next unless send(id_attr).present?
+
+      # Snapshot if there's no snapshot yet, or the ID changed without
+      # the setter already updating the snapshot.
+      needs_snapshot = send(snapshot_attr).blank? ||
+        (will_save_change_to_attribute?(id_attr) && !will_save_change_to_attribute?(snapshot_attr))
+
+      if needs_snapshot && (addr = Address.unscoped.find_by(id: send(id_attr)))
+        send(:"#{snapshot_attr}=", address_to_snapshot(addr))
+      end
+    end
+  end
+
+  def address_to_snapshot(address)
+    {
+      first_name:     address.first_name,
+      last_name:      address.last_name,
+      phone:          address.phone,
+      street_address: address.street_address,
+      apartment:      address.apartment,
+      city:           address.city,
+      state:          address.state,
+      postal_code:    address.postal_code,
+      country:        address.country
+    }
   end
 end

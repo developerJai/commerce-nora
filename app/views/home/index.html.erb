@@ -58,7 +58,8 @@
           <% if banner.image.attached? %>
             <%= image_tag banner.image, class: 'w-full h-full object-cover' %>
           <% else %>
-            <div class="w-full h-full bg-gradient-to-r from-rose-100 to-amber-50"></div>
+            <%= image_tag asset_path('storefront/home/discount-banner.png'), class: 'w-full h-full object-cover' %>
+            <%# <div class="w-full h-full bg-gradient-to-r from-rose-100 to-amber-50"></div> %>
           <% end %>
           <div class="absolute inset-0 bg-gradient-to-r from-stone-900/60 via-stone-900/30 to-transparent flex items-center">
             <div class="px-6 sm:px-10 md:px-16">

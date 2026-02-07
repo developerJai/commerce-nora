@@ -9,7 +9,7 @@
       <div class="space-y-3">
         <% @addresses.each do |address| %>
           <%= form_with url: address_checkout_path, method: :post do |f| %>
-            <%= f.hidden_field :address_id, value: address.id %>
+            <%= f.hidden_field :address_token, value: address.token %>
             <button type="submit" class="w-full text-left p-4 border border-stone-200 rounded-lg hover:border-rose-400 hover:bg-rose-50 transition">
               <div class="flex items-start justify-between">
                 <div>

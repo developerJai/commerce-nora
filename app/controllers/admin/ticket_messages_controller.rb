@@ -3,19 +3,20 @@ module Admin
     before_action :set_ticket
 
     def create
-      @message = @ticket.add_message(sender: current_admin, body: params[:body])
-
-      if @message.persisted?
-        redirect_to admin_support_ticket_path(@ticket), notice: "Reply sent"
-      else
-        redirect_to admin_support_ticket_path(@ticket), alert: "Failed to send reply"
-      end
+      @ticket.add_message(sender: current_admin, body: ticket_message_params[:body])
+      redirect_to admin_support_ticket_path(@ticket), notice: "Reply sent"
+    rescue ActiveRecord::RecordInvalid => e
+      redirect_to admin_support_ticket_path(@ticket), alert: e.record.errors.full_messages.join(", ")
     end
 
     private
 
     def set_ticket
-      @ticket = SupportTicket.find(params[:support_ticket_id])
+      @ticket = SupportTicket.find_by!(ticket_number: params[:support_ticket_ticket_number])
+    end
+
+    def ticket_message_params
+      params.require(:ticket_message).permit(:body)
     end
   end
 end

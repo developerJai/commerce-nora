@@ -14,6 +14,6 @@ class CustomerTicketMessagesController < ApplicationController
   private
 
   def set_ticket
-    @ticket = current_customer.support_tickets.find(params[:support_ticket_id])
+    @ticket = current_customer.support_tickets.find_by!(ticket_number: params[:support_ticket_ticket_number])
   end
 end

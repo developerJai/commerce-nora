@@ -7,6 +7,20 @@ class CartsController < ApplicationController
     @cart_items = @cart.cart_items.includes(product_variant: [:product, image_attachment: :blob])
   end
 
+  def coupons
+    @cart = current_cart
+    @subtotal = @cart.subtotal
+    @coupons = Coupon.available.order(created_at: :desc)
+    @applicable_coupons = @coupons.select { |c| c.applicable_to?(@subtotal) }
+    @inapplicable_coupons = @coupons - @applicable_coupons
+
+    if params[:close].to_s == '1'
+      render inline: "<turbo-frame id=\"coupon_modal\"></turbo-frame>", layout: false
+    else
+      render :coupons
+    end
+  end
+
   def add
     @cart_item = current_cart.add_item(@variant, params[:quantity]&.to_i || 1)
     @from_product_page = params[:from_product_page].to_s == "1"
@@ -94,7 +108,7 @@ class CartsController < ApplicationController
     elsif !coupon.valid_for_use?
       redirect_to cart_path, alert: "This coupon is not valid"
     elsif !coupon.applicable_to?(current_cart.subtotal)
-      redirect_to cart_path, alert: "Minimum order amount of #{format_price(coupon.minimum_order_amount)} required"
+      redirect_to cart_path, alert: "Minimum order amount of #{helpers.format_price(coupon.minimum_order_amount)} required"
     else
       session[:coupon_id] = coupon.id
       redirect_to cart_path, notice: "Coupon applied! #{coupon.display_value} off"
@@ -113,6 +127,6 @@ class CartsController < ApplicationController
   end
 
   def set_cart_item
-    @cart_item = current_cart.cart_items.find(params[:item_id])
+    @cart_item = current_cart.cart_items.find_by!(product_variant_id: params[:variant_id])
   end
 end

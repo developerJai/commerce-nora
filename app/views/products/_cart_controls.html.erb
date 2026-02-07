@@ -3,7 +3,7 @@
   <!-- Item in cart - Show quantity controls -->
   <div class="flex items-center gap-3" 
        data-controller="cart-controls"
-       data-cart-controls-update-url-value="<%= update_item_cart_path(cart_item) %>"
+       data-cart-controls-update-url-value="<%= update_item_cart_path(variant.id) %>"
        data-cart-controls-current-quantity-value="<%= cart_item.quantity %>"
        data-cart-controls-max-stock-value="<%= variant.stock_quantity %>">
     

@@ -48,6 +48,10 @@ class Customer < ApplicationRecord
     wishlist_items.count
   end
 
+  def unread_support_tickets_count
+    support_tickets.unread_for_customer.count
+  end
+
   def product_in_wishlist?(product)
     wishlist_items.exists?(product_id: product.id)
   end

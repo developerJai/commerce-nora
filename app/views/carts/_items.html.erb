@@ -29,7 +29,7 @@
                 <p class="text-xs text-stone-500 mt-0.5"><%= item.product_variant.name %></p>
                 <p class="text-sm font-medium text-stone-900 mt-1"><%= format_price(item.unit_price) %></p>
               </div>
-              <%= button_to remove_from_cart_path(item), 
+              <%= button_to remove_from_cart_path(item.product_variant_id), 
                             method: :delete,
                             class: "text-stone-400 hover:text-rose-600 p-1",
                             title: "Remove",
@@ -44,7 +44,7 @@
             <div class="flex items-center justify-between mt-3">
               <div class="inline-flex items-center border border-stone-200 rounded-lg"
                    data-controller="cart-controls"
-                   data-cart-controls-update-url-value="<%= update_item_cart_path(item) %>"
+                   data-cart-controls-update-url-value="<%= update_item_cart_path(item.product_variant_id) %>"
                    data-cart-controls-current-quantity-value="<%= item.quantity %>"
                    data-cart-controls-max-stock-value="<%= item.available_quantity %>">
                 <button type="button" 

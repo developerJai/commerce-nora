@@ -1,5 +1,26 @@
 @import "tailwindcss";
 
+/* Interactive elements should show pointer cursor */
+a[href],
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+summary,
+[role="button"],
+[data-action],
+[data-controller] [data-action] {
+  cursor: pointer;
+}
+
+button:disabled,
+input[type="button"]:disabled,
+input[type="submit"]:disabled,
+input[type="reset"]:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* Pagy pagination styling */
 .pagy {
   @apply flex items-center justify-center gap-1 mt-6;

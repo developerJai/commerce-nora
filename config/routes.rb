@@ -30,20 +30,21 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :orders do
+    resources :orders, param: :order_number do
       member do
         patch :confirm
         patch :process_order
         patch :ship
         patch :deliver
         patch :cancel
+        patch :rollback
       end
       collection do
         get :drafts
       end
     end
 
-    resources :draft_orders do
+    resources :draft_orders, param: :order_number do
       member do
         post :convert_to_order
       end
@@ -63,7 +64,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :support_tickets do
+    resources :support_tickets, param: :ticket_number do
       resources :ticket_messages, only: [:create]
       member do
         patch :resolve
@@ -122,11 +123,12 @@ Rails.application.routes.draw do
   # Cart
   resource :cart, only: [:show] do
     post 'add/:variant_id', action: :add, as: :add_to
-    patch 'update/:item_id', action: :update_item, as: :update_item
-    delete 'remove/:item_id', action: :remove, as: :remove_from
+    patch 'update/:variant_id', action: :update_item, as: :update_item
+    delete 'remove/:variant_id', action: :remove, as: :remove_from
     delete 'clear', action: :clear, as: :clear
     post 'apply_coupon', action: :apply_coupon, as: :apply_coupon
     delete 'remove_coupon', action: :remove_coupon, as: :remove_coupon
+    get 'coupons', action: :coupons, as: :coupons
   end
 
   # Checkout
@@ -137,22 +139,25 @@ Rails.application.routes.draw do
   end
 
   # Orders
-  resources :orders, only: [:index, :show] do
+  resources :orders, only: [:index, :show], param: :order_number do
+    member do
+      patch :cancel
+    end
     resources :reviews, only: [:new, :create], controller: 'order_reviews'
   end
 
   # Addresses
-  resources :addresses
+  resources :addresses, param: :token
 
   # Wishlist
-  resources :wishlists, only: [:index, :create, :destroy] do
+  resources :wishlists, only: [:index, :create, :destroy], param: :product_id do
     collection do
       delete :clear
     end
   end
 
   # Support
-  resources :support_tickets, path: 'support' do
+  resources :support_tickets, path: 'support', param: :ticket_number do
     resources :messages, controller: 'customer_ticket_messages', only: [:create]
   end
 

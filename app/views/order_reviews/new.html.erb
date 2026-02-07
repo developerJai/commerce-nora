@@ -1,45 +1,51 @@
 <% content_for(:title) { "Write Review" } %>
 
-<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-  <!-- Breadcrumb -->
-  <nav class="flex items-center gap-2 text-sm text-stone-500 mb-6">
-    <%= link_to 'Orders', orders_path, class: 'hover:text-rose-700' %>
-    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-    </svg>
-    <%= link_to @order.order_number, order_path(@order), class: 'hover:text-rose-700' %>
-    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-    </svg>
-    <span class="text-stone-900">Write Review</span>
-  </nav>
-
-  <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 mb-6">Write a Review</h1>
-
-  <!-- Product Info -->
-  <div class="bg-white rounded-xl border border-stone-200 p-5 mb-6">
-    <div class="flex items-center gap-4">
-      <div class="w-20 h-20 flex-shrink-0 bg-stone-50 rounded-lg overflow-hidden">
-        <% if @product.images.attached? %>
-          <%= image_tag @product.images.first, class: 'w-full h-full object-cover' %>
-        <% else %>
-          <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-50 to-amber-50">
-            <svg class="w-8 h-8 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
-            </svg>
-          </div>
-        <% end %>
-      </div>
-      <div>
-        <h3 class="font-medium text-stone-900"><%= @product.name %></h3>
-        <p class="text-sm text-stone-500 mt-1">Order #<%= @order.order_number %></p>
-      </div>
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+  <div class="flex flex-col lg:flex-row gap-6">
+    <div class="w-full lg:w-64 flex-shrink-0">
+      <%= render 'shared/account_sidebar', active_page: 'orders' %>
     </div>
-  </div>
 
-  <!-- Review Form -->
-  <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
-    <%= form_with(model: @review, url: order_reviews_path(@order), class: 'space-y-5') do |f| %>
+    <div class="flex-1">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-sm text-stone-500 mb-6">
+        <%= link_to 'Orders', orders_path, class: 'hover:text-rose-700' %>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <%= link_to @order.order_number, order_path(@order), class: 'hover:text-rose-700' %>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="text-stone-900">Write Review</span>
+      </nav>
+
+      <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 mb-6">Write a Review</h1>
+
+      <!-- Product Info -->
+      <div class="bg-white rounded-xl border border-stone-200 p-5 mb-6">
+        <div class="flex items-center gap-4">
+          <div class="w-20 h-20 flex-shrink-0 bg-stone-50 rounded-lg overflow-hidden">
+            <% if @product.images.attached? %>
+              <%= image_tag @product.images.first, class: 'w-full h-full object-cover' %>
+            <% else %>
+              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-50 to-amber-50">
+                <svg class="w-8 h-8 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                </svg>
+              </div>
+            <% end %>
+          </div>
+          <div>
+            <h3 class="font-medium text-stone-900"><%= @product.name %></h3>
+            <p class="text-sm text-stone-500 mt-1">Order #<%= @order.order_number %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review Form -->
+      <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+        <%= form_with(model: @review, url: order_reviews_path(@order), class: 'space-y-5') do |f| %>
       <%= f.hidden_field :product_id, value: @product.id %>
 
       <% if @review.errors.any? %>
@@ -99,7 +105,9 @@
         <%= f.submit "Submit Review", class: 'px-6 py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition cursor-pointer' %>
         <%= link_to 'Cancel', order_path(@order), class: 'px-6 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition' %>
       </div>
-    <% end %>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>
 

@@ -3,7 +3,10 @@ class AddressesController < ApplicationController
   before_action :set_address, only: [:show, :edit, :update, :destroy]
 
   def index
-    @addresses = current_customer.addresses.default_first
+    @address_type = params[:address_type].to_s
+    @address_type = 'shipping' unless Address::ADDRESS_TYPES.include?(@address_type)
+
+    @addresses = current_customer.addresses.where(address_type: @address_type).default_first
   end
 
   def show
@@ -11,13 +14,15 @@ class AddressesController < ApplicationController
 
   def new
     @address = current_customer.addresses.build
+    requested_type = params[:address_type].to_s
+    @address.address_type = requested_type if Address::ADDRESS_TYPES.include?(requested_type)
   end
 
   def create
     @address = current_customer.addresses.build(address_params)
 
     if @address.save
-      redirect_to addresses_path, notice: "Address added successfully"
+      redirect_to addresses_path(address_type: @address.address_type), notice: "Address added successfully"
     else
       render :new, status: :unprocessable_entity
     end
@@ -28,21 +33,22 @@ class AddressesController < ApplicationController
 
   def update
     if @address.update(address_params)
-      redirect_to addresses_path, notice: "Address updated successfully"
+      redirect_to addresses_path(address_type: @address.address_type), notice: "Address updated successfully"
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
+    address_type = @address.address_type
     @address.destroy
-    redirect_to addresses_path, notice: "Address deleted"
+    redirect_to addresses_path(address_type: address_type), notice: "Address deleted"
   end
 
   private
 
   def set_address
-    @address = current_customer.addresses.find(params[:id])
+    @address = current_customer.addresses.find_by!(token: params[:token])
   end
 
   def address_params
