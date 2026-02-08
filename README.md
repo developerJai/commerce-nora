@@ -64,10 +64,15 @@ bin/importmap pin --all
 ### 3. Configure Environment
 
 ```bash
-# Copy environment file
-cp .env.development .env
+# Edit credentials
+EDITOR=vim rails credentials:edit
 
-# Edit .env with your local settings (optional)
+# Add AWS credentials
+aws:
+   access_key_id: xxx
+   secret_access_key: xxx
+   bucket_name: xxx
+   region: xxx
 ```
 
 ### 4. Setup Database
