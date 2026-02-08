@@ -79,6 +79,13 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :homepage_collections do
+      member do
+        patch :toggle_status
+      end
+      resources :homepage_collection_items, as: :items, path: :items
+    end
+
     # Inventory Management
     resources :inventory, only: [:index] do
       collection do

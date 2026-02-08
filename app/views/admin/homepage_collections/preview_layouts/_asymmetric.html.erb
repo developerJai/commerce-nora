@@ -1,0 +1,15 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+  <%# Hero item: spans full height %>
+  <% if items[0] %>
+    <div class="md:row-span-2 relative overflow-hidden rounded-xl">
+      <%= render "admin/homepage_collections/preview_layouts/preview_item", item: items[0], height_class: "h-56 sm:h-64 md:h-full md:min-h-[340px]" %>
+    </div>
+  <% end %>
+
+  <%# Stacked items %>
+  <% items[1..2]&.each do |item| %>
+    <div class="relative overflow-hidden rounded-xl">
+      <%= render "admin/homepage_collections/preview_layouts/preview_item", item: item, height_class: "h-40 sm:h-44 md:h-[164px]" %>
+    </div>
+  <% end %>
+</div>

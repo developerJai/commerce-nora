@@ -1,0 +1,32 @@
+<%# Bento Grid - Featured hero left + 4 smaller items right
+    Inspired by the Valentine's Special layout in the reference %>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4" style="grid-template-rows: auto auto;">
+  <%# First item: Large featured - spans 1 col and 2 rows on desktop %>
+  <% if items[0] %>
+    <% item = items[0] %>
+    <% tag_class = "col-span-2 md:col-span-1 md:row-span-2 relative group overflow-hidden rounded-xl sm:rounded-2xl" %>
+    <% if item.link_url.present? %>
+      <%= link_to item.link_url, class: tag_class do %>
+        <%= render "home/layouts/item_inner", item: item, aspect: "h-64 sm:h-72 md:h-full md:min-h-[480px]" %>
+      <% end %>
+    <% else %>
+      <div class="<%= tag_class %>">
+        <%= render "home/layouts/item_inner", item: item, aspect: "h-64 sm:h-72 md:h-full md:min-h-[480px]" %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%# Items 2-5: Smaller grid items %>
+  <% items[1..4]&.each do |item| %>
+    <% tag_class = "relative group overflow-hidden rounded-xl sm:rounded-2xl" %>
+    <% if item.link_url.present? %>
+      <%= link_to item.link_url, class: tag_class do %>
+        <%= render "home/layouts/item_inner", item: item, aspect: "h-48 sm:h-56 md:h-[232px]" %>
+      <% end %>
+    <% else %>
+      <div class="<%= tag_class %>">
+        <%= render "home/layouts/item_inner", item: item, aspect: "h-48 sm:h-56 md:h-[232px]" %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

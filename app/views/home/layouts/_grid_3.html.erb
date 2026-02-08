@@ -1,0 +1,6 @@
+<%# 3-Column Grid - Elegant for featured collections %>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
+  <% items.first(6).each do |item| %>
+    <%= render "home/layouts/collection_item", item: item, aspect: "h-60 sm:h-72 md:h-80" %>
+  <% end %>
+</div>

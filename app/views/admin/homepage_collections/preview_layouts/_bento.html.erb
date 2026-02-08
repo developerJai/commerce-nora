@@ -1,0 +1,15 @@
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3" style="grid-template-rows: 1fr 1fr;">
+  <%# Hero item: spans 2 rows on desktop %>
+  <% if items[0] %>
+    <div class="col-span-2 md:col-span-1 md:row-span-2 relative overflow-hidden rounded-xl">
+      <%= render "admin/homepage_collections/preview_layouts/preview_item", item: items[0], height_class: "h-48 sm:h-56 md:h-full md:min-h-[320px]" %>
+    </div>
+  <% end %>
+
+  <%# Grid items %>
+  <% items[1..4]&.each do |item| %>
+    <div class="relative overflow-hidden rounded-xl">
+      <%= render "admin/homepage_collections/preview_layouts/preview_item", item: item, height_class: "h-32 sm:h-36 md:h-[154px]" %>
+    </div>
+  <% end %>
+</div>

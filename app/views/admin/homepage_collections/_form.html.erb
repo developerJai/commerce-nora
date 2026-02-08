@@ -1,0 +1,104 @@
+<%= form_with model: [:admin, collection], class: 'space-y-6' do |f| %>
+  <% if collection.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <ul class="text-sm text-red-700 list-disc list-inside">
+        <% collection.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-lg shadow-sm p-6 space-y-6">
+    <div>
+      <%= f.label :name, 'Section Title', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+      <%= f.text_field :name, required: true, placeholder: "e.g. Valentine's Special, Handpicked Just For You", class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <p class="mt-1 text-xs text-gray-500">This heading is displayed above the collection on the homepage</p>
+    </div>
+
+    <div>
+      <%= f.label :subtitle, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+      <%= f.text_field :subtitle, placeholder: "e.g. Gifts that speak the language of love", class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <p class="mt-1 text-xs text-gray-500">Optional subtext shown below the heading</p>
+    </div>
+
+    <div>
+      <%= f.label :layout_type, 'Layout Style', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+      <%= f.select :layout_type, HomepageCollection::LAYOUT_TYPES.map { |k, v| [v, k] }, {}, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <div class="mt-2 grid grid-cols-5 gap-3">
+        <div class="text-center">
+          <div class="border-2 border-gray-200 rounded p-2 aspect-video flex gap-0.5">
+            <div class="flex-1 bg-gray-200 rounded-sm"></div>
+            <div class="flex-1 bg-gray-200 rounded-sm"></div>
+            <div class="flex-1 bg-gray-200 rounded-sm"></div>
+            <div class="flex-1 bg-gray-200 rounded-sm"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">4-Column</p>
+        </div>
+        <div class="text-center">
+          <div class="border-2 border-gray-200 rounded p-2 aspect-video flex gap-0.5">
+            <div class="flex-1 bg-gray-200 rounded-sm"></div>
+            <div class="flex-1 bg-gray-200 rounded-sm"></div>
+            <div class="flex-1 bg-gray-200 rounded-sm"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">3-Column</p>
+        </div>
+        <div class="text-center">
+          <div class="border-2 border-gray-200 rounded p-2 aspect-video flex gap-0.5">
+            <div class="flex-1 bg-gray-200 rounded-sm"></div>
+            <div class="flex-1 bg-gray-200 rounded-sm"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">2-Column</p>
+        </div>
+        <div class="text-center">
+          <div class="border-2 border-gray-200 rounded p-2 aspect-video grid grid-cols-3 grid-rows-2 gap-0.5">
+            <div class="col-span-1 row-span-2 bg-gray-300 rounded-sm"></div>
+            <div class="bg-gray-200 rounded-sm"></div>
+            <div class="bg-gray-200 rounded-sm"></div>
+            <div class="bg-gray-200 rounded-sm"></div>
+            <div class="bg-gray-200 rounded-sm"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Bento</p>
+        </div>
+        <div class="text-center">
+          <div class="border-2 border-gray-200 rounded p-2 aspect-video grid grid-cols-3 grid-rows-2 gap-0.5">
+            <div class="col-span-2 row-span-2 bg-gray-300 rounded-sm"></div>
+            <div class="bg-gray-200 rounded-sm"></div>
+            <div class="bg-gray-200 rounded-sm"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Asymmetric</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :starts_at, 'Start Date', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.datetime_local_field :starts_at, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+      <div>
+        <%= f.label :ends_at, 'End Date', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= f.datetime_local_field :ends_at, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      </div>
+    </div>
+    <p class="text-xs text-gray-500 -mt-4">Leave empty to show always. Use dates for seasonal or promotional collections.</p>
+
+    <div>
+      <%= f.label :position, 'Display Order', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+      <%= f.number_field :position, min: 0, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <p class="mt-1 text-xs text-gray-500">Lower numbers appear first on the homepage</p>
+    </div>
+
+    <div class="flex items-center">
+      <label class="flex items-center">
+        <%= f.check_box :active, class: 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded' %>
+        <span class="ml-2 text-sm text-gray-700">Active</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to 'Cancel', admin_homepage_collections_path, class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50' %>
+    <%= f.submit 'Save Collection', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+  </div>
+<% end %>

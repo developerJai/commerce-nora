@@ -1,0 +1,202 @@
+<%
+  # Determine which position this item is/will be in
+  item_position = item.position || collection.items.ordered.size
+  dims = collection.dimension_for_position(item_position)
+%>
+
+<%= form_with model: [:admin, collection, item],
+    url: item.persisted? ? admin_homepage_collection_item_path(collection, item) : admin_homepage_collection_items_path(collection),
+    class: "space-y-6",
+    data: {
+      controller: "collection-item-preview",
+      collection_item_preview_recommended_width_value: dims[:width],
+      collection_item_preview_recommended_height_value: dims[:height]
+    } do |f| %>
+
+  <% if item.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <ul class="text-sm text-red-700 list-disc list-inside">
+        <% item.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- ═══ LEFT: Form Fields ═══ -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg shadow-sm p-6 space-y-6">
+        <!-- Image Upload -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <%= f.label :image, class: "block text-sm font-medium text-gray-700" %>
+            <span class="text-xs text-gray-400">Max 2 MB &bull; JPG, PNG, WebP</span>
+          </div>
+
+          <%= f.file_field :image, accept: "image/jpeg,image/png,image/webp",
+              class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500",
+              data: { collection_item_preview_target: "input", action: "change->collection-item-preview#selectFile" } %>
+
+          <!-- Error message -->
+          <p class="mt-1 text-sm text-red-600 hidden" data-collection-item-preview-target="errorMessage"></p>
+
+          <!-- File meta (dimensions + size) after upload -->
+          <div data-collection-item-preview-target="fileMeta"></div>
+
+          <!-- Dimension guidance -->
+          <div class="mt-2 rounded-md bg-indigo-50 border border-indigo-100 px-3 py-2">
+            <div class="flex items-start gap-2">
+              <svg class="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div class="text-xs text-indigo-700">
+                <p class="font-semibold">Recommended: <%= dims[:width] %> &times; <%= dims[:height] %>px (<%= dims[:ratio] %>)</p>
+                <p class="text-indigo-600 mt-0.5">
+                  Layout "<%= collection.layout_label %>" &mdash; <%= dims[:label] %>.
+                  Larger images will be auto-cropped to fit. Smaller images may appear blurry.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <div>
+          <%= f.label :title, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.text_field :title, placeholder: "e.g. Diamond Jewellery, Endless Bond",
+              class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500",
+              data: { collection_item_preview_target: "titleInput", action: "input->collection-item-preview#updateOverlay" } %>
+          <p class="mt-1 text-xs text-gray-500">Overlay heading on the image. Leave empty for image-only.</p>
+        </div>
+
+        <!-- Subtitle -->
+        <div>
+          <%= f.label :subtitle, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.text_field :subtitle, placeholder: "e.g. 1900+ Unique designs, Starting from ₹11,500",
+              class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500",
+              data: { collection_item_preview_target: "subtitleInput", action: "input->collection-item-preview#updateOverlay" } %>
+          <p class="mt-1 text-xs text-gray-500">Secondary text below the title.</p>
+        </div>
+
+        <!-- Badge Text -->
+        <div>
+          <%= f.label :badge_text, "Badge Text", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.text_field :badge_text, placeholder: "e.g. UP TO 30% OFF, NEW",
+              class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500",
+              data: { collection_item_preview_target: "badgeInput", action: "input->collection-item-preview#updateOverlay" } %>
+          <p class="mt-1 text-xs text-gray-500">Promotional badge shown on the image.</p>
+        </div>
+
+        <!-- Link URL -->
+        <div>
+          <%= f.label :link_url, "Link URL", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.text_field :link_url, placeholder: "/products?category=diamond or /categories/diamond",
+              class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" %>
+          <p class="mt-1 text-xs text-gray-500">Where the user goes when they click.</p>
+        </div>
+
+        <!-- Overlay Position -->
+        <div>
+          <%= f.label :overlay_position, "Text Overlay Position", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.select :overlay_position, HomepageCollectionItem::OVERLAY_POSITIONS.map { |k, v| [v, k] }, {},
+              class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" %>
+        </div>
+
+        <!-- Display Order -->
+        <div>
+          <%= f.label :position, "Display Order", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.number_field :position, min: 0,
+              class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" %>
+          <p class="mt-1 text-xs text-gray-500">Lower numbers appear first. Position affects recommended image size in bento/asymmetric layouts.</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <%= link_to "Cancel", admin_homepage_collection_path(collection),
+            class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50" %>
+        <%= f.submit item.persisted? ? "Update Item" : "Add Item",
+            class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer" %>
+      </div>
+    </div>
+
+    <!-- ═══ RIGHT: Live Preview Card ═══ -->
+    <div>
+      <div class="sticky top-24">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-gray-900">Live Preview</h3>
+            <span class="text-xs text-gray-400">How it will appear on the homepage</span>
+          </div>
+
+          <!-- Preview card mimicking storefront layout -->
+          <div class="relative group overflow-hidden rounded-xl bg-gray-100" style="aspect-ratio: <%= dims[:width] %>/<%= dims[:height] %>;">
+            <!-- Uploaded/existing image -->
+            <% if item.image.attached? %>
+              <%= image_tag item.image,
+                  class: "w-full h-full object-cover",
+                  data: { collection_item_preview_target: "previewImage" } %>
+            <% else %>
+              <img src="" alt="Preview"
+                   class="w-full h-full object-cover hidden"
+                   data-collection-item-preview-target="previewImage">
+            <% end %>
+
+            <!-- Placeholder when no image -->
+            <div class="<%= item.image.attached? ? 'hidden' : '' %> w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-stone-700 via-stone-600 to-rose-900/70"
+                 data-collection-item-preview-target="previewPlaceholder">
+              <svg class="w-12 h-12 text-white/20 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-white/30 text-xs">Upload an image to preview</p>
+            </div>
+
+            <!-- Gradient overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-stone-900/70 via-stone-900/20 to-transparent hidden"
+                 data-collection-item-preview-target="previewOverlay">
+              <!-- Text overlay -->
+              <div class="absolute inset-0 flex items-end justify-start p-4">
+                <div>
+                  <span class="inline-block px-2 py-0.5 bg-rose-600/90 text-white text-[10px] font-semibold tracking-wider uppercase rounded-full mb-1.5 hidden"
+                        data-collection-item-preview-target="previewBadge"></span>
+                  <h4 class="text-white font-serif font-semibold text-lg leading-snug drop-shadow-md hidden"
+                      data-collection-item-preview-target="previewTitle"></h4>
+                  <p class="text-white/80 text-xs mt-0.5 drop-shadow-sm hidden"
+                     data-collection-item-preview-target="previewSubtitle"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dimension reference table for this layout -->
+          <div class="mt-4 border-t border-gray-100 pt-4">
+            <p class="text-xs font-medium text-gray-700 mb-2">Image dimensions for "<%= collection.layout_label %>"</p>
+            <table class="w-full text-xs">
+              <thead>
+                <tr class="text-gray-500">
+                  <th class="text-left font-medium pb-1">Position</th>
+                  <th class="text-left font-medium pb-1">Size</th>
+                  <th class="text-left font-medium pb-1">Ratio</th>
+                </tr>
+              </thead>
+              <tbody class="text-gray-600">
+                <% seen = Set.new %>
+                <% collection.min_items_for_layout.times do |i| %>
+                  <% d = collection.dimension_for_position(i) %>
+                  <% key = "#{d[:width]}x#{d[:height]}" %>
+                  <% next if seen.include?(key) && i > 0 %>
+                  <% seen << key %>
+                  <tr class="<%= i == item_position ? 'text-indigo-700 font-medium' : '' %>">
+                    <td class="py-0.5"><%= d[:label] %><%= i == item_position ? " ← this item" : "" %></td>
+                    <td class="py-0.5"><%= d[:width] %> &times; <%= d[:height] %>px</td>
+                    <td class="py-0.5"><%= d[:ratio] %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

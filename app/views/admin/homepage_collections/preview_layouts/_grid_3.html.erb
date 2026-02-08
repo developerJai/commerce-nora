@@ -1,0 +1,7 @@
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+  <% items.first(6).each do |item| %>
+    <div class="relative overflow-hidden rounded-xl">
+      <%= render "admin/homepage_collections/preview_layouts/preview_item", item: item, height_class: "h-44 sm:h-52" %>
+    </div>
+  <% end %>
+</div>

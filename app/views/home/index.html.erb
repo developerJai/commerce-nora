@@ -79,6 +79,13 @@
 </section>
 <% end %>
 
+<!-- Homepage Collections -->
+<% @homepage_collections.each do |collection| %>
+  <% if collection.items.any? %>
+    <%= render 'home/homepage_collection', collection: collection %>
+  <% end %>
+<% end %>
+
 <!-- Shop by Category -->
 <section class="py-8 sm:py-12">
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">

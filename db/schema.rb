@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_07_121500) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -171,6 +171,38 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_121500) do
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_customers_on_deleted_at"
     t.index ["email"], name: "index_customers_on_email", unique: true
+  end
+
+  create_table "homepage_collection_items", force: :cascade do |t|
+    t.string "badge_text"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.bigint "homepage_collection_id", null: false
+    t.string "link_url"
+    t.string "overlay_position", default: "bottom_left"
+    t.integer "position", default: 0
+    t.string "subtitle"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_homepage_collection_items_on_deleted_at"
+    t.index ["homepage_collection_id"], name: "index_homepage_collection_items_on_homepage_collection_id"
+    t.index ["position"], name: "index_homepage_collection_items_on_position"
+  end
+
+  create_table "homepage_collections", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.datetime "ends_at"
+    t.string "layout_type", default: "grid_4", null: false
+    t.string "name", null: false
+    t.integer "position", default: 0
+    t.datetime "starts_at"
+    t.string "subtitle"
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_homepage_collections_on_active"
+    t.index ["deleted_at"], name: "index_homepage_collections_on_deleted_at"
+    t.index ["position"], name: "index_homepage_collections_on_position"
   end
 
   create_table "order_items", force: :cascade do |t|
@@ -368,6 +400,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_121500) do
   add_foreign_key "cart_items", "product_variants"
   add_foreign_key "carts", "customers"
   add_foreign_key "categories", "categories", column: "parent_id"
+  add_foreign_key "homepage_collection_items", "homepage_collections"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "product_variants"
   add_foreign_key "orders", "coupons"

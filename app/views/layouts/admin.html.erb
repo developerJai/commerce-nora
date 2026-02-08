@@ -38,6 +38,7 @@
         <%= render 'admin/shared/sidebar_link', path: admin_categories_path, icon: 'categories', label: 'Categories', active: controller_name == 'categories' %>
         <%= render 'admin/shared/sidebar_link', path: admin_inventory_index_path, icon: 'inventory', label: 'Inventory', active: controller_name == 'inventory' %>
         <%= render 'admin/shared/sidebar_link', path: admin_banners_path, icon: 'banners', label: 'Banners', active: controller_name == 'banners' %>
+        <%= render 'admin/shared/sidebar_link', path: admin_homepage_collections_path, icon: 'collections', label: 'Collections', active: controller_name.in?(['homepage_collections', 'homepage_collection_items']) %>
         
         <div class="pt-4">
           <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Sales</p>

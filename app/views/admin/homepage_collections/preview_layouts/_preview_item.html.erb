@@ -1,0 +1,35 @@
+<%# Shared preview item used inside admin storefront previews %>
+<% has_content = item.title.present? || item.subtitle.present? || item.badge_text.present? %>
+<% show_overlay = item.overlay_position != "hidden" && has_content %>
+
+<% if item.image.attached? %>
+  <%= image_tag item.image, class: "w-full #{height_class} object-cover", loading: "lazy" %>
+<% else %>
+  <div class="w-full <%= height_class %> bg-gradient-to-br from-stone-700 via-stone-600 to-rose-900/70 flex flex-col items-center justify-center">
+    <svg class="w-8 h-8 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    </svg>
+    <p class="text-white/25 text-[10px] mt-1">Upload image</p>
+  </div>
+<% end %>
+
+<% if show_overlay %>
+  <% if item.image.attached? %>
+    <div class="absolute inset-0 bg-gradient-to-t from-stone-900/70 via-stone-900/20 to-transparent"></div>
+  <% end %>
+  <div class="absolute inset-0 flex p-3 sm:p-4 <%= item.overlay_position_class %>">
+    <div class="max-w-full">
+      <% if item.badge_text.present? %>
+        <span class="inline-block px-2 py-0.5 bg-rose-600/90 text-white text-[9px] font-semibold tracking-wider uppercase rounded-full mb-1">
+          <%= item.badge_text %>
+        </span>
+      <% end %>
+      <% if item.title.present? %>
+        <h4 class="text-white font-serif font-semibold text-sm sm:text-base leading-snug drop-shadow-md"><%= item.title %></h4>
+      <% end %>
+      <% if item.subtitle.present? %>
+        <p class="text-white/80 text-[10px] sm:text-xs mt-0.5 drop-shadow-sm"><%= item.subtitle %></p>
+      <% end %>
+    </div>
+  </div>
+<% end %>
