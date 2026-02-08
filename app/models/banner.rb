@@ -1,6 +1,10 @@
 class Banner < ApplicationRecord
   include SoftDeletable
+  include OrganizedUploads
+
   has_one_attached :image
+
+  upload_key_prefix { "admin/banners" }
 
   validates :title, presence: true
 

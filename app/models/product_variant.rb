@@ -1,6 +1,13 @@
 class ProductVariant < ApplicationRecord
   include SoftDeletable
+  include OrganizedUploads
+
   belongs_to :product
+
+  upload_key_prefix do
+    vid = product&.vendor_id
+    vid ? "vendors/#{vid}/variants" : "variants"
+  end
   has_many :cart_items, dependent: :destroy
   has_many :order_items, dependent: :nullify
   has_many :stock_adjustments, dependent: :destroy

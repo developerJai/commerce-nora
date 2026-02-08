@@ -82,8 +82,8 @@ production:
   primary: &primary_production
     <<: *default
     database: noralooks_production
-    username: noralooks
-    password: <%= ENV["NORALOOKS_DATABASE_PASSWORD"] %>
+    # username: noralooks
+    # password: <%= ENV["NORALOOKS_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
     database: noralooks_production_cache

@@ -14,7 +14,7 @@ description: Project context and architecture for the Noralooks jewellery e-comm
 | CSS | Tailwind CSS 4 via `tailwindcss-rails` gem |
 | JS | Hotwire (Turbo + Stimulus), Importmap (no bundler) |
 | Assets | Propshaft (not Sprockets) |
-| Images | Active Storage — local (dev), AWS S3 (prod) |
+| Images | Active Storage — local (dev), AWS S3 + CloudFront CDN (prod); organized folder keys |
 | Auth | Custom `has_secure_password` + session — **no Devise** |
 | Pagination | Pagy 43.x |
 | Soft deletes | `SoftDeletable` concern (`deleted_at` + `default_scope`) |
@@ -148,6 +148,7 @@ lib/tasks/                 — rake tasks (seed:homepage, seed:hsn_codes, seed:v
 - Admin toggle pattern: `toggle_status` action + `PATCH` route
 - Vendor scoping: always use `vendor_scoped(scope)` helper or `for_vendor` model scope
 - Security: vendor_id set server-side (never from form params for vendor role); `require_admin_role!` on admin-only controllers
+- Uploads: `OrganizedUploads` concern + `active_storage_organized_keys` initializer; models declare `upload_key_prefix` block; S3 keys structured as `vendors/{id}/products/{token}.ext`, `admin/banners/{token}.ext`, etc.
 
 ### Credentials
 
