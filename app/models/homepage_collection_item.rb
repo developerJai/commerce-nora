@@ -1,8 +1,11 @@
 class HomepageCollectionItem < ApplicationRecord
   include SoftDeletable
+  include OrganizedUploads
 
   belongs_to :homepage_collection
   has_one_attached :image
+
+  upload_key_prefix { "admin/collections" }
 
   validate :validate_image_size
   validate :validate_image_content_type

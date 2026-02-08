@@ -1,8 +1,14 @@
 class Product < ApplicationRecord
   include SoftDeletable
+  include OrganizedUploads
+
   belongs_to :category, optional: true
   belongs_to :vendor, optional: true
   belongs_to :hsn_code, optional: true
+
+  upload_key_prefix do
+    vendor_id ? "vendors/#{vendor_id}/products" : "products"
+  end
   has_many :variants, class_name: 'ProductVariant', dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :wishlist_items, dependent: :destroy, class_name: 'Wishlist'
