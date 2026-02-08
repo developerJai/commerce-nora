@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-  <title><%= content_for(:title) || "Noralooks" %> | Fine Jewellery</title>
+  <title><%= content_for(:title) || "Noralooks" %> | Jewellery & Traditional Wear</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -52,7 +52,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
                 <%= f.search_field :q, value: params[:q], 
-                    placeholder: 'Search for jewellery...', 
+                    placeholder: 'Search jewellery, traditional wear & gifts...', 
                     class: 'w-full h-10 pl-10 pr-4 bg-stone-100 text-stone-800 rounded-full border-0 focus:ring-2 focus:ring-rose-400 focus:bg-white placeholder:text-stone-400 text-sm transition',
                     autocomplete: 'off',
                     data: { 
@@ -150,7 +150,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <%= f.search_field :q, value: params[:q], 
-            placeholder: 'Search jewellery...', 
+            placeholder: 'Search jewellery, traditional wear & gifts...', 
             class: 'w-full h-10 pl-10 pr-4 bg-stone-100 text-stone-800 rounded-full border-0 focus:ring-2 focus:ring-rose-400 placeholder:text-stone-400 text-sm' %>
       <% end %>
     </div>
