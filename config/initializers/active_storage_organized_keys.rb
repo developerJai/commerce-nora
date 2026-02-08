@@ -9,19 +9,22 @@
 # Existing blobs with random keys continue to work — only new uploads
 # are affected. Works identically on Disk (development) and S3 (production).
 
-Rails.application.config.after_initialize do
-  ActiveStorage::Blob.class_eval do
-    before_create :apply_organized_key_prefix
+# Only apply the organized keys if AWS is properly configured
+if ENV['AWS_ACCESS_KEY_ID'].present? && ENV['AWS_SECRET_ACCESS_KEY'].present? && ENV['AWS_REGION'].present?
+  Rails.application.config.after_initialize do
+    ActiveStorage::Blob.class_eval do
+      before_create :apply_organized_key_prefix
 
-    private
+      private
 
-    def apply_organized_key_prefix
-      prefix = Thread.current[:active_storage_key_prefix]
-      return if prefix.blank?
+      def apply_organized_key_prefix
+        prefix = Thread.current[:active_storage_key_prefix]
+        return if prefix.blank?
 
-      ext   = filename.extension_with_delimiter
-      token = SecureRandom.base36(28)
-      self.key = "#{prefix}/#{token}#{ext}"
+        ext   = filename.extension_with_delimiter
+        token = SecureRandom.base36(28)
+        self.key = "#{prefix}/#{token}#{ext}"
+      end
     end
   end
 end
