@@ -24,7 +24,10 @@ class Product < ApplicationRecord
 
   validate :validate_images
 
-  scope :active, -> { where(active: true) }
+  scope :active, -> {
+    left_joins(:vendor).where(products: { active: true })
+                       .where("vendors.active IS NULL OR vendors.active = ?", true)
+  }
   scope :featured, -> { where(featured: true) }
   scope :with_category, ->(category_id) { where(category_id: category_id) if category_id.present? }
   scope :search, ->(query) {
