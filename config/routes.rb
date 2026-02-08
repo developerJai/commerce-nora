@@ -172,6 +172,7 @@ Rails.application.routes.draw do
   resources :orders, only: [:index, :show], param: :order_number do
     member do
       patch :cancel
+      get :download_invoice, defaults: { format: 'pdf' }
     end
     resources :reviews, only: [:new, :create], controller: 'order_reviews'
   end

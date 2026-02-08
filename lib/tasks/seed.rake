@@ -22,7 +22,9 @@ namespace :seed do
       { name: "Earrings",    slug: "earrings",     description: "Studs, jhumkas, drops and hoops",                        position: 2 },
       { name: "Bangles",     slug: "bangles",      description: "Gold, diamond and gemstone bangles",                     position: 3 },
       { name: "Bracelets",   slug: "bracelets",    description: "Chain bracelets, charm bracelets and cuffs",             position: 4 },
-      { name: "Pendants",    slug: "pendants",     description: "Solitaire, religious and everyday pendants",             position: 5 }
+      { name: "Pendants",    slug: "pendants",     description: "Solitaire, religious and everyday pendants",             position: 5 },
+      { name: "Traditional Wear", slug: "traditional-wear", description: "Sarees, salwar suits, lehengas and traditional clothing", position: 6 },
+      { name: "Gifts",       slug: "gifts",        description: "Curated gifts for special occasions and celebrations",    position: 7 }
     ]
 
     categories_data.each do |cat|
@@ -294,6 +296,8 @@ namespace :seed do
     bangles    = Category.find_by(slug: "bangles")
     bracelets  = Category.find_by(slug: "bracelets")
     pendants   = Category.find_by(slug: "pendants")
+    traditional_wear = Category.find_by(slug: "traditional-wear")
+    gifts      = Category.find_by(slug: "gifts")
 
     # Vendor and HSN assignment
     vendors = Vendor.active.to_a
@@ -388,6 +392,72 @@ namespace :seed do
           { name: "16 inches", price: 45_600.00, stock_quantity: 18 },
           { name: "18 inches", price: 47_800.00, stock_quantity: 22 },
           { name: "20 inches", price: 50_000.00, stock_quantity: 10 }
+        ]
+      },
+      {
+        name: "Embroidered Silk Saree", slug: "embroidered-silk-saree",
+        description: "Exquisite hand-embroidered silk saree with intricate zari work and traditional motifs. Perfect for weddings and festivals.",
+        short_description: "Hand-embroidered silk saree",
+        category: traditional_wear, price: 15_900.00, featured: true,
+        variants: [
+          { name: "Red & Gold",    price: 15_900.00, stock_quantity: 25 },
+          { name: "Blue & Silver", price: 16_500.00, stock_quantity: 20 },
+          { name: "Green & Gold",  price: 17_200.00, stock_quantity: 15 }
+        ]
+      },
+      {
+        name: "Designer Salwar Suit", slug: "designer-salwar-suit",
+        description: "Elegant designer salwar suit with embroidered kurta and matching dupatta. A perfect blend of tradition and modern style.",
+        short_description: "Embroidered designer salwar suit",
+        category: traditional_wear, price: 8_750.00, featured: true,
+        variants: [
+          { name: "Maroon Set", price: 8_750.00, stock_quantity: 30 },
+          { name: "Navy Blue Set", price: 9_200.00, stock_quantity: 28 },
+          { name: "Cream Set", price: 8_900.00, stock_quantity: 25 }
+        ]
+      },
+      {
+        name: "Bridal Lehenga Choli", slug: "bridal-lehenga-choli",
+        description: "Stunning bridal lehenga choli with heavy embroidery, sequins, and traditional embellishments. Made for your special day.",
+        short_description: "Heavy embroidered bridal lehenga",
+        category: traditional_wear, price: 85_000.00, featured: true,
+        variants: [
+          { name: "Red Lehenga", price: 85_000.00, compare_at_price: 95_000.00, stock_quantity: 5 },
+          { name: "Pink Lehenga", price: 87_500.00, stock_quantity: 3 },
+          { name: "Gold Lehenga", price: 90_000.00, stock_quantity: 4 }
+        ]
+      },
+      {
+        name: "Luxury Gift Hamper", slug: "luxury-gift-hamper",
+        description: "Curated luxury gift hamper containing premium chocolates, scented candles, and elegant accessories. Perfect for special occasions.",
+        short_description: "Curated luxury gift hamper",
+        category: gifts, price: 5_500.00, featured: true,
+        variants: [
+          { name: "Birthday Special", price: 5_500.00, stock_quantity: 50 },
+          { name: "Anniversary Set", price: 6_200.00, stock_quantity: 40 },
+          { name: "Festive Hamper", price: 7_800.00, compare_at_price: 8_500.00, stock_quantity: 35 }
+        ]
+      },
+      {
+        name: "Personalized Photo Frame", slug: "personalized-photo-frame",
+        description: "Elegant silver-plated photo frame with personalized engraving. A thoughtful gift for loved ones.",
+        short_description: "Personalized silver photo frame",
+        category: gifts, price: 2_800.00, featured: false,
+        variants: [
+          { name: "4x6 inches", price: 2_800.00, stock_quantity: 60 },
+          { name: "5x7 inches", price: 3_200.00, stock_quantity: 45 },
+          { name: "8x10 inches", price: 4_500.00, stock_quantity: 30 }
+        ]
+      },
+      {
+        name: "Crystal Vase Set", slug: "crystal-vase-set",
+        description: "Beautiful crystal vase set with intricate cuts and premium quality. Perfect for home decor and gifting.",
+        short_description: "Premium crystal vase set",
+        category: gifts, price: 12_500.00, featured: false,
+        variants: [
+          { name: "Single Vase", price: 6_800.00, stock_quantity: 25 },
+          { name: "Vase Pair", price: 12_500.00, compare_at_price: 14_000.00, stock_quantity: 20 },
+          { name: "Vase Trio", price: 18_900.00, stock_quantity: 15 }
         ]
       }
     ]

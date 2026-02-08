@@ -19,7 +19,7 @@ class CartItem < ApplicationRecord
   end
 
   def available_quantity
-    [product_variant.stock_quantity, quantity].min
+    product_variant.stock_quantity
   end
 
   def exceeds_stock?
