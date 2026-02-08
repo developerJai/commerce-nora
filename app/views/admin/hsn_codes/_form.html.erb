@@ -1,0 +1,46 @@
+<div class="space-y-6">
+  <% if @hsn_code.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-md p-4">
+      <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+      <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+        <% @hsn_code.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= form.label :code, 'HSN Code', class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :code, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm', placeholder: 'e.g. 7113' %>
+      </div>
+
+      <div>
+        <%= form.label :gst_rate, 'GST Rate (%)', class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.number_field :gst_rate, step: 0.01, min: 0, max: 100, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm', placeholder: 'e.g. 3.00' %>
+      </div>
+
+      <div class="md:col-span-2">
+        <%= form.label :description, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :description, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm', placeholder: 'e.g. Articles of jewellery and parts thereof' %>
+      </div>
+
+      <div>
+        <%= form.label :category_name, 'Category', class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :category_name, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm', placeholder: 'e.g. Jewellery' %>
+      </div>
+
+      <div class="flex items-center gap-2 pt-6">
+        <%= form.check_box :active, class: 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded' %>
+        <%= form.label :active, 'Active', class: 'text-sm font-medium text-gray-700' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to 'Cancel', admin_hsn_codes_path, class: 'px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50' %>
+    <%= form.submit @hsn_code.new_record? ? 'Create HSN Code' : 'Update HSN Code', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium cursor-pointer' %>
+  </div>
+</div>

@@ -6,6 +6,30 @@
     <p class="mt-1 text-sm text-gray-500">Welcome back, <%= current_admin.name %>!</p>
   </div>
 
+  <% if vendor_context? && ((@out_of_stock_variants_count.to_i > 0) || (@low_stock_variants_count.to_i > 0)) %>
+    <div class="bg-white shadow rounded-lg">
+      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Inventory Alerts</h3>
+        <p class="mt-1 text-sm text-gray-500">Variants that need restock attention</p>
+      </div>
+      <div class="p-4 sm:p-6">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <%= link_to admin_inventory_index_path(filter: 'out_of_stock'), class: 'block rounded-lg border border-red-200 bg-red-50 p-4 hover:bg-red-100 transition' do %>
+            <div class="text-xs font-medium text-red-800">Out of Stock</div>
+            <div class="mt-2 text-2xl font-semibold text-red-900"><%= @out_of_stock_variants_count.to_i %></div>
+            <div class="mt-1 text-xs text-red-700">View out of stock inventory</div>
+          <% end %>
+
+          <%= link_to admin_inventory_index_path(filter: 'low_stock'), class: 'block rounded-lg border border-yellow-200 bg-yellow-50 p-4 hover:bg-yellow-100 transition' do %>
+            <div class="text-xs font-medium text-yellow-800">Low Stock</div>
+            <div class="mt-2 text-2xl font-semibold text-yellow-900"><%= @low_stock_variants_count.to_i %></div>
+            <div class="mt-1 text-xs text-yellow-700">View low stock inventory</div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <!-- Priority Actions -->
   <div class="bg-white shadow rounded-lg">
     <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
@@ -45,6 +69,31 @@
         <% end %>
       </div>
     </div>
+
+    <% if admin_role? && !vendor_context? %>
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Low Inventory Vendors</dt>
+                <dd class="text-lg font-semibold text-gray-900"><%= @low_inventory_vendors.to_i %> / <%= @total_vendors.to_i %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-5 py-3">
+          <div class="text-sm">
+            <%= link_to 'View inventory', admin_inventory_index_path(filter: 'needs_reorder'), class: 'font-medium text-indigo-600 hover:text-indigo-500' %>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
 
   <!-- Stats cards -->
@@ -97,23 +146,25 @@
       </div>
     </div>
 
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="p-5">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-            </svg>
-          </div>
-          <div class="ml-5 w-0 flex-1">
-            <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">Total Customers</dt>
-              <dd class="text-lg font-semibold text-gray-900"><%= number_with_delimiter(@total_customers) %></dd>
-            </dl>
+    <% if admin_role? && !vendor_context? %>
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Total Customers</dt>
+                <dd class="text-lg font-semibold text-gray-900"><%= number_with_delimiter(@total_customers) %></dd>
+              </dl>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    <% end %>
 
     <div class="bg-white overflow-hidden shadow rounded-lg">
       <div class="p-5">

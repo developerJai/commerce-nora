@@ -1,7 +1,8 @@
 class SupportTicket < ApplicationRecord
   include SoftDeletable
-  belongs_to :customer
+  belongs_to :customer, optional: true
   belongs_to :order, optional: true
+  belongs_to :vendor, optional: true
   has_many :ticket_messages, dependent: :destroy
 
   STATUSES = %w[open in_progress resolved closed].freeze
@@ -11,6 +12,15 @@ class SupportTicket < ApplicationRecord
   validates :subject, presence: true
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :priority, presence: true, inclusion: { in: PRIORITIES }
+  validate :must_have_customer_or_vendor
+
+  def vendor_ticket?
+    vendor_id.present? && customer_id.blank?
+  end
+
+  def customer_ticket?
+    customer_id.present?
+  end
 
   before_validation :generate_ticket_number, if: -> { ticket_number.blank? }
 
@@ -23,6 +33,11 @@ class SupportTicket < ApplicationRecord
   scope :by_status, ->(status) { where(status: status) if status.present? }
   scope :by_priority, ->(priority) { where(priority: priority) if priority.present? }
   scope :recent, -> { order(created_at: :desc) }
+  scope :for_vendor, ->(vendor) {
+    if vendor
+      left_joins(:order).where("orders.vendor_id = :vid OR support_tickets.vendor_id = :vid", vid: vendor.id)
+    end
+  }
 
   scope :unread_for_customer, -> {
     where(last_message_sender_type: 'AdminUser')
@@ -109,6 +124,12 @@ class SupportTicket < ApplicationRecord
     loop do
       self.ticket_number = "TKT-#{Time.current.strftime('%Y%m%d')}-#{SecureRandom.hex(3).upcase}"
       break unless SupportTicket.exists?(ticket_number: ticket_number)
+    end
+  end
+
+  def must_have_customer_or_vendor
+    if customer_id.blank? && vendor_id.blank?
+      errors.add(:base, "Ticket must belong to either a customer or a vendor")
     end
   end
 end

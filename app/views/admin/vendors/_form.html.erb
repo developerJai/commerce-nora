@@ -1,0 +1,98 @@
+<div class="space-y-6">
+  <% if @vendor.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-md p-4">
+      <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+      <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+        <% @vendor.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Business Details</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= form.label :business_name, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :business_name, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :contact_name, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :contact_name, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :email, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.email_field :email, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :phone, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :phone, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :gst_number, 'GST Number', class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :gst_number, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Address</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="md:col-span-2">
+        <%= form.label :address_line1, 'Address Line 1', class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :address_line1, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+
+      <div class="md:col-span-2">
+        <%= form.label :address_line2, 'Address Line 2', class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :address_line2, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :city, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :city, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :state, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :state, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :pincode, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.text_field :pincode, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' %>
+      </div>
+    </div>
+  </div>
+
+  <% if @vendor.new_record? %>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Login Credentials</h2>
+      <p class="text-sm text-gray-500 mb-4">These credentials will be used by the vendor to log into the vendor portal.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <%= form.label :password, class: 'block text-sm font-medium text-gray-700' %>
+          <%= form.password_field :password, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm', autocomplete: 'new-password' %>
+        </div>
+
+        <div>
+          <%= form.label :password_confirmation, class: 'block text-sm font-medium text-gray-700' %>
+          <%= form.password_field :password_confirmation, class: 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm', autocomplete: 'new-password' %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to 'Cancel', admin_vendors_path, class: 'px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50' %>
+    <%= form.submit @vendor.new_record? ? 'Create Vendor' : 'Update Vendor', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium cursor-pointer' %>
+  </div>
+</div>

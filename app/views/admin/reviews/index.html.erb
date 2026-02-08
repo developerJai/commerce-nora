@@ -5,12 +5,28 @@
     <h1 class="text-2xl font-bold text-gray-900">Reviews</h1>
   </div>
 
+  <!-- Status Counters -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "All (#{@review_counts[:all].to_i})", admin_reviews_path(vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Pending (#{@review_counts[:pending].to_i})", admin_reviews_path(status: 'pending', vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == 'pending' ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Approved (#{@review_counts[:approved].to_i})", admin_reviews_path(status: 'approved', vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == 'approved' ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+    </div>
+  </div>
+
   <!-- Filters -->
   <div class="bg-white rounded-lg shadow-sm p-4">
     <%= form_with url: admin_reviews_path, method: :get, class: 'flex gap-4' do |f| %>
       <%= f.select :status, [['All', ''], ['Pending', 'pending'], ['Approved', 'approved']], 
           { selected: params[:status] },
           class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <%= f.hidden_field :vendor_id, value: @vendor_id %>
+      <% if admin_role? && !vendor_context? && @vendors.present? %>
+        <%= f.select :vendor_id,
+            options_from_collection_for_select(@vendors, :id, :business_name, @vendor_id),
+            { include_blank: 'All Vendors' },
+            class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <% end %>
       <%= f.submit 'Filter', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
     <% end %>
   </div>

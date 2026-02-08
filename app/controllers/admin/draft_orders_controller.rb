@@ -1,5 +1,6 @@
 module Admin
   class DraftOrdersController < BaseController
+    before_action :require_admin_role!
     before_action :set_order, only: [:show, :edit, :update, :destroy, :convert_to_order]
 
     def index

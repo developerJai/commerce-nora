@@ -56,21 +56,45 @@
 
     <!-- Sidebar -->
     <div class="space-y-6">
-      <!-- Customer info -->
-      <div class="bg-white rounded-lg shadow-sm p-4">
-        <h3 class="text-sm font-medium text-gray-900 mb-4">Customer</h3>
-        <div class="space-y-3 text-sm">
-          <div>
-            <span class="text-gray-500">Name:</span>
-            <span class="ml-2 text-gray-900"><%= @support_ticket.customer.full_name %></span>
+      <% if @support_ticket.customer %>
+        <!-- Customer info -->
+        <div class="bg-white rounded-lg shadow-sm p-4">
+          <h3 class="text-sm font-medium text-gray-900 mb-4">Customer</h3>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="text-gray-500">Name:</span>
+              <span class="ml-2 text-gray-900"><%= @support_ticket.customer.full_name %></span>
+            </div>
+            <div>
+              <span class="text-gray-500">Email:</span>
+              <span class="ml-2 text-gray-900"><%= @support_ticket.customer.email %></span>
+            </div>
+            <% if admin_role? %>
+              <%= link_to 'View Customer', admin_customer_path(@support_ticket.customer), class: 'text-indigo-600 hover:underline text-sm' %>
+            <% end %>
           </div>
-          <div>
-            <span class="text-gray-500">Email:</span>
-            <span class="ml-2 text-gray-900"><%= @support_ticket.customer.email %></span>
-          </div>
-          <%= link_to 'View Customer', admin_customer_path(@support_ticket.customer), class: 'text-indigo-600 hover:underline text-sm' %>
         </div>
-      </div>
+      <% end %>
+
+      <% if @support_ticket.vendor %>
+        <!-- Vendor info -->
+        <div class="bg-white rounded-lg shadow-sm p-4">
+          <h3 class="text-sm font-medium text-gray-900 mb-4">Vendor</h3>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="text-gray-500">Business:</span>
+              <span class="ml-2 text-gray-900"><%= @support_ticket.vendor.business_name %></span>
+            </div>
+            <div>
+              <span class="text-gray-500">Contact:</span>
+              <span class="ml-2 text-gray-900"><%= @support_ticket.vendor.contact_name %></span>
+            </div>
+            <% if admin_role? %>
+              <%= link_to 'View Vendor', admin_vendor_path(@support_ticket.vendor), class: 'text-indigo-600 hover:underline text-sm' %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
 
       <!-- Order info -->
       <% if @support_ticket.order %>

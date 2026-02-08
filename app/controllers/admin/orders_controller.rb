@@ -5,13 +5,36 @@ module Admin
     def index
       @status = params[:status]
       @not_shipped = params[:not_shipped]
-      orders = Order.placed.includes(:customer).recent
+      @vendor_id = params[:vendor_id]
+
+      base_orders = vendor_scoped(Order).placed
+      if admin_role? && !vendor_context? && @vendor_id.present?
+        base_orders = base_orders.where(vendor_id: @vendor_id)
+      end
+
+      @order_counts = {
+        all: base_orders.count,
+        pending: base_orders.where(status: 'pending').count,
+        confirmed: base_orders.where(status: 'confirmed').count,
+        processing: base_orders.where(status: 'processing').count,
+        shipped: base_orders.where(status: 'shipped').count,
+        delivered: base_orders.where(status: 'delivered').count,
+        cancelled: base_orders.where(status: 'cancelled').count
+      }
+      @not_shipped_count = base_orders.where(status: %w[confirmed processing]).count
+
+      orders = base_orders.includes(:customer).recent
       orders = orders.where(status: %w[confirmed processing]) if @not_shipped.present?
       orders = orders.by_status(@status) if @status.present?
       @pagy, @orders = pagy(orders, limit: 20)
+
+      if admin_role? && !vendor_context?
+        @vendors = Vendor.ordered
+      end
     end
 
     def drafts
+      return redirect_to(admin_root_path, alert: "Access denied") if vendor_role?
       @pagy, @orders = pagy(Order.draft.includes(:customer).recent, limit: 20)
     end
 
@@ -71,7 +94,7 @@ module Admin
     private
 
     def set_order
-      @order = Order.find_by!(order_number: params[:order_number])
+      @order = vendor_scoped(Order).find_by!(order_number: params[:order_number])
     end
 
     def order_params

@@ -1,6 +1,7 @@
 class OrderItem < ApplicationRecord
   belongs_to :order
   belongs_to :product_variant, optional: true
+  belongs_to :vendor, optional: true
 
   validates :product_name, :variant_name, presence: true
   validates :quantity, presence: true, numericality: { greater_than: 0 }

@@ -2,8 +2,19 @@ module Admin
   class InventoryController < BaseController
     def index
       @filter = params[:filter] || 'all'
+      @vendor_id = params[:vendor_id]
       
-      variants = ProductVariant.active.includes(:product, image_attachment: :blob)
+      base_variants = if vendor_context?
+        ProductVariant.active.joins(:product).where(products: { vendor_id: current_vendor.id })
+      else
+        variants = ProductVariant.active
+        if admin_role? && @vendor_id.present?
+          variants = variants.joins(:product).where(products: { vendor_id: @vendor_id })
+        end
+        variants
+      end
+
+      variants = base_variants.includes(:product, image_attachment: :blob)
       
       variants = case @filter
       when 'out_of_stock'
@@ -27,10 +38,14 @@ module Admin
       @pagy, @variants = pagy(variants, limit: 25)
 
       # Stats
-      @total_variants = ProductVariant.active.count
-      @out_of_stock_count = ProductVariant.active.out_of_stock.count
-      @low_stock_count = ProductVariant.active.low_stock.count
-      @needs_reorder_count = ProductVariant.active.needs_reorder.count
+      @total_variants = base_variants.count
+      @out_of_stock_count = base_variants.out_of_stock.count
+      @low_stock_count = base_variants.low_stock.count
+      @needs_reorder_count = base_variants.needs_reorder.count
+
+      if admin_role? && !vendor_context?
+        @vendors = Vendor.ordered
+      end
     end
 
     def adjustments
@@ -44,11 +59,11 @@ module Admin
     end
 
     def adjust
-      @variant = ProductVariant.find(params[:id])
+      @variant = find_variant(params[:id])
     end
 
     def create_adjustment
-      @variant = ProductVariant.find(params[:id])
+      @variant = find_variant(params[:id])
       
       quantity_change = params[:quantity_change].to_i
       reason = params[:reason]
@@ -64,7 +79,12 @@ module Admin
     end
 
     def bulk_adjust
-      @variants = ProductVariant.active.needs_reorder.includes(:product).order('stock_quantity ASC')
+      base = if vendor_context?
+        ProductVariant.active.joins(:product).where(products: { vendor_id: current_vendor.id })
+      else
+        ProductVariant.active
+      end
+      @variants = base.needs_reorder.includes(:product).order('stock_quantity ASC')
     end
 
     def create_bulk_adjustment
@@ -98,9 +118,12 @@ module Admin
     end
 
     def reorder_report
-      @variants = ProductVariant.active.needs_reorder
-                    .includes(:product)
-                    .order('stock_quantity ASC')
+      base = if vendor_context?
+        ProductVariant.active.joins(:product).where(products: { vendor_id: current_vendor.id })
+      else
+        ProductVariant.active
+      end
+      @variants = base.needs_reorder.includes(:product).order('stock_quantity ASC')
       
       respond_to do |format|
         format.html
@@ -111,6 +134,14 @@ module Admin
     end
 
     private
+
+    def find_variant(id)
+      if vendor_context?
+        ProductVariant.joins(:product).where(products: { vendor_id: current_vendor.id }).find(id)
+      else
+        ProductVariant.find(id)
+      end
+    end
 
     def generate_reorder_csv
       require 'csv'

@@ -28,6 +28,18 @@
         </div>
 
         <div>
+          <%= f.label :hsn_code_id, 'HSN Code (Tax Classification)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.collection_select :hsn_code_id, HsnCode.active.ordered, :id, :display_name, { include_blank: 'Select HSN code...' }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        </div>
+
+        <% if admin_role? && !vendor_context? %>
+          <div>
+            <%= f.label :vendor_id, 'Vendor', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.collection_select :vendor_id, Vendor.active.ordered, :id, :business_name, { include_blank: 'Select vendor...' }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+          </div>
+        <% end %>
+
+        <div>
           <%= f.label :short_description, class: 'block text-sm font-medium text-gray-700 mb-1' %>
           <%= f.text_area :short_description, rows: 2, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
         </div>

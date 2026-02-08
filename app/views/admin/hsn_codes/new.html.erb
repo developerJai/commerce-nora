@@ -1,0 +1,11 @@
+<% content_for(:title) { "Add HSN Code" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">Add HSN Code</h1>
+  </div>
+
+  <%= form_with model: [:admin, @hsn_code] do |form| %>
+    <%= render 'form', form: form %>
+  <% end %>
+</div>

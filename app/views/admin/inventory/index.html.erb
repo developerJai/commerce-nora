@@ -13,9 +13,23 @@
     </div>
   </div>
 
+  <% if admin_role? && !vendor_context? && @vendors.present? %>
+    <div class="bg-white rounded-lg shadow-sm p-4">
+      <%= form_with url: admin_inventory_index_path, method: :get, class: 'flex gap-4 items-center' do |f| %>
+        <%= f.hidden_field :filter, value: @filter %>
+        <%= f.hidden_field :q, value: params[:q] %>
+        <%= f.select :vendor_id,
+            options_from_collection_for_select(@vendors, :id, :business_name, @vendor_id),
+            { include_blank: 'All Vendors' },
+            class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        <%= f.submit 'Apply', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+      <% end %>
+    </div>
+  <% end %>
+
   <!-- Stats Cards -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-    <%= link_to admin_inventory_index_path(filter: 'all'), class: "block bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition #{@filter == 'all' ? 'ring-2 ring-indigo-500' : ''}" do %>
+    <%= link_to admin_inventory_index_path(filter: 'all', vendor_id: @vendor_id), class: "block bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition #{@filter == 'all' ? 'ring-2 ring-indigo-500' : ''}" do %>
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm text-gray-500">Total Items</p>
@@ -29,7 +43,7 @@
       </div>
     <% end %>
 
-    <%= link_to admin_inventory_index_path(filter: 'out_of_stock'), class: "block bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition #{@filter == 'out_of_stock' ? 'ring-2 ring-red-500' : ''}" do %>
+    <%= link_to admin_inventory_index_path(filter: 'out_of_stock', vendor_id: @vendor_id), class: "block bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition #{@filter == 'out_of_stock' ? 'ring-2 ring-red-500' : ''}" do %>
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm text-gray-500">Out of Stock</p>
@@ -43,7 +57,7 @@
       </div>
     <% end %>
 
-    <%= link_to admin_inventory_index_path(filter: 'low_stock'), class: "block bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition #{@filter == 'low_stock' ? 'ring-2 ring-yellow-500' : ''}" do %>
+    <%= link_to admin_inventory_index_path(filter: 'low_stock', vendor_id: @vendor_id), class: "block bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition #{@filter == 'low_stock' ? 'ring-2 ring-yellow-500' : ''}" do %>
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm text-gray-500">Low Stock</p>
@@ -57,7 +71,7 @@
       </div>
     <% end %>
 
-    <%= link_to admin_inventory_index_path(filter: 'needs_reorder'), class: "block bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition #{@filter == 'needs_reorder' ? 'ring-2 ring-orange-500' : ''}" do %>
+    <%= link_to admin_inventory_index_path(filter: 'needs_reorder', vendor_id: @vendor_id), class: "block bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition #{@filter == 'needs_reorder' ? 'ring-2 ring-orange-500' : ''}" do %>
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm text-gray-500">Needs Reorder</p>
@@ -72,10 +86,20 @@
     <% end %>
   </div>
 
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "All (#{@total_variants})", admin_inventory_index_path(filter: 'all', vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@filter == 'all' ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Out of Stock (#{@out_of_stock_count})", admin_inventory_index_path(filter: 'out_of_stock', vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@filter == 'out_of_stock' ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Low Stock (#{@low_stock_count})", admin_inventory_index_path(filter: 'low_stock', vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@filter == 'low_stock' ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Needs Reorder (#{@needs_reorder_count})", admin_inventory_index_path(filter: 'needs_reorder', vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@filter == 'needs_reorder' ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+    </div>
+  </div>
+
   <!-- Search -->
   <div class="bg-white rounded-lg shadow-sm p-4">
     <%= form_with url: admin_inventory_index_path, method: :get, class: 'flex gap-4' do |f| %>
       <%= f.hidden_field :filter, value: @filter %>
+      <%= f.hidden_field :vendor_id, value: @vendor_id %>
       <%= f.search_field :q, value: params[:q], placeholder: 'Search by product name, variant, or SKU...', 
           class: 'flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
       <%= f.submit 'Search', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>

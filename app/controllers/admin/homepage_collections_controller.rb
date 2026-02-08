@@ -1,5 +1,6 @@
 module Admin
   class HomepageCollectionsController < BaseController
+    before_action :require_admin_role!
     before_action :set_collection, only: [:show, :edit, :update, :destroy, :toggle_status]
 
     def index

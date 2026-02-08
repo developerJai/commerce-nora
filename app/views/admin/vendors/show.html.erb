@@ -1,0 +1,75 @@
+<% content_for(:title) { @vendor.business_name } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900"><%= @vendor.business_name %></h1>
+    <div class="flex gap-3">
+      <%= link_to 'Inventory', admin_inventory_index_path(vendor_id: @vendor.id), class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium' %>
+      <%= link_to 'Orders', admin_orders_path(vendor_id: @vendor.id), class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium' %>
+      <%= button_to "Act as Vendor", act_as_admin_vendor_path(@vendor), method: :post, class: 'px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm font-medium' %>
+      <%= link_to 'Edit', edit_admin_vendor_path(@vendor), class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium' %>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="text-sm font-medium text-gray-500">Products</div>
+      <div class="mt-1 text-3xl font-bold text-gray-900"><%= @products_count %></div>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="text-sm font-medium text-gray-500">Orders</div>
+      <div class="mt-1 text-3xl font-bold text-gray-900"><%= @orders_count %></div>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="text-sm font-medium text-gray-500">Total Revenue</div>
+      <div class="mt-1 text-3xl font-bold text-gray-900"><%= number_to_currency(@total_revenue, unit: "\u20B9", precision: 0) %></div>
+    </div>
+  </div>
+
+  <!-- Details -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Vendor Details</h2>
+
+    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Contact Name</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @vendor.contact_name %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Email</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @vendor.email %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Phone</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @vendor.phone.presence || '-' %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">GST Number</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @vendor.gst_number.presence || '-' %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Status</dt>
+        <dd class="mt-1">
+          <% if @vendor.active? %>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+          <% else %>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
+          <% end %>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Vendor Login</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @admin_user&.email || 'No login configured' %></dd>
+      </div>
+      <% if @vendor.address_line1.present? %>
+        <div class="md:col-span-2">
+          <dt class="text-sm font-medium text-gray-500">Address</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <%= [@vendor.address_line1, @vendor.address_line2, @vendor.city, @vendor.state, @vendor.pincode].compact_blank.join(', ') %>
+          </dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
+</div>

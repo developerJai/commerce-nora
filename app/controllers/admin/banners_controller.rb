@@ -1,5 +1,6 @@
 module Admin
   class BannersController < BaseController
+    before_action :require_admin_role!
     before_action :set_banner, only: [:show, :edit, :update, :destroy, :toggle_status]
 
     def index

@@ -12,7 +12,7 @@ namespace :seed do
       admin.password = "password123"
       admin.active = true
     end
-    puts "  ✓ Admin: admin@noralooks.com / password123"
+    puts "  ✓ Admin: admin@noralooks.com / password123 (role: admin)"
 
     # ── Categories (Jewellery-focused) ──
     puts "\n→ Creating categories..."
@@ -183,6 +183,97 @@ namespace :seed do
 
   # ─────────────────────────────────────────────────────────────
 
+  desc "Seed HSN codes for tax classification"
+  task hsn_codes: :environment do
+    puts "\n→ Creating HSN codes..."
+    hsn_data = [
+      { code: "7113", description: "Articles of jewellery and parts thereof, of precious metal", gst_rate: 3.0, category_name: "Jewellery" },
+      { code: "71131100", description: "Articles of jewellery of silver", gst_rate: 3.0, category_name: "Jewellery" },
+      { code: "71131900", description: "Articles of jewellery of other precious metal", gst_rate: 3.0, category_name: "Jewellery" },
+      { code: "7117", description: "Imitation jewellery", gst_rate: 3.0, category_name: "Imitation Jewellery" },
+      { code: "7114", description: "Articles of goldsmiths' or silversmiths' wares", gst_rate: 3.0, category_name: "Precious Metal Wares" },
+      { code: "7116", description: "Articles of natural or cultured pearls, precious or semi-precious stones", gst_rate: 3.0, category_name: "Gemstones" },
+      { code: "4819", description: "Packaging boxes, cartons and cases of paper or paperboard", gst_rate: 18.0, category_name: "Packaging" },
+      { code: "7101", description: "Pearls, natural or cultured", gst_rate: 3.0, category_name: "Gemstones" }
+    ]
+
+    hsn_data.each do |data|
+      HsnCode.find_or_create_by!(code: data[:code]) do |h|
+        h.description = data[:description]
+        h.gst_rate = data[:gst_rate]
+        h.category_name = data[:category_name]
+        h.active = true
+      end
+    end
+    puts "  ✓ #{hsn_data.size} HSN codes created"
+  end
+
+  # ─────────────────────────────────────────────────────────────
+
+  desc "Seed sample vendors with login credentials"
+  task vendors: :environment do
+    puts "\n→ Creating vendors..."
+
+    default_hsn = HsnCode.find_by(code: "7113")
+
+    vendors_data = [
+      {
+        business_name: "Laxmi Gold House",
+        contact_name: "Rajesh Kumar",
+        email: "vendor1@noralooks.com",
+        phone: "9876543210",
+        gst_number: "07AABCT1332L1ZH",
+        city: "Jaipur", state: "Rajasthan", pincode: "302001",
+        password: "password123"
+      },
+      {
+        business_name: "Shree Diamonds",
+        contact_name: "Priya Sharma",
+        email: "vendor2@noralooks.com",
+        phone: "9876543211",
+        gst_number: "27AADCS0472N1ZG",
+        city: "Mumbai", state: "Maharashtra", pincode: "400001",
+        password: "password123"
+      },
+      {
+        business_name: "Royal Gems & Jewels",
+        contact_name: "Amit Patel",
+        email: "vendor3@noralooks.com",
+        phone: "9876543212",
+        gst_number: "24AAECR5055K1ZB",
+        city: "Surat", state: "Gujarat", pincode: "395001",
+        password: "password123"
+      }
+    ]
+
+    vendors_data.each do |vdata|
+      vendor = Vendor.find_or_create_by!(email: vdata[:email]) do |v|
+        v.business_name = vdata[:business_name]
+        v.contact_name = vdata[:contact_name]
+        v.phone = vdata[:phone]
+        v.gst_number = vdata[:gst_number]
+        v.city = vdata[:city]
+        v.state = vdata[:state]
+        v.pincode = vdata[:pincode]
+        v.active = true
+      end
+
+      AdminUser.find_or_create_by!(email: vdata[:email]) do |admin|
+        admin.name = vdata[:contact_name]
+        admin.password = vdata[:password]
+        admin.role = "vendor"
+        admin.vendor = vendor
+        admin.active = true
+      end
+
+      puts "  ✓ #{vdata[:business_name]}: #{vdata[:email]} / #{vdata[:password]}"
+    end
+
+    puts "  ✓ #{vendors_data.size} vendors created"
+  end
+
+  # ─────────────────────────────────────────────────────────────
+
   desc "Section 2: Seed products and variants"
   task products: :environment do
     puts "=" * 60
@@ -203,6 +294,11 @@ namespace :seed do
     bangles    = Category.find_by(slug: "bangles")
     bracelets  = Category.find_by(slug: "bracelets")
     pendants   = Category.find_by(slug: "pendants")
+
+    # Vendor and HSN assignment
+    vendors = Vendor.active.to_a
+    default_hsn = HsnCode.find_by(code: "7113")
+    target_vendor_id = ENV['VENDOR_ID'] ? ENV['VENDOR_ID'].to_i : nil
 
     products_data = [
       {
@@ -296,7 +392,7 @@ namespace :seed do
       }
     ]
 
-    products_data.each do |pdata|
+    products_data.each_with_index do |pdata, pidx|
       product = Product.find_or_create_by!(slug: pdata[:slug]) do |p|
         p.name = pdata[:name]
         p.description = pdata[:description]
@@ -305,6 +401,8 @@ namespace :seed do
         p.price = pdata[:price]
         p.active = true
         p.featured = pdata[:featured]
+        p.hsn_code = default_hsn
+        p.vendor_id = target_vendor_id || (vendors.any? ? vendors[pidx % vendors.size].id : nil)
       end
 
       pdata[:variants].each_with_index do |vdata, index|
@@ -350,6 +448,8 @@ namespace :seed do
           p.price = base_price
           p.active = true
           p.featured = featured
+          p.hsn_code = default_hsn
+          p.vendor_id = target_vendor_id || (vendors.any? ? vendors[idx % vendors.size].id : nil)
         end
 
         variant_count = 2 + (idx % 2)
@@ -531,10 +631,14 @@ namespace :seed do
         )
 
         order_variants = available_variants.sample(rand(1..3))
+        order_vendor_id = order_variants.first&.product&.vendor_id
+        order.vendor_id = order_vendor_id
+
         order_variants.each do |variant|
           quantity = [1, 1, 1, 2, 2, 3].sample
           order.order_items.create!(
             product_variant: variant,
+            vendor_id: variant.product.vendor_id,
             product_name: variant.product.name,
             variant_name: variant.name,
             sku: variant.sku,
@@ -584,24 +688,31 @@ namespace :seed do
 
   # ─────────────────────────────────────────────────────────────
 
-  desc "Run all seed sections in order (homepage → products → orders)"
+  desc "Run all seed sections in order (homepage → hsn_codes → vendors → products → orders)"
   task all: :environment do
     Rake::Task["seed:homepage"].invoke
+    Rake::Task["seed:hsn_codes"].invoke
+    Rake::Task["seed:vendors"].invoke
     Rake::Task["seed:products"].invoke
     Rake::Task["seed:orders"].invoke
 
     puts ""
     puts "=" * 60
-    puts "🎉 ALL SEEDS COMPLETE"
+    puts "ALL SEEDS COMPLETE"
     puts "=" * 60
     puts ""
     puts "Admin:    admin@noralooks.com / password123"
+    puts "Vendor 1: vendor1@noralooks.com / password123 (Laxmi Gold House)"
+    puts "Vendor 2: vendor2@noralooks.com / password123 (Shree Diamonds)"
+    puts "Vendor 3: vendor3@noralooks.com / password123 (Royal Gems & Jewels)"
     puts "Customer: demo@example.com / password123"
     puts ""
     puts "Next steps:"
     puts "  1. Start the server:  bin/dev"
-    puts "  2. Upload images to homepage collections at /admin/homepage_collections"
-    puts "  3. Upload product images at /admin/products"
+    puts "  2. Admin panel: /admin/login"
+    puts "  3. Vendor portal: /vendor/login"
+    puts "  4. Upload images to homepage collections at /admin/homepage_collections"
+    puts "  5. Upload product images at /admin/products"
     puts ""
   end
 end

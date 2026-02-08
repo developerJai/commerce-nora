@@ -27,6 +27,13 @@
         </button>
       </div>
 
+      <% if vendor_role? %>
+        <div class="px-6 py-2 bg-slate-800 border-b border-slate-700">
+          <p class="text-xs text-slate-400 uppercase tracking-wider">Vendor Panel</p>
+          <p class="text-sm text-white font-medium truncate"><%= current_vendor&.business_name %></p>
+        </div>
+      <% end %>
+
       <!-- Navigation -->
       <nav class="mt-6 px-4 space-y-1">
         <%= render 'admin/shared/sidebar_link', path: admin_root_path, icon: 'dashboard', label: 'Dashboard', active: controller_name == 'dashboard' %>
@@ -35,29 +42,51 @@
           <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Store</p>
         </div>
         <%= render 'admin/shared/sidebar_link', path: admin_products_path, icon: 'products', label: 'Products', active: controller_name.in?(['products', 'product_variants']) %>
-        <%= render 'admin/shared/sidebar_link', path: admin_categories_path, icon: 'categories', label: 'Categories', active: controller_name == 'categories' %>
+        <% if admin_role? %>
+          <%= render 'admin/shared/sidebar_link', path: admin_categories_path, icon: 'categories', label: 'Categories', active: controller_name == 'categories' %>
+        <% end %>
         <%= render 'admin/shared/sidebar_link', path: admin_inventory_index_path, icon: 'inventory', label: 'Inventory', active: controller_name == 'inventory' %>
-        <%= render 'admin/shared/sidebar_link', path: admin_banners_path, icon: 'banners', label: 'Banners', active: controller_name == 'banners' %>
-        <%= render 'admin/shared/sidebar_link', path: admin_homepage_collections_path, icon: 'collections', label: 'Collections', active: controller_name.in?(['homepage_collections', 'homepage_collection_items']) %>
+        <% if admin_role? %>
+          <%= render 'admin/shared/sidebar_link', path: admin_banners_path, icon: 'banners', label: 'Banners', active: controller_name == 'banners' %>
+          <%= render 'admin/shared/sidebar_link', path: admin_homepage_collections_path, icon: 'collections', label: 'Collections', active: controller_name.in?(['homepage_collections', 'homepage_collection_items']) %>
+        <% end %>
         
         <div class="pt-4">
           <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Sales</p>
         </div>
         <%= render 'admin/shared/sidebar_link', path: admin_orders_path, icon: 'orders', label: 'Orders', active: controller_name == 'orders' && action_name != 'drafts' %>
-        <%= render 'admin/shared/sidebar_link', path: admin_draft_orders_path, icon: 'draft', label: 'Draft Orders', active: controller_name == 'draft_orders' %>
-        <%= render 'admin/shared/sidebar_link', path: admin_coupons_path, icon: 'coupons', label: 'Coupons', active: controller_name == 'coupons' %>
+        <% if admin_role? %>
+          <%= render 'admin/shared/sidebar_link', path: admin_draft_orders_path, icon: 'draft', label: 'Draft Orders', active: controller_name == 'draft_orders' %>
+          <%= render 'admin/shared/sidebar_link', path: admin_coupons_path, icon: 'coupons', label: 'Coupons', active: controller_name == 'coupons' %>
+        <% end %>
         
-        <div class="pt-4">
-          <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Customers</p>
-        </div>
-        <%= render 'admin/shared/sidebar_link', path: admin_customers_path, icon: 'customers', label: 'Customers', active: controller_name == 'customers' %>
+        <% if admin_role? %>
+          <div class="pt-4">
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Customers</p>
+          </div>
+          <%= render 'admin/shared/sidebar_link', path: admin_customers_path, icon: 'customers', label: 'Customers', active: controller_name == 'customers' %>
+        <% end %>
+        
+        <% unless admin_role? %>
+          <div class="pt-4">
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Feedback</p>
+          </div>
+        <% end %>
         <%= render 'admin/shared/sidebar_link', path: admin_reviews_path, icon: 'reviews', label: 'Reviews', active: controller_name == 'reviews' %>
         <%= render 'admin/shared/sidebar_link', path: admin_support_tickets_path, icon: 'support', label: 'Support', active: controller_name == 'support_tickets' %>
         
-        <div class="pt-4">
-          <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Analytics</p>
-        </div>
-        <%= render 'admin/shared/sidebar_link', path: admin_reports_path, icon: 'reports', label: 'Reports', active: controller_name == 'reports' %>
+        <% if admin_role? %>
+          <div class="pt-4">
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Management</p>
+          </div>
+          <%= render 'admin/shared/sidebar_link', path: admin_vendors_path, icon: 'vendors', label: 'Vendors', active: controller_name == 'vendors' %>
+          <%= render 'admin/shared/sidebar_link', path: admin_hsn_codes_path, icon: 'hsn', label: 'HSN Codes', active: controller_name == 'hsn_codes' %>
+
+          <div class="pt-4">
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Analytics</p>
+          </div>
+          <%= render 'admin/shared/sidebar_link', path: admin_reports_path, icon: 'reports', label: 'Reports', active: controller_name == 'reports' %>
+        <% end %>
       </nav>
     </aside>
 
@@ -87,12 +116,23 @@
                 <%= link_to 'Settings', admin_settings_path, class: 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
                 <%= link_to 'Change Password', edit_admin_password_path, class: 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
                 <hr class="my-1">
-                <%= button_to 'Logout', admin_logout_path, method: :delete, class: 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
+                <% if vendor_role? %>
+                  <%= button_to 'Logout', vendor_logout_path, method: :delete, class: 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
+                <% else %>
+                  <%= button_to 'Logout', admin_logout_path, method: :delete, class: 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
+                <% end %>
               </div>
             </div>
           </div>
         </div>
       </header>
+
+      <% if admin_role? && session[:acting_as_vendor_id] && current_vendor %>
+        <div class="bg-amber-500 text-amber-900 px-4 py-2 flex items-center justify-between text-sm font-medium">
+          <span>Acting as vendor: <strong><%= current_vendor.business_name %></strong></span>
+          <%= button_to "Exit Vendor Mode", admin_exit_vendor_mode_path, method: :delete, class: "bg-amber-700 text-white px-3 py-1 rounded text-xs hover:bg-amber-800" %>
+        </div>
+      <% end %>
 
       <!-- Page content -->
       <main class="py-6 px-4 sm:px-6 lg:px-8">
