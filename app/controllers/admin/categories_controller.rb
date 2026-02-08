@@ -1,5 +1,6 @@
 module Admin
   class CategoriesController < BaseController
+    before_action :require_admin_role!
     before_action :set_category, only: [:show, :edit, :update, :destroy, :toggle_status]
 
     def index

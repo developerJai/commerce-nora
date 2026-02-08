@@ -34,6 +34,7 @@ class Order < ApplicationRecord
   # ── Associations ──
   belongs_to :customer, optional: true
   belongs_to :coupon, optional: true
+  belongs_to :vendor, optional: true
   has_many :order_items, dependent: :destroy
   has_many :reviews, dependent: :nullify
   has_many :support_tickets, dependent: :nullify
@@ -44,7 +45,8 @@ class Order < ApplicationRecord
 
   SHIPPING_FREE_THRESHOLD = 999
   SHIPPING_FLAT_FEE = 99
-  TAX_RATE = 0.18
+  TAX_RATE = 0.18 # Legacy fallback; prefer HSN-based calculation
+  DEFAULT_JEWELLERY_GST_RATE = 3.0
   PAYMENT_STATUSES = %w[pending paid failed refunded].freeze
   PAYMENT_METHODS = %w[cod].freeze
   CANCELLATION_REASONS = [
@@ -113,6 +115,7 @@ class Order < ApplicationRecord
   scope :placed, -> { where(is_draft: false).where.not(placed_at: nil) }
   scope :by_status, ->(status) { where(status: status) if status.present? }
   scope :recent, -> { order(created_at: :desc) }
+  scope :for_vendor, ->(vendor) { where(vendor_id: vendor.id) if vendor }
 
   def place!
     return false if is_draft? && order_items.empty?
@@ -226,7 +229,7 @@ class Order < ApplicationRecord
 
     discounted_subtotal = subtotal - discount_amount
     self.shipping_amount = self.class.calculate_shipping_amount(discounted_subtotal)
-    self.tax_amount = self.class.calculate_tax_amount(discounted_subtotal + shipping_amount.to_f)
+    self.tax_amount = calculate_hsn_tax(discounted_subtotal)
 
     self.total_amount = subtotal - discount_amount + shipping_amount + tax_amount
   end
@@ -237,8 +240,23 @@ class Order < ApplicationRecord
     SHIPPING_FLAT_FEE
   end
 
+  # Legacy class method kept for backward compatibility
   def self.calculate_tax_amount(taxable_amount)
     (taxable_amount.to_f * TAX_RATE).round(2)
+  end
+
+  # Per-item HSN-based tax calculation
+  def calculate_hsn_tax(discounted_subtotal)
+    return 0 if subtotal.to_f <= 0 || discounted_subtotal <= 0
+
+    total_tax = order_items.sum do |item|
+      rate = item.product_variant&.product&.hsn_code&.gst_rate || DEFAULT_JEWELLERY_GST_RATE
+      (item.total_price.to_f * rate / 100.0)
+    end
+
+    # Adjust proportionally for discount
+    ratio = discounted_subtotal.to_f / subtotal.to_f
+    (total_tax * ratio).round(2)
   end
 
   def items_count

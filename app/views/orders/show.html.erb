@@ -13,18 +13,28 @@
           <div class="flex flex-wrap items-center gap-3 mt-1">
             <p class="text-sm text-stone-600"><%= @order.order_number %></p>
             <span class="text-stone-300">•</span>
-            <p class="text-sm text-stone-500">Placed on <%= @order.placed_at&.strftime('%B %d, %Y at %I:%M %p') %></p>
-            <span class="px-3 py-1 rounded-full text-xs font-medium <%= order_status_badge(@order.status) %>">
-              <%= @order.status.titleize %>
-            </span>
+            <div class="flex items-center gap-2">
+              <p class="text-sm text-stone-500">Placed on <%= @order.placed_at&.strftime('%B %d, %Y at %I:%M %p') %></p>
+              <span class="px-3 py-1 rounded-full text-xs font-medium <%= order_status_badge(@order.status) %>">
+                <%= @order.status.titleize %>
+              </span>
+            </div>
           </div>
         </div>
-        <%= link_to orders_path, class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition' do %>
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to orders
-        <% end %>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <%= link_to orders_path, class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition whitespace-nowrap' do %>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to orders
+          <% end %>
+          <%= link_to download_invoice_order_path(@order), class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition whitespace-nowrap' do %>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Download Invoice
+          <% end %>
+        </div>
       </div>
 
       <!-- Order Timeline -->
@@ -103,6 +113,22 @@
           <!-- Order Summary -->
           <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 lg:sticky lg:top-24">
             <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Summary</h2>
+
+            <!-- Vendor Information -->
+            <% if @order.vendor.present? %>
+              <div class="mb-4 p-3 bg-stone-50 rounded-lg border border-stone-200">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-stone-700">Sold by</p>
+                    <p class="text-sm font-semibold text-stone-900"><%= @order.vendor.business_name %></p>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">
                 <span class="text-stone-600">Subtotal</span>

@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
-  helper_method :current_customer, :customer_logged_in?, :current_cart
+  helper_method :current_customer, :customer_logged_in?, :current_cart, :search_placeholder
 
   private
 
@@ -52,5 +52,32 @@ class ApplicationController < ActionController::Base
     cart = Cart.create!(token: SecureRandom.uuid)
     session[:cart_token] = cart.token
     cart
+  end
+
+  def search_placeholder
+    active_categories = Category.active.root.ordered.pluck(:name)
+    search_parts = []
+
+    # Add "jewellery" if any jewellery categories are active
+    jewellery_categories = ["Necklaces", "Rings", "Earrings", "Bangles", "Bracelets", "Pendants"]
+    if (active_categories & jewellery_categories).any?
+      search_parts << "jewellery"
+    end
+
+    # Add "traditional wear" if active
+    if active_categories.include?("Traditional Wear")
+      search_parts << "traditional wear"
+    end
+
+    # Add "gifts" if active
+    if active_categories.include?("Gifts")
+      search_parts << "gifts"
+    end
+
+    if search_parts.length > 1
+      "Search #{search_parts[0..-2].join(', ')} & #{search_parts.last}..."
+    else
+      "Search #{search_parts.first}..."
+    end
   end
 end

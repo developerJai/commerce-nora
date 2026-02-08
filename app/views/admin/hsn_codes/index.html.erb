@@ -1,0 +1,58 @@
+<% content_for(:title) { "HSN Codes" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">HSN Codes</h1>
+    <%= link_to 'Add HSN Code', new_admin_hsn_code_path, class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium' %>
+  </div>
+
+  <!-- Search -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <%= form_with url: admin_hsn_codes_path, method: :get, class: 'flex gap-4' do |f| %>
+      <%= f.search_field :q, value: @q, placeholder: 'Search by code or description...',
+          class: 'flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <%= f.submit 'Search', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+    <% end %>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GST Rate</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @hsn_codes.each do |hsn| %>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= hsn.code %></td>
+            <td class="px-6 py-4 text-sm text-gray-500"><%= hsn.description %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= hsn.category_name.presence || '-' %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium"><%= hsn.gst_rate %>%</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% if hsn.active? %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+              <% else %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+              <%= link_to 'Edit', edit_admin_hsn_code_path(hsn), class: 'text-indigo-600 hover:text-indigo-900' %>
+              <%= button_to hsn.active? ? 'Disable' : 'Enable', toggle_status_admin_hsn_code_path(hsn), method: :patch, class: "text-#{hsn.active? ? 'red' : 'green'}-600 hover:text-#{hsn.active? ? 'red' : 'green'}-900" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @pagy.last > 1 %>
+    <%== @pagy.series_nav %>
+  <% end %>
+</div>

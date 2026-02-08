@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_08_130002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -73,9 +73,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.datetime "last_login_at"
     t.string "name", null: false
     t.string "password_digest", null: false
+    t.string "role", default: "admin", null: false
     t.datetime "updated_at", null: false
+    t.bigint "vendor_id"
     t.index ["deleted_at"], name: "index_admin_users_on_deleted_at"
     t.index ["email"], name: "index_admin_users_on_email", unique: true
+    t.index ["role"], name: "index_admin_users_on_role"
+    t.index ["vendor_id"], name: "index_admin_users_on_vendor_id"
   end
 
   create_table "banners", force: :cascade do |t|
@@ -205,6 +209,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.index ["position"], name: "index_homepage_collections_on_position"
   end
 
+  create_table "hsn_codes", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.string "category_name"
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.string "description", null: false
+    t.decimal "gst_rate", precision: 5, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_hsn_codes_on_code", unique: true
+  end
+
   create_table "order_items", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
@@ -217,9 +232,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.decimal "unit_price", precision: 10, scale: 2, null: false
     t.datetime "updated_at", null: false
     t.string "variant_name", null: false
+    t.bigint "vendor_id"
     t.index ["deleted_at"], name: "index_order_items_on_deleted_at"
     t.index ["order_id"], name: "index_order_items_on_order_id"
     t.index ["product_variant_id"], name: "index_order_items_on_product_variant_id"
+    t.index ["vendor_id"], name: "index_order_items_on_vendor_id"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -228,6 +245,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.jsonb "billing_address_snapshot"
     t.string "cancellation_reason"
     t.datetime "cancelled_at"
+    t.string "checkout_batch_id"
     t.bigint "coupon_id"
     t.datetime "created_at", null: false
     t.bigint "customer_id"
@@ -253,7 +271,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.string "tracking_number"
     t.string "tracking_url"
     t.datetime "updated_at", null: false
+    t.bigint "vendor_id"
     t.index ["billing_address_id"], name: "index_orders_on_billing_address_id"
+    t.index ["checkout_batch_id"], name: "index_orders_on_checkout_batch_id"
     t.index ["coupon_id"], name: "index_orders_on_coupon_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["deleted_at"], name: "index_orders_on_deleted_at"
@@ -261,6 +281,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
     t.index ["shipping_address_id"], name: "index_orders_on_shipping_address_id"
     t.index ["status"], name: "index_orders_on_status"
+    t.index ["vendor_id"], name: "index_orders_on_vendor_id"
   end
 
   create_table "product_variants", force: :cascade do |t|
@@ -293,6 +314,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.datetime "deleted_at"
     t.text "description"
     t.boolean "featured", default: false, null: false
+    t.bigint "hsn_code_id"
     t.string "name", null: false
     t.decimal "price", precision: 10, scale: 2, default: "0.0"
     t.integer "ratings_count", default: 0
@@ -300,11 +322,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.string "sku"
     t.string "slug", null: false
     t.datetime "updated_at", null: false
+    t.bigint "vendor_id"
     t.index ["active"], name: "index_products_on_active"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["deleted_at"], name: "index_products_on_deleted_at"
     t.index ["featured"], name: "index_products_on_featured"
+    t.index ["hsn_code_id"], name: "index_products_on_hsn_code_id"
     t.index ["slug"], name: "index_products_on_slug", unique: true
+    t.index ["vendor_id"], name: "index_products_on_vendor_id"
   end
 
   create_table "reviews", force: :cascade do |t|
@@ -359,6 +384,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.string "subject", null: false
     t.string "ticket_number", null: false
     t.datetime "updated_at", null: false
+    t.bigint "vendor_id"
     t.index ["admin_last_seen_at"], name: "index_support_tickets_on_admin_last_seen_at"
     t.index ["customer_id"], name: "index_support_tickets_on_customer_id"
     t.index ["customer_last_seen_at"], name: "index_support_tickets_on_customer_last_seen_at"
@@ -368,6 +394,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.index ["order_id"], name: "index_support_tickets_on_order_id"
     t.index ["status"], name: "index_support_tickets_on_status"
     t.index ["ticket_number"], name: "index_support_tickets_on_ticket_number", unique: true
+    t.index ["vendor_id"], name: "index_support_tickets_on_vendor_id"
   end
 
   create_table "ticket_messages", force: :cascade do |t|
@@ -383,6 +410,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
     t.index ["support_ticket_id"], name: "index_ticket_messages_on_support_ticket_id"
   end
 
+  create_table "vendors", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.string "address_line1"
+    t.string "address_line2"
+    t.string "business_name", null: false
+    t.string "city"
+    t.string "contact_name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.string "email", null: false
+    t.string "gst_number"
+    t.string "phone"
+    t.string "pincode"
+    t.string "state"
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_vendors_on_deleted_at"
+    t.index ["email"], name: "index_vendors_on_email", unique: true
+  end
+
   create_table "wishlists", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "customer_id", null: false
@@ -396,6 +442,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "customers"
+  add_foreign_key "admin_users", "vendors"
   add_foreign_key "cart_items", "carts"
   add_foreign_key "cart_items", "product_variants"
   add_foreign_key "carts", "customers"
@@ -403,16 +450,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_120000) do
   add_foreign_key "homepage_collection_items", "homepage_collections"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "product_variants"
+  add_foreign_key "order_items", "vendors"
   add_foreign_key "orders", "coupons"
   add_foreign_key "orders", "customers"
+  add_foreign_key "orders", "vendors"
   add_foreign_key "product_variants", "products"
   add_foreign_key "products", "categories"
+  add_foreign_key "products", "hsn_codes"
+  add_foreign_key "products", "vendors"
   add_foreign_key "reviews", "customers"
   add_foreign_key "reviews", "orders"
   add_foreign_key "reviews", "products"
   add_foreign_key "stock_adjustments", "product_variants"
   add_foreign_key "support_tickets", "customers"
   add_foreign_key "support_tickets", "orders"
+  add_foreign_key "support_tickets", "vendors"
   add_foreign_key "ticket_messages", "support_tickets"
   add_foreign_key "wishlists", "customers"
   add_foreign_key "wishlists", "products"

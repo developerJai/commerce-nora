@@ -3,6 +3,21 @@
 <div class="space-y-6">
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-bold text-gray-900">Support Tickets</h1>
+    <% if vendor_role? %>
+      <%= link_to 'New Ticket', new_admin_support_ticket_path, class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium' %>
+    <% end %>
+  </div>
+
+  <!-- Status Counters -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "All (#{@ticket_counts[:all].to_i})", admin_support_tickets_path(priority: @priority, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status.blank? && @unread.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Open (#{@ticket_counts[:open].to_i})", admin_support_tickets_path(status: 'open', priority: @priority, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == 'open' && @unread.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "In Progress (#{@ticket_counts[:in_progress].to_i})", admin_support_tickets_path(status: 'in_progress', priority: @priority, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == 'in_progress' && @unread.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Resolved (#{@ticket_counts[:resolved].to_i})", admin_support_tickets_path(status: 'resolved', priority: @priority, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == 'resolved' && @unread.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Closed (#{@ticket_counts[:closed].to_i})", admin_support_tickets_path(status: 'closed', priority: @priority, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == 'closed' && @unread.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Unread (#{@unread_count.to_i})", admin_support_tickets_path(unread: 1, priority: @priority, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@unread.present? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+    </div>
   </div>
 
   <!-- Filters -->
@@ -14,6 +29,13 @@
       <%= f.select :priority, [['All Priorities', ''], ['Low', 'low'], ['Normal', 'normal'], ['High', 'high'], ['Urgent', 'urgent']], 
           { selected: params[:priority] },
           class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <%= f.hidden_field :vendor_id, value: @vendor_id %>
+      <% if admin_role? && !vendor_context? && @vendors.present? %>
+        <%= f.select :vendor_id,
+            options_from_collection_for_select(@vendors, :id, :business_name, @vendor_id),
+            { include_blank: 'All Vendors' },
+            class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <% end %>
       <%= f.submit 'Filter', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
     <% end %>
   </div>
@@ -38,7 +60,12 @@
               <span class="font-mono text-sm font-medium text-gray-900"><%= ticket.ticket_number %></span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              <%= ticket.customer.full_name %>
+              <% if ticket.customer %>
+                <%= ticket.customer.full_name %>
+              <% elsif ticket.vendor %>
+                <span class="text-amber-700"><%= ticket.vendor.business_name %></span>
+                <span class="text-xs text-gray-400">(Vendor)</span>
+              <% end %>
             </td>
             <td class="px-6 py-4">
               <div class="text-sm font-medium text-gray-900"><%= truncate(ticket.subject, length: 50) %></div>

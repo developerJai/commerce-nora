@@ -8,10 +8,27 @@
 
   <!-- Status Filter -->
   <div class="bg-white rounded-lg shadow-sm p-4">
-    <div class="flex gap-2">
-      <%= link_to 'All', admin_orders_path, class: "px-4 py-2 rounded-md text-sm font-medium #{@status.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
-      <% %w[pending confirmed processing shipped delivered cancelled].each do |status| %>
-        <%= link_to status.titleize, admin_orders_path(status: status), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == status ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+    <div class="flex flex-wrap gap-3 items-center justify-between">
+      <div class="flex flex-wrap gap-2">
+        <%= link_to "All (#{@order_counts[:all].to_i})", admin_orders_path(vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status.blank? && @not_shipped.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+
+        <%= link_to "Not Shipped (#{@not_shipped_count.to_i})", admin_orders_path(not_shipped: 1, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@not_shipped.present? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+
+        <% %w[pending confirmed processing shipped delivered cancelled].each do |status| %>
+          <%= link_to "#{status.titleize} (#{@order_counts[status.to_sym].to_i})", admin_orders_path(status: status, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == status && @not_shipped.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+        <% end %>
+      </div>
+
+      <% if admin_role? && !vendor_context? && @vendors.present? %>
+        <%= form_with url: admin_orders_path, method: :get, class: 'flex gap-2 items-center' do |f| %>
+          <%= f.hidden_field :status, value: @status %>
+          <%= f.hidden_field :not_shipped, value: @not_shipped %>
+          <%= f.select :vendor_id,
+              options_from_collection_for_select(@vendors, :id, :business_name, @vendor_id),
+              { include_blank: 'All Vendors' },
+              class: 'px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm' %>
+          <%= f.submit 'Apply', class: 'px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer text-sm' %>
+        <% end %>
       <% end %>
     </div>
   </div>

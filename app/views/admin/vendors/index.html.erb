@@ -1,0 +1,64 @@
+<% content_for(:title) { "Vendors" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">Vendors</h1>
+    <%= link_to 'Add Vendor', new_admin_vendor_path, class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium' %>
+  </div>
+
+  <!-- Search -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <%= form_with url: admin_vendors_path, method: :get, class: 'flex gap-4' do |f| %>
+      <%= f.search_field :q, value: @q, placeholder: 'Search by business name, contact or email...',
+          class: 'flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <%= f.submit 'Search', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+    <% end %>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Business</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @vendors.each do |vendor| %>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900"><%= vendor.business_name %></div>
+              <% if vendor.gst_number.present? %>
+                <div class="text-xs text-gray-500">GST: <%= vendor.gst_number %></div>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= vendor.contact_name %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= vendor.email %></td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% if vendor.active? %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+              <% else %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= vendor.products.count %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+              <%= link_to 'View', admin_vendor_path(vendor), class: 'text-indigo-600 hover:text-indigo-900' %>
+              <%= link_to 'Edit', edit_admin_vendor_path(vendor), class: 'text-indigo-600 hover:text-indigo-900' %>
+              <%= button_to vendor.active? ? 'Disable' : 'Enable', toggle_status_admin_vendor_path(vendor), method: :patch, class: "text-#{vendor.active? ? 'red' : 'green'}-600 hover:text-#{vendor.active? ? 'red' : 'green'}-900" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @pagy.last > 1 %>
+    <%== @pagy.series_nav %>
+  <% end %>
+</div>

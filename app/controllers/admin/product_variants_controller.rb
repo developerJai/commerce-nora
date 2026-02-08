@@ -54,7 +54,7 @@ module Admin
     private
 
     def set_product
-      @product = Product.find(params[:product_id])
+      @product = vendor_scoped(Product).find(params[:product_id])
     end
 
     def set_variant

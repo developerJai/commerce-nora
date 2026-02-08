@@ -8,7 +8,7 @@ module Admin
     end
 
     def create
-      admin = AdminUser.authenticate(params[:email], params[:password])
+      admin = AdminUser.authenticate(params[:email], params[:password], role: 'admin')
 
       if admin && admin.active?
         session[:admin_id] = admin.id
@@ -22,6 +22,7 @@ module Admin
 
     def destroy
       session.delete(:admin_id)
+      session.delete(:acting_as_vendor_id)
       redirect_to admin_login_path, notice: "You have been logged out"
     end
 

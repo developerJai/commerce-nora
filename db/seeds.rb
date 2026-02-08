@@ -1,9 +1,11 @@
 # This file delegates to modular rake tasks in lib/tasks/seed.rake
 #
 # Usage:
-#   rails db:seed              — runs all 3 sections
+#   rails db:seed              — runs all sections
 #   rails seed:homepage        — Section 1: admin, categories, banners, homepage collections, coupons
-#   rails seed:products        — Section 2: products, variants, inventory
+#   rails seed:hsn_codes       — HSN codes for tax classification
+#   rails seed:vendors         — Sample vendors with login credentials
+#   rails seed:products        — Section 2: products, variants, inventory (pass VENDOR_ID=N to scope)
 #   rails seed:orders          — Section 3: customers, addresses, reviews, demo orders
 #   rails seed:all             — same as db:seed
 

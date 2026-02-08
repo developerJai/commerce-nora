@@ -1,0 +1,11 @@
+<% content_for(:title) { "Edit Vendor" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">Edit Vendor</h1>
+  </div>
+
+  <%= form_with model: [:admin, @vendor] do |form| %>
+    <%= render 'form', form: form %>
+  <% end %>
+</div>

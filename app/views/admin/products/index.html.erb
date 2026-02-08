@@ -6,14 +6,31 @@
     <%= link_to 'Add Product', new_admin_product_path, class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700' %>
   </div>
 
+  <!-- Status Counters -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "All (#{@product_counts[:all].to_i})", admin_products_path(q: @q, category_id: @category_id, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status.blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Active (#{@product_counts[:active].to_i})", admin_products_path(status: 'active', q: @q, category_id: @category_id, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == 'active' ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Draft (#{@product_counts[:draft].to_i})", admin_products_path(status: 'draft', q: @q, category_id: @category_id, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == 'draft' ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      <%= link_to "Featured (#{@product_counts[:featured].to_i})", admin_products_path(status: 'featured', q: @q, category_id: @category_id, vendor_id: @vendor_id), class: "px-4 py-2 rounded-md text-sm font-medium #{@status == 'featured' ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+    </div>
+  </div>
+
   <!-- Filters -->
   <div class="bg-white rounded-lg shadow-sm p-4">
     <%= form_with url: admin_products_path, method: :get, class: 'flex gap-4' do |f| %>
+      <%= f.hidden_field :status, value: @status %>
       <%= f.search_field :q, value: @q, placeholder: 'Search products...', 
           class: 'flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
       <%= f.select :category_id, options_from_collection_for_select(@categories, :id, :name, @category_id), 
           { include_blank: 'All Categories' }, 
           class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <% if admin_role? && !vendor_context? && @vendors.present? %>
+        <%= f.select :vendor_id,
+            options_from_collection_for_select(@vendors, :id, :business_name, @vendor_id),
+            { include_blank: 'All Vendors' },
+            class: 'px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <% end %>
       <%= f.submit 'Filter', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
     <% end %>
   </div>

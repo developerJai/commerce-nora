@@ -1,5 +1,6 @@
 module Admin
   class CustomersController < BaseController
+    before_action :require_admin_role!
     before_action :set_customer, only: [:show, :edit, :update, :destroy, :toggle_status]
 
     def index

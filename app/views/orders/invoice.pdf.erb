@@ -1,0 +1,134 @@
+<div class="invoice-header">
+  <div class="company-info">
+    <div class="company-name">Auracraft</div>
+    <div class="company-address">123 Jewelry Street</div>
+    <div class="company-address">Mumbai, Maharashtra 400001</div>
+    <div class="company-address">India</div>
+    <div class="company-address">Phone: +91 98765 43210</div>
+    <div class="company-address">Email: support@auracraft.com</div>
+  </div>
+
+  <div class="invoice-details">
+    <div class="invoice-title">INVOICE</div>
+    <div class="invoice-number">Invoice #: <%= @order.order_number %></div>
+    <div class="invoice-date">Date: <%= @order.placed_at&.strftime('%B %d, %Y') %></div>
+    <div class="invoice-date">Payment Status: <%= @order.payment_status.titleize %></div>
+    <% if @order.vendor.present? %>
+      <div class="invoice-date">Vendor: <%= @order.vendor.business_name %></div>
+    <% end %>
+  </div>
+</div>
+
+<div class="customer-section">
+  <div class="customer-info">
+    <div class="section-title">Bill To:</div>
+    <% if @order.shipping_address %>
+      <div><%= @order.shipping_address.full_name %></div>
+      <div><%= @order.shipping_address.street_address %></div>
+      <% if @order.shipping_address.apartment.present? %>
+        <div><%= @order.shipping_address.apartment %></div>
+      <% end %>
+      <div><%= [@order.shipping_address.city, @order.shipping_address.state, @order.shipping_address.postal_code].compact.join(', ') %></div>
+      <div><%= @order.shipping_address.country %></div>
+      <% if @order.shipping_address.phone.present? %>
+        <div>Phone: <%= @order.shipping_address.phone %></div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="billing-info">
+    <div class="section-title">Ship To:</div>
+    <% if @order.shipping_address %>
+      <div><%= @order.shipping_address.full_name %></div>
+      <div><%= @order.shipping_address.street_address %></div>
+      <% if @order.shipping_address.apartment.present? %>
+        <div><%= @order.shipping_address.apartment %></div>
+      <% end %>
+      <div><%= [@order.shipping_address.city, @order.shipping_address.state, @order.shipping_address.postal_code].compact.join(', ') %></div>
+      <div><%= @order.shipping_address.country %></div>
+    <% end %>
+  </div>
+</div>
+
+<table class="items-table">
+  <thead>
+    <tr>
+      <th class="description">Description</th>
+      <th class="quantity">Qty</th>
+      <th class="unit-price">Unit Price</th>
+      <th class="total">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @order_items.each do |item| %>
+      <tr>
+        <td class="description">
+          <%= item.product_name %><br>
+          <small style="color: #6b7280;"><%= item.variant_name %></small>
+        </td>
+        <td class="quantity"><%= item.quantity %></td>
+        <td class="unit-price"><%= format_price(item.unit_price) %></td>
+        <td class="total"><%= format_price(item.total_price) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div class="totals-section">
+  <div class="total-row">
+    <span>Subtotal:</span>
+    <span><%= format_price(@order.subtotal) %></span>
+  </div>
+
+  <% if @order.discount_amount > 0 %>
+    <div class="total-row">
+      <span>Discount:</span>
+      <span>-<%= format_price(@order.discount_amount) %></span>
+    </div>
+  <% end %>
+
+  <div class="total-row">
+    <span>Shipping:</span>
+    <span><%= @order.shipping_amount > 0 ? format_price(@order.shipping_amount) : 'Free' %></span>
+  </div>
+
+  <% if @order.tax_amount > 0 %>
+    <div class="total-row">
+      <span>Tax:</span>
+      <span><%= format_price(@order.tax_amount) %></span>
+    </div>
+  <% end %>
+
+  <div class="total-row final">
+    <span>Total:</span>
+    <span><%= format_price(@order.total_amount) %></span>
+  </div>
+</div>
+
+<div class="thank-you">
+  Thank you for your business!
+</div>
+
+<% if @order.tracking_number.present? || @order.shipping_carrier.present? %>
+<div style="clear: both; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+  <div style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">Shipping Information:</div>
+  <% if @order.shipping_carrier.present? %>
+    <div>Carrier: <%= @order.shipping_carrier %></div>
+  <% end %>
+  <% if @order.tracking_number.present? %>
+    <div>Tracking Number: <%= @order.tracking_number %></div>
+  <% end %>
+  <% if @order.tracking_url.present? %>
+    <div>Track your package: <%= @order.tracking_url %></div>
+  <% end %>
+  <% if @order.shipped_at.present? %>
+    <div>Shipped on: <%= @order.shipped_at.strftime('%B %d, %Y') %></div>
+  <% end %>
+</div>
+<% end %>
+
+<div class="footer">
+  <div>This is a computer-generated invoice and does not require a signature.</div>
+  <div>For any queries, please contact us at support@auracraft.com or call +91 98765 43210</div>
+  <div>Thank you for shopping with Auracraft - Your trusted jewelry partner!</div>
+</div>

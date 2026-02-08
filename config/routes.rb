@@ -100,10 +100,33 @@ Rails.application.routes.draw do
       end
     end
 
+    # Vendor management
+    resources :vendors do
+      member do
+        patch :toggle_status
+        post :act_as
+      end
+    end
+    delete 'exit_vendor_mode', to: 'vendors#exit_vendor_mode'
+
+    # HSN Code management
+    resources :hsn_codes do
+      member do
+        patch :toggle_status
+      end
+    end
+
     get 'reports', to: 'reports#index'
     get 'reports/sales', to: 'reports#sales'
     get 'reports/products', to: 'reports#products'
     get 'reports/customers', to: 'reports#customers'
+  end
+
+  # Vendor authentication
+  namespace :vendor, module: :vendor_portal do
+    get 'login', to: 'sessions#new'
+    post 'login', to: 'sessions#create'
+    delete 'logout', to: 'sessions#destroy'
   end
 
   # Storefront (root namespace)
@@ -149,6 +172,7 @@ Rails.application.routes.draw do
   resources :orders, only: [:index, :show], param: :order_number do
     member do
       patch :cancel
+      get :download_invoice, defaults: { format: 'pdf' }
     end
     resources :reviews, only: [:new, :create], controller: 'order_reviews'
   end

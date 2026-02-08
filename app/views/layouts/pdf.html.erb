@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Invoice</title>
+  <style>
+    @page {
+      margin: 20mm 15mm 20mm 15mm;
+    }
+    body {
+      font-family: 'Helvetica', sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #374151;
+      margin: 0;
+      padding: 0;
+    }
+    .invoice-header {
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .company-info {
+      float: left;
+      width: 50%;
+    }
+    .invoice-details {
+      float: right;
+      width: 40%;
+      text-align: right;
+    }
+    .company-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: #dc2626;
+      margin-bottom: 8px;
+    }
+    .company-address {
+      margin-bottom: 4px;
+    }
+    .invoice-title {
+      font-size: 36px;
+      font-weight: bold;
+      color: #dc2626;
+      margin-bottom: 10px;
+    }
+    .invoice-number {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .invoice-date {
+      margin-bottom: 5px;
+    }
+    .customer-section {
+      clear: both;
+      margin-bottom: 30px;
+    }
+    .customer-info {
+      float: left;
+      width: 50%;
+    }
+    .billing-info {
+      float: right;
+      width: 40%;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #374151;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 4px;
+    }
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    .items-table th,
+    .items-table td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .items-table th {
+      background-color: #f9fafb;
+      font-weight: bold;
+      color: #374151;
+    }
+    .items-table .description {
+      width: 40%;
+    }
+    .items-table .quantity,
+    .items-table .unit-price,
+    .items-table .total {
+      width: 15%;
+      text-align: right;
+    }
+    .totals-section {
+      float: right;
+      width: 250px;
+      margin-top: 20px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .total-row.final {
+      border-bottom: 2px solid #374151;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .footer {
+      clear: both;
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      font-size: 10px;
+      color: #6b7280;
+    }
+    .thank-you {
+      text-align: center;
+      margin: 30px 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <%= yield %>
+</body>
+</html>

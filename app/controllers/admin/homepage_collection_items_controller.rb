@@ -1,5 +1,6 @@
 module Admin
   class HomepageCollectionItemsController < BaseController
+    before_action :require_admin_role!
     before_action :set_collection
     before_action :set_item, only: [:edit, :update, :destroy]
 
