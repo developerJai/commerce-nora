@@ -62,10 +62,16 @@ module Admin
     end
 
     def variant_params
-      params.require(:product_variant).permit(
+      result = params.require(:product_variant).permit(
         :name, :sku, :price, :compare_at_price, :stock_quantity,
-        :weight, :active, :position, :image
+        :weight, :color, :size, :active, :position, :image
       )
+
+      if params[:product_variant][:properties].is_a?(ActionController::Parameters)
+        result[:properties] = params[:product_variant][:properties].permit!.to_h
+      end
+
+      result
     end
   end
 end

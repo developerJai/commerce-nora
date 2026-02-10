@@ -14,6 +14,24 @@ namespace :seed do
     end
     puts "  ✓ Admin: admin@noralooks.com / password123 (role: admin)"
 
+    # ── Store Settings ──
+    puts "\n→ Creating store settings..."
+    StoreSetting.find_or_create_by!({}) do |s|
+      s.filter_config = {
+        "show_availability"  => true,
+        "show_categories"    => true,
+        "show_subcategories" => true,
+        "show_price_range"   => true,
+        "show_color"         => true,
+        "show_material"      => true,
+        "show_stone_type"    => true,
+        "show_occasion"      => true,
+        "show_discount"      => true,
+        "show_rating"        => true
+      }
+    end
+    puts "  ✓ Store filter settings (all filters enabled)"
+
     # ── Categories (Jewellery-focused) ──
     puts "\n→ Creating categories..."
     categories_data = [
@@ -35,7 +53,303 @@ namespace :seed do
         c.position = cat[:position]
       end
     end
-    puts "  ✓ #{categories_data.size} categories created"
+    puts "  ✓ #{categories_data.size} root categories created"
+
+    # ── Subcategories ──
+    puts "\n→ Creating subcategories..."
+    subcategories_data = {
+      "necklaces" => [
+        { name: "Pendant Sets", slug: "pendant-sets", position: 0 },
+        { name: "Chain Necklaces", slug: "chain-necklaces", position: 1 },
+        { name: "Chokers", slug: "chokers", position: 2 },
+        { name: "Mangalsutra", slug: "mangalsutra", position: 3 },
+        { name: "Layered Necklaces", slug: "layered-necklaces", position: 4 }
+      ],
+      "rings" => [
+        { name: "Engagement Rings", slug: "engagement-rings", position: 0 },
+        { name: "Cocktail Rings", slug: "cocktail-rings", position: 1 },
+        { name: "Band Rings", slug: "band-rings", position: 2 },
+        { name: "Nose Rings", slug: "nose-rings", position: 3 },
+        { name: "Toe Rings", slug: "toe-rings", position: 4 }
+      ],
+      "earrings" => [
+        { name: "Studs", slug: "studs", position: 0 },
+        { name: "Jhumkas", slug: "jhumkas", position: 1 },
+        { name: "Drop Earrings", slug: "drop-earrings", position: 2 },
+        { name: "Hoops", slug: "hoops", position: 3 },
+        { name: "Chandbalis", slug: "chandbalis", position: 4 },
+        { name: "Ear Cuffs", slug: "ear-cuffs", position: 5 }
+      ],
+      "bangles" => [
+        { name: "Gold Bangles", slug: "gold-bangles", position: 0 },
+        { name: "Diamond Bangles", slug: "diamond-bangles", position: 1 },
+        { name: "Kada", slug: "kada", position: 2 },
+        { name: "Bangle Sets", slug: "bangle-sets", position: 3 }
+      ],
+      "bracelets" => [
+        { name: "Chain Bracelets", slug: "chain-bracelets", position: 0 },
+        { name: "Charm Bracelets", slug: "charm-bracelets", position: 1 },
+        { name: "Cuff Bracelets", slug: "cuff-bracelets", position: 2 },
+        { name: "Tennis Bracelets", slug: "tennis-bracelets", position: 3 }
+      ],
+      "pendants" => [
+        { name: "Solitaire Pendants", slug: "solitaire-pendants", position: 0 },
+        { name: "Religious Pendants", slug: "religious-pendants", position: 1 },
+        { name: "Fashion Pendants", slug: "fashion-pendants", position: 2 },
+        { name: "Name Pendants", slug: "name-pendants", position: 3 }
+      ]
+    }
+
+    sub_count = 0
+    subcategories_data.each do |parent_slug, children|
+      parent = Category.find_by(slug: parent_slug)
+      next unless parent
+
+      children.each do |child|
+        Category.find_or_create_by!(slug: child[:slug]) do |c|
+          c.name = child[:name]
+          c.parent = parent
+          c.active = true
+          c.position = child[:position]
+        end
+        sub_count += 1
+      end
+    end
+    puts "  ✓ #{sub_count} subcategories created"
+
+    # ── Attribute Configurations per Root Category ──
+    puts "\n→ Setting up category attribute configurations..."
+
+    # Jewellery attribute config (shared by all jewellery root categories)
+    jewellery_config = {
+      product_attributes: {
+        base_material: {
+          label: "Base Material",
+          required: true,
+          options: [
+            "Sterling Silver", "925 Silver", "Gold", "Rose Gold", "Brass",
+            "Alloy", "Platinum", "Copper", "Stainless Steel", "German Silver",
+            "White Metal", "Panchdhatu", "Bronze", "Zinc", "Iron"
+          ]
+        },
+        plating: {
+          label: "Plating",
+          required: false,
+          options: [
+            "Gold Plated", "22K Gold Plated", "18K Gold Plated",
+            "Rose Gold Plated", "Rhodium Plated", "Silver Plated",
+            "Black Rhodium", "Two-Tone", "Oxidised", "Antique Gold",
+            "Antique Silver", "Matte Finish", "Micron Gold", "None"
+          ]
+        },
+        gemstone: {
+          label: "Gemstone / Stone Type",
+          required: false,
+          options: [
+            "Diamond", "Lab-Grown Diamond", "Pearl", "Ruby", "Emerald",
+            "Sapphire", "Cubic Zirconia (CZ)", "American Diamond (AD)",
+            "Moissanite", "Topaz", "Amethyst", "Garnet", "Opal",
+            "Turquoise", "Kundan", "Polki", "Meenakari", "Zircon",
+            "Crystal", "Swarovski Crystal", "Glass Stone", "Semi-Precious Stone",
+            "Onyx", "Agate", "Lapis Lazuli", "Coral", "Cat's Eye",
+            "Moon Stone", "Tiger Eye", "Navratna", "Temple Stone", "None"
+          ]
+        },
+        occasion: {
+          label: "Occasion",
+          required: false,
+          options: [
+            "Wedding", "Engagement", "Party", "Casual", "Festive",
+            "Traditional", "Office Wear", "Anniversary", "Daily Wear",
+            "Bridal", "Puja", "Haldi", "Mehendi", "Sangeet"
+          ]
+        },
+        ideal_for: {
+          label: "Ideal For",
+          required: false,
+          options: ["Women", "Men", "Girls", "Boys", "Unisex", "Couples"]
+        },
+        country_of_origin: {
+          label: "Country of Origin",
+          required: false,
+          options: [],
+          default: "India"
+        }
+      },
+      variant_attributes: {
+        color: {
+          label: "Color",
+          required: false,
+          options: [
+            "Gold", "Silver", "Rose Gold", "White", "Black",
+            "Green", "Red", "Blue", "Pink", "Multi", "Oxidised",
+            "Antique Gold", "Copper", "Two-Tone", "Yellow", "Brown"
+          ]
+        },
+        size: {
+          label: "Size",
+          required: false,
+          options: ["Free Size", "Adjustable"]
+        }
+      }
+    }
+
+    # Ring-specific config (different sizes)
+    ring_config = jewellery_config.deep_dup
+    ring_config[:variant_attributes][:size][:options] = [
+      "Free Size", "Adjustable",
+      "5", "6", "7", "8", "9", "10", "11", "12", "13", "14",
+      "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"
+    ]
+
+    # Bangle-specific config (different sizes)
+    bangle_config = jewellery_config.deep_dup
+    bangle_config[:variant_attributes][:size][:options] = [
+      "Free Size", "Adjustable",
+      "2.2", "2.4", "2.6", "2.8", "2.10", "2.12"
+    ]
+
+    # Necklace/Chain config (length-based sizes)
+    necklace_config = jewellery_config.deep_dup
+    necklace_config[:variant_attributes][:size][:options] = [
+      "Free Size", "Adjustable",
+      "14 inch", "16 inch", "18 inch", "20 inch", "22 inch", "24 inch", "30 inch"
+    ]
+
+    # Traditional Wear config
+    traditional_wear_config = {
+      product_attributes: {
+        fabric_type: {
+          label: "Fabric Type",
+          required: true,
+          options: [
+            "Silk", "Pure Silk", "Banarasi Silk", "Kanjivaram Silk",
+            "Cotton", "Pure Cotton", "Cotton Blend", "Georgette",
+            "Chiffon", "Crepe", "Net", "Organza", "Satin",
+            "Velvet", "Linen", "Rayon", "Lycra", "Jacquard"
+          ]
+        },
+        pattern: {
+          label: "Pattern / Work",
+          required: false,
+          options: [
+            "Zari Work", "Embroidery", "Sequin Work", "Mirror Work",
+            "Block Print", "Bandhani", "Kalamkari", "Ikat",
+            "Patola", "Leheriya", "Phulkari", "Chikankari",
+            "Gota Patti", "Thread Work", "Stone Work", "Plain"
+          ]
+        },
+        occasion: {
+          label: "Occasion",
+          required: false,
+          options: [
+            "Wedding", "Festive", "Casual", "Party", "Daily Wear",
+            "Puja", "Traditional", "Formal"
+          ]
+        },
+        ideal_for: {
+          label: "Ideal For",
+          required: false,
+          options: ["Women", "Men", "Girls", "Boys", "Unisex"]
+        },
+        country_of_origin: {
+          label: "Country of Origin",
+          required: false,
+          options: [],
+          default: "India"
+        }
+      },
+      variant_attributes: {
+        color: {
+          label: "Color",
+          required: false,
+          options: [
+            "Red", "Blue", "Green", "Yellow", "Pink", "Purple",
+            "Orange", "White", "Black", "Maroon", "Navy Blue",
+            "Magenta", "Teal", "Peach", "Cream", "Beige",
+            "Gold", "Silver", "Multi"
+          ]
+        },
+        size: {
+          label: "Size",
+          required: false,
+          options: [
+            "Free Size",
+            "XS", "S", "M", "L", "XL", "XXL", "XXXL",
+            "32", "34", "36", "38", "40", "42", "44", "46"
+          ]
+        }
+      }
+    }
+
+    # Gifts config
+    gifts_config = {
+      product_attributes: {
+        gift_type: {
+          label: "Gift Type",
+          required: false,
+          options: [
+            "Jewellery Set", "Gift Box", "Hamper", "Personalised",
+            "Combo Set", "Pooja Thali", "Return Gift", "Corporate Gift"
+          ]
+        },
+        occasion: {
+          label: "Occasion",
+          required: false,
+          options: [
+            "Birthday", "Anniversary", "Wedding", "Diwali", "Raksha Bandhan",
+            "Karva Chauth", "Valentine's Day", "Mother's Day", "Housewarming",
+            "Thank You", "Festival", "Any Occasion"
+          ]
+        },
+        ideal_for: {
+          label: "Ideal For",
+          required: false,
+          options: ["Women", "Men", "Girls", "Boys", "Couples", "Family", "Anyone"]
+        },
+        country_of_origin: {
+          label: "Country of Origin",
+          required: false,
+          options: [],
+          default: "India"
+        }
+      },
+      variant_attributes: {
+        color: {
+          label: "Color",
+          required: false,
+          options: [
+            "Gold", "Silver", "Rose Gold", "Multi", "Red",
+            "Blue", "Green", "Pink", "White", "Black"
+          ]
+        },
+        size: {
+          label: "Size / Variant",
+          required: false,
+          options: ["Standard", "Small", "Medium", "Large"]
+        }
+      }
+    }
+
+    # Apply configs to root categories
+    config_map = {
+      "necklaces"       => necklace_config,
+      "rings"           => ring_config,
+      "earrings"        => jewellery_config,
+      "bangles"         => bangle_config,
+      "bracelets"       => jewellery_config,
+      "pendants"        => necklace_config,
+      "traditional-wear" => traditional_wear_config,
+      "gifts"           => gifts_config
+    }
+
+    config_map.each do |slug, config|
+      cat = Category.find_by(slug: slug)
+      if cat
+        cat.update!(attribute_config: config)
+        puts "  ✓ #{cat.name}: #{config[:product_attributes].size} product attrs, #{config[:variant_attributes].size} variant attrs"
+      end
+    end
 
     # ── Banners ──
     puts "\n→ Creating banners..."

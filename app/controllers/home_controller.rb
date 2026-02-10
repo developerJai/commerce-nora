@@ -4,7 +4,7 @@ class HomeController < ApplicationController
     @homepage_collections = HomepageCollection.visible.includes(items: { image_attachment: :blob })
     @featured_products = Product.active.featured.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).limit(10)
     @new_arrivals = Product.active.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).order(created_at: :desc).limit(10)
-    @categories = Category.active.root.ordered.limit(6)
+    @categories = Category.active.root.ordered.includes(image_attachment: :blob).limit(8)
 
     # Dynamic hero heading based on active categories
     active_categories = Category.active.root.ordered.pluck(:name)

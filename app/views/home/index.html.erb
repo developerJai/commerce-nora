@@ -93,12 +93,18 @@
       <h2 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Shop by Category</h2>
     </div>
     <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 sm:gap-6">
-      <% Category.active.root.ordered.limit(8).each do |category| %>
+      <% @categories.each do |category| %>
         <%= link_to category_path(category.slug), class: 'group text-center' do %>
-          <div class="aspect-square bg-gradient-to-br from-rose-50 to-amber-50 rounded-full flex items-center justify-center mb-3 group-hover:from-rose-100 group-hover:to-amber-100 transition mx-auto w-16 h-16 sm:w-20 sm:h-20">
-            <svg class="w-7 h-7 sm:w-9 sm:h-9 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
-            </svg>
+          <div class="aspect-square rounded-full flex items-center justify-center mb-3 group-hover:from-rose-100 group-hover:to-amber-100 transition mx-auto w-16 h-16 sm:w-20 sm:h-20 overflow-hidden">
+            <% if category.image.attached? %>
+              <%= image_tag category.image, class: 'w-full h-full object-cover rounded-full' %>
+            <% else %>
+              <div class="w-full h-full bg-gradient-to-br from-rose-50 to-amber-50 flex items-center justify-center">
+                <svg class="w-7 h-7 sm:w-9 sm:h-9 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                </svg>
+              </div>
+            <% end %>
           </div>
           <p class="text-xs sm:text-sm font-medium text-stone-700 group-hover:text-rose-800 transition"><%= category.name %></p>
         <% end %>

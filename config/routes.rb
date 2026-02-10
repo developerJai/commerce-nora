@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     delete 'logout', to: 'sessions#destroy'
 
     resource :settings, only: [:show, :update]
+    resource :store_settings, only: [:show, :update]
     resource :password, only: [:edit, :update]
 
     resources :customers do
@@ -22,6 +23,9 @@ Rails.application.routes.draw do
       end
     end
     resources :products do
+      collection do
+        get :attribute_fields
+      end
       resources :variants, controller: 'product_variants' do
         member do
           patch :toggle_status

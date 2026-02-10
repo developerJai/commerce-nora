@@ -22,14 +22,27 @@
 
     <div>
       <%= f.label :parent_id, 'Parent Category', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-      <%= f.collection_select :parent_id, Category.root.where.not(id: category.id), :id, :name, 
+      <%= f.collection_select :parent_id, Category.root.active.ordered.where.not(id: category.id), :id, :name, 
           { include_blank: 'None (Root category)' }, 
           class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <p class="mt-1 text-xs text-gray-500">Only root categories can be parents. Max 2 levels: Parent > Child.</p>
     </div>
 
     <div>
       <%= f.label :description, class: 'block text-sm font-medium text-gray-700 mb-1' %>
       <%= f.text_area :description, rows: 3, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+    </div>
+
+    <div>
+      <%= f.label :image, 'Category Image', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+      <%= f.file_field :image, accept: 'image/*', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+      <p class="mt-1 text-xs text-gray-500">Shown on the storefront "Shop by Category" section. Recommended: square, at least 200x200px.</p>
+      <% if category.persisted? && category.image.attached? %>
+        <div class="mt-2 flex items-center gap-3">
+          <%= image_tag category.image, class: 'h-16 w-16 rounded-lg object-cover border border-gray-200' %>
+          <span class="text-xs text-gray-500">Current image</span>
+        </div>
+      <% end %>
     </div>
 
     <div>
@@ -44,6 +57,92 @@
       </label>
     </div>
   </div>
+
+  <!-- Attribute Configuration (Root categories only) -->
+  <% if category.root? || (category.new_record? && category.parent_id.blank?) %>
+    <div class="bg-white rounded-lg shadow-sm p-6 space-y-6" data-controller="attribute-config">
+      <!-- Hidden field that holds the serialized JSON -->
+      <%= f.hidden_field :attribute_config,
+          value: (category.attribute_config.present? ? category.attribute_config.to_json : '{}'),
+          data: { attribute_config_target: "hiddenField" } %>
+
+      <div>
+        <h3 class="text-base font-semibold text-gray-900 border-b border-gray-200 pb-3">
+          Attribute Configuration
+        </h3>
+        <p class="mt-2 text-sm text-gray-500">
+          Define which attributes vendors fill when creating products in this category.
+          Child categories inherit this configuration from their parent.
+        </p>
+      </div>
+
+      <!-- Preset selector -->
+      <div class="bg-indigo-50 rounded-lg p-4">
+        <div class="flex items-center gap-3">
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-indigo-700 mb-1">Start from a preset</label>
+            <p class="text-xs text-indigo-500">Choose a template to pre-fill attributes, then customize as needed</p>
+          </div>
+          <select data-attribute-config-target="presetSelect"
+                  class="px-4 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="">Select a preset...</option>
+            <option value="jewellery">Jewellery (materials, stones, plating)</option>
+            <option value="clothing">Clothing / Traditional Wear (fabric, pattern, sizes)</option>
+            <option value="gifts">Gifts (type, occasion, recipients)</option>
+          </select>
+          <button type="button" data-action="click->attribute-config#applyPreset"
+                  class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition">
+            Apply
+          </button>
+        </div>
+      </div>
+
+      <!-- Product Attributes -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h4 class="text-sm font-semibold text-gray-900">Product Attributes</h4>
+            <p class="text-xs text-gray-500">Fields shown when creating/editing a product in this category</p>
+          </div>
+          <button type="button" data-action="click->attribute-config#addProductAttr"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Attribute
+          </button>
+        </div>
+        <div data-attribute-config-target="productSection" class="space-y-3"></div>
+        <p data-attribute-config-target="emptyProduct" class="text-sm text-gray-400 italic py-3 text-center border border-dashed border-gray-200 rounded-lg hidden">
+          No product attributes configured. Click "Add Attribute" or apply a preset.
+        </p>
+      </div>
+
+      <!-- Variant Attributes -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h4 class="text-sm font-semibold text-gray-900">Variant Attributes</h4>
+            <p class="text-xs text-gray-500">Fields shown when creating/editing a product variant (e.g. color, size)</p>
+          </div>
+          <button type="button" data-action="click->attribute-config#addVariantAttr"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Attribute
+          </button>
+        </div>
+        <div data-attribute-config-target="variantSection" class="space-y-3"></div>
+        <p data-attribute-config-target="emptyVariant" class="text-sm text-gray-400 italic py-3 text-center border border-dashed border-gray-200 rounded-lg hidden">
+          No variant attributes configured. Click "Add Attribute" or apply a preset.
+        </p>
+      </div>
+    </div>
+  <% elsif category.parent_id.present? %>
+    <div class="bg-blue-50 rounded-lg p-4">
+      <p class="text-sm text-blue-700">
+        <strong>Attribute Configuration:</strong> This subcategory inherits its attribute configuration from its parent category.
+        To change the attributes, edit the parent category.
+      </p>
+    </div>
+  <% end %>
 
   <div class="flex justify-end gap-3">
     <%= link_to 'Cancel', admin_categories_path, class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50' %>

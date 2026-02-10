@@ -57,7 +57,23 @@ module Admin
     end
 
     def category_params
-      params.require(:category).permit(:name, :slug, :description, :parent_id, :position, :active)
+      permitted = params.require(:category).permit(:name, :slug, :description, :parent_id, :position, :active, :image, :attribute_config)
+
+      # Parse attribute_config from JSON string to hash
+      if permitted[:attribute_config].is_a?(String)
+        if permitted[:attribute_config].present?
+          begin
+            permitted[:attribute_config] = JSON.parse(permitted[:attribute_config])
+          rescue JSON::ParserError
+            # Leave as-is; validation will catch it
+            permitted[:attribute_config] = {}
+          end
+        else
+          permitted[:attribute_config] = {}
+        end
+      end
+
+      permitted
     end
   end
 end

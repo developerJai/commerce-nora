@@ -2,6 +2,7 @@ class ProductVariant < ApplicationRecord
   include SoftDeletable
   include OrganizedUploads
 
+  # ── Associations ──────────────────────────────────────────────────
   belongs_to :product
 
   upload_key_prefix do
@@ -13,15 +14,18 @@ class ProductVariant < ApplicationRecord
   has_many :stock_adjustments, dependent: :destroy
   has_one_attached :image
 
+  # ── Validations ───────────────────────────────────────────────────
   validates :name, presence: true
   validates :sku, presence: true, uniqueness: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :stock_quantity, numericality: { greater_than_or_equal_to: 0 }
 
   before_validation :generate_sku, if: -> { sku.blank? }
+  before_validation :auto_generate_name, if: -> { name.blank? && (color.present? || size.present?) }
 
   validate :validate_image
 
+  # ── Scopes ────────────────────────────────────────────────────────
   scope :active, -> { where(active: true) }
   scope :in_stock, -> { where("stock_quantity > 0") }
   scope :out_of_stock, -> { where(stock_quantity: 0) }
@@ -111,6 +115,30 @@ class ProductVariant < ApplicationRecord
     adjust_stock!(change, reason: 'correction', notes: notes, adjusted_by: adjusted_by)
   end
 
+  # ── Category-aware attribute helpers ──────────────────────────────
+
+  def variant_attribute_definitions
+    product&.category&.variant_attribute_definitions || []
+  end
+
+  def attribute_value(key)
+    key = key.to_s
+    if respond_to?(key) && Category::VARIANT_COLUMN_ATTRIBUTES.include?(key)
+      send(key)
+    else
+      properties&.dig(key)
+    end
+  end
+
+  def set_attribute_value(key, value)
+    key = key.to_s
+    if respond_to?("#{key}=") && Category::VARIANT_COLUMN_ATTRIBUTES.include?(key)
+      send("#{key}=", value)
+    else
+      self.properties = (properties || {}).merge(key => value)
+    end
+  end
+
   # Legacy methods (deprecated - use adjust_stock! instead)
   def decrement_stock!(quantity)
     adjust_stock!(-quantity, reason: 'sale')
@@ -121,6 +149,13 @@ class ProductVariant < ApplicationRecord
   end
 
   private
+
+  def auto_generate_name
+    parts = []
+    parts << color if color.present?
+    parts << size if size.present?
+    self.name = parts.any? ? parts.join(" / ") : "Default"
+  end
 
   def generate_sku
     base = product&.sku.presence || "PRD"

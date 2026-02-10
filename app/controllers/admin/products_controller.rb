@@ -79,6 +79,19 @@ module Admin
       redirect_to admin_products_path, notice: "Product deleted successfully"
     end
 
+    # GET /admin/products/attribute_fields?category_id=X&product_id=Y
+    # Returns the dynamic attribute fields partial for the given category
+    def attribute_fields
+      @category = Category.find_by(id: params[:category_id])
+      @product = params[:product_id].present? ? vendor_scoped(Product).find_by(id: params[:product_id]) : Product.new
+      @product ||= Product.new
+
+      render partial: 'admin/products/attribute_fields', locals: {
+        category: @category,
+        product: @product
+      }, layout: false
+    end
+
     private
 
     def set_product
@@ -86,10 +99,26 @@ module Admin
     end
 
     def product_params
-      permitted = [:name, :slug, :description, :short_description, :category_id,
-                   :sku, :price, :active, :featured, :hsn_code_id, images: []]
+      permitted = [
+        :name, :slug, :description, :short_description, :category_id,
+        :sku, :price, :active, :featured, :hsn_code_id,
+        :base_material, :plating, :gemstone, :occasion, :ideal_for, :country_of_origin,
+        images: [],
+        variants_attributes: [
+          :id, :name, :sku, :price, :compare_at_price, :stock_quantity,
+          :weight, :color, :size, :active, :position, :image, :_destroy
+        ]
+      ]
       permitted << :vendor_id if admin_role? && !vendor_context?
-      params.require(:product).permit(*permitted)
+
+      result = params.require(:product).permit(*permitted)
+
+      # Merge dynamic properties from category-driven attributes
+      if params[:product][:properties].is_a?(ActionController::Parameters)
+        result[:properties] = params[:product][:properties].permit!.to_h
+      end
+
+      result
     end
   end
 end

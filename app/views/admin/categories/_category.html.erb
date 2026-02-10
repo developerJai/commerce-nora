@@ -1,10 +1,21 @@
-<tr id="<%= dom_id(category) %>">
+<tr id="<%= dom_id(category) %>" class="<%= category.parent_id ? 'bg-gray-50/50' : '' %>">
   <td class="px-6 py-4 whitespace-nowrap">
-    <div class="text-sm font-medium text-gray-900">
-      <%= '— ' * (category.parent_id ? 1 : 0) %><%= category.name %>
+    <div class="flex items-center gap-3 text-sm font-medium text-gray-900">
+      <% if category.parent_id %>
+        <span class="text-gray-400 ml-4">└</span>
+      <% end %>
+      <% if category.image.attached? %>
+        <%= image_tag category.image, class: 'h-8 w-8 rounded-full object-cover border border-gray-200' %>
+      <% end %>
+      <div>
+        <%= category.name %>
+        <% if category.root? && category.children.any? %>
+          <span class="text-xs text-gray-400 ml-1">(<%= category.children.count %> subcategories)</span>
+        <% end %>
+      </div>
     </div>
   </td>
-  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= category.slug %></td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono"><%= category.slug %></td>
   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= category.products.count %></td>
   <td class="px-6 py-4 whitespace-nowrap">
     <span class="px-2 py-1 text-xs font-medium rounded-full <%= category.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">

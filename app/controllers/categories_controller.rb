@@ -1,8 +1,11 @@
 class CategoriesController < ApplicationController
   def show
     category = Category.active.find_by!(slug: params[:slug])
-    
-    # Redirect to products index with category_ids parameter
-    redirect_to products_path(category_ids: [category.id], **params.except(:slug, :controller, :action).permit!)
+
+    # For root categories, include all child category IDs so products from
+    # subcategories also appear. For leaf categories, just use their own ID.
+    category_ids = category.self_and_children_ids
+
+    redirect_to products_path(category_ids: category_ids, **params.except(:slug, :controller, :action).permit!)
   end
 end

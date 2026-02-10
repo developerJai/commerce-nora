@@ -277,6 +277,31 @@
               <p class="font-medium text-stone-900"><%= @product.category.name %></p>
             </div>
           <% end %>
+          <%# Dynamic product attributes from category config %>
+          <% @product.filled_attributes.each do |label, value| %>
+            <div class="p-3 bg-stone-50 rounded-lg">
+              <p class="text-stone-500"><%= label %></p>
+              <p class="font-medium text-stone-900"><%= value %></p>
+            </div>
+          <% end %>
+          <%# Variant-level attributes %>
+          <% if default_variant %>
+            <% (default_variant.variant_attribute_definitions).each do |defn| %>
+              <% val = default_variant.attribute_value(defn[:key]) %>
+              <% if val.present? %>
+                <div class="p-3 bg-stone-50 rounded-lg">
+                  <p class="text-stone-500"><%= defn[:label] %></p>
+                  <p class="font-medium text-stone-900"><%= val %></p>
+                </div>
+              <% end %>
+            <% end %>
+            <% if default_variant.weight.present? && default_variant.weight > 0 %>
+              <div class="p-3 bg-stone-50 rounded-lg">
+                <p class="text-stone-500">Weight</p>
+                <p class="font-medium text-stone-900"><%= default_variant.weight %> g</p>
+              </div>
+            <% end %>
+          <% end %>
           <div class="p-3 bg-stone-50 rounded-lg">
             <p class="text-stone-500">Variants</p>
             <p class="font-medium text-stone-900"><%= @variants.count %> options available</p>

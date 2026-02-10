@@ -155,7 +155,7 @@
       <% end %>
     </div>
 
-    <!-- Categories Nav -->
+    <!-- Categories Nav with Subcategory Dropdowns -->
     <nav class="border-t border-stone-100">
       <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="flex items-center gap-1 sm:gap-4 h-10 overflow-x-auto scrollbar-hide">
@@ -169,9 +169,25 @@
             All
           <% end %>
           <%= link_to 'Collections', products_path(featured: true), class: (collections_active ? active_class : inactive_class) %>
-          <% Category.active.root.ordered.limit(8).each do |category| %>
-            <% category_active = selected_category_ids.include?(category.id.to_s) %>
-            <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
+          <% Category.tree.each do |category| %>
+            <% category_active = selected_category_ids.include?(category.id.to_s) || category.children.any? { |c| selected_category_ids.include?(c.id.to_s) } %>
+            <% has_children = category.children.select(&:active?).any? %>
+            <% if has_children %>
+              <div class="relative group">
+                <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
+                <div class="absolute left-0 top-full pt-1 hidden group-hover:block z-50">
+                  <div class="bg-white border border-stone-200 rounded-lg shadow-lg py-2 min-w-[180px]">
+                    <% category.children.select(&:active?).sort_by { |c| [c.position, c.name] }.each do |child| %>
+                      <% child_active = selected_category_ids.include?(child.id.to_s) %>
+                      <%= link_to child.name, category_path(child.slug),
+                          class: "block px-4 py-2 text-sm transition #{child_active ? 'text-rose-700 font-medium bg-rose-50' : 'text-stone-600 hover:text-rose-800 hover:bg-rose-50'}" %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% else %>
+              <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
+            <% end %>
           <% end %>
         </div>
       </div>

@@ -1,4 +1,9 @@
-<%= form_with model: [:admin, product], class: 'space-y-6' do |f| %>
+<%= form_with model: [:admin, product], class: 'space-y-6',
+             data: {
+               controller: "multi-image-preview category-attributes",
+               category_attributes_url_value: attribute_fields_admin_products_path,
+               category_attributes_product_id_value: product.persisted? ? product.id : ""
+             } do |f| %>
   <% if product.errors.any? %>
     <div class="rounded-md bg-red-50 p-4">
       <ul class="text-sm text-red-700 list-disc list-inside">
@@ -9,12 +14,17 @@
     </div>
   <% end %>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6" data-controller="multi-image-preview">
-    <div class="lg:col-span-7">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- ─── Left Column: Product details ─── -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- Basic Info -->
       <div class="bg-white rounded-lg shadow-sm p-6 space-y-6">
+        <h3 class="text-base font-semibold text-gray-900 border-b border-gray-200 pb-3">Basic Information</h3>
+
         <div>
           <%= f.label :name, class: 'block text-sm font-medium text-gray-700 mb-1' %>
-          <%= f.text_field :name, required: true, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+          <%= f.text_field :name, required: true, placeholder: 'e.g. Pearl Drop Earrings', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
         </div>
 
         <div>
@@ -22,14 +32,26 @@
           <%= f.text_field :slug, placeholder: 'Leave blank to auto-generate', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
         </div>
 
-        <div>
-          <%= f.label :category_id, 'Category', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-          <%= f.collection_select :category_id, Category.active.ordered, :id, :name, { include_blank: 'Select category...' }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
-        </div>
-
-        <div>
-          <%= f.label :hsn_code_id, 'HSN Code (Tax Classification)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-          <%= f.collection_select :hsn_code_id, HsnCode.active.ordered, :id, :display_name, { include_blank: 'Select HSN code...' }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <%= f.label :category_id, 'Category', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.select :category_id,
+                grouped_options_for_select(
+                  Category.tree.map { |parent|
+                    children = parent.children.select(&:active?).sort_by { |c| [c.position, c.name] }
+                    [parent.name, [[parent.name, parent.id]] + children.map { |c| [c.name, c.id] }]
+                  },
+                  product.category_id
+                ),
+                { include_blank: 'Select category...' },
+                class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500',
+                data: { category_attributes_target: "categorySelect", action: "change->category-attributes#categoryChanged" } %>
+            <p class="mt-1 text-xs text-gray-500">Category determines which product attributes are shown below</p>
+          </div>
+          <div>
+            <%= f.label :hsn_code_id, 'HSN Code', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.collection_select :hsn_code_id, HsnCode.active.ordered, :id, :display_name, { include_blank: 'Select HSN code...' }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+          </div>
         </div>
 
         <% if admin_role? && !vendor_context? %>
@@ -41,24 +63,182 @@
 
         <div>
           <%= f.label :short_description, class: 'block text-sm font-medium text-gray-700 mb-1' %>
-          <%= f.text_area :short_description, rows: 2, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+          <%= f.text_area :short_description, rows: 2, placeholder: 'Brief product summary for cards and previews', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
         </div>
 
         <div>
           <%= f.label :description, class: 'block text-sm font-medium text-gray-700 mb-1' %>
-          <%= f.text_area :description, rows: 6, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+          <%= f.text_area :description, rows: 6, placeholder: 'Detailed product description shown on the product page', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
             <%= f.label :sku, 'SKU', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-            <%= f.text_field :sku, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+            <%= f.text_field :sku, placeholder: 'Auto-generated if blank', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
           </div>
           <div>
-            <%= f.label :price, 'Base Price', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.label :price, 'Base Price (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
             <%= f.number_field :price, step: 0.01, min: 0, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+            <p class="mt-1 text-xs text-gray-500">Reference price; actual selling price is set per variant</p>
           </div>
         </div>
+      </div>
+
+      <!-- Dynamic Product Attributes (loaded from category config) -->
+      <div class="bg-white rounded-lg shadow-sm p-6 space-y-6">
+        <h3 class="text-base font-semibold text-gray-900 border-b border-gray-200 pb-3">Product Attributes</h3>
+        <div data-category-attributes-target="productAttributes">
+          <% if product.category %>
+            <% product.category.product_attribute_definitions.tap do |defs| %>
+              <% if defs.any? %>
+                <div class="grid grid-cols-2 gap-4">
+                  <% defs.each do |defn| %>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <%= defn[:label] %>
+                        <% if defn[:required] %><span class="text-red-500">*</span><% end %>
+                      </label>
+                      <%
+                        key = defn[:key]
+                        is_column = Category::PRODUCT_COLUMN_ATTRIBUTES.include?(key)
+                        current_value = is_column ? product.send(key) : product.properties&.dig(key)
+                        field_name = is_column ? "product[#{key}]" : "product[properties][#{key}]"
+                        options = defn[:options] || []
+                      %>
+                      <% if options.any? %>
+                        <select name="<%= field_name %>"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                <%= 'required' if defn[:required] %>>
+                          <option value="">Select <%= defn[:label].downcase %>...</option>
+                          <% options.each do |opt| %>
+                            <option value="<%= opt %>" <%= 'selected' if current_value == opt %>><%= opt %></option>
+                          <% end %>
+                        </select>
+                      <% else %>
+                        <input type="text" name="<%= field_name %>"
+                               value="<%= current_value %>"
+                               placeholder="<%= defn[:default] || '' %>"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                               <%= 'required' if defn[:required] %>>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% else %>
+                <p class="text-sm text-gray-400 italic py-2">No product attributes configured for this category</p>
+              <% end %>
+            <% end %>
+          <% else %>
+            <p class="text-sm text-gray-400 italic py-2">Select a category to see relevant product attributes</p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Default Variant (inline on creation) -->
+      <% if product.new_record? %>
+        <div class="bg-white rounded-lg shadow-sm p-6 space-y-6 border-2 border-indigo-100">
+          <div>
+            <h3 class="text-base font-semibold text-gray-900 border-b border-gray-200 pb-3">
+              Default Variant
+              <span class="text-xs font-normal text-red-600 ml-2">* Required</span>
+            </h3>
+            <p class="mt-2 text-sm text-gray-500">
+              Every product needs at least one variant with pricing and stock to appear on the storefront.
+              You can add more variants later from the product page.
+            </p>
+          </div>
+
+          <%= f.fields_for :variants do |vf| %>
+            <!-- Dynamic variant attributes (color, size, etc. based on category) -->
+            <div data-category-attributes-target="variantAttributes">
+              <% if product.category %>
+                <% product.category.variant_attribute_definitions.tap do |vdefs| %>
+                  <% if vdefs.any? %>
+                    <div class="grid grid-cols-2 gap-4">
+                      <% vdefs.each do |defn| %>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1"><%= defn[:label] %></label>
+                          <%
+                            key = defn[:key]
+                            is_column = Category::VARIANT_COLUMN_ATTRIBUTES.include?(key)
+                            options = defn[:options] || []
+                          %>
+                          <% if options.any? %>
+                            <%= vf.select key.to_sym, options, { include_blank: "Select #{defn[:label].downcase}..." }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' if is_column %>
+                            <% unless is_column %>
+                              <select name="product[variants_attributes][0][properties][<%= key %>]"
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Select <%= defn[:label].downcase %>...</option>
+                                <% options.each do |opt| %>
+                                  <option value="<%= opt %>"><%= opt %></option>
+                                <% end %>
+                              </select>
+                            <% end %>
+                          <% else %>
+                            <% if is_column %>
+                              <%= vf.text_field key.to_sym, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+                            <% else %>
+                              <input type="text" name="product[variants_attributes][0][properties][<%= key %>]"
+                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                            <% end %>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                <% end %>
+              <% else %>
+                <p class="text-sm text-gray-400 italic py-2">Select a category to see variant attributes (color, size, etc.)</p>
+              <% end %>
+            </div>
+
+            <div>
+              <%= vf.label :name, 'Variant Name', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+              <%= vf.text_field :name, placeholder: 'Auto-generated from color/size if blank (e.g. "Gold / Free Size")', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <%= vf.label :price, 'Selling Price (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= vf.number_field :price, step: 0.01, min: 0, required: true, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+                <p class="mt-1 text-xs text-gray-500">Customer-facing price shown on storefront</p>
+              </div>
+              <div>
+                <%= vf.label :compare_at_price, 'MRP / Compare Price (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= vf.number_field :compare_at_price, step: 0.01, min: 0, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+                <p class="mt-1 text-xs text-gray-500">Shown as struck-through if higher than selling price</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <%= vf.label :stock_quantity, 'Stock Quantity', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= vf.number_field :stock_quantity, min: 0, required: true, value: vf.object.stock_quantity || 0, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+                <p class="mt-1 text-xs text-amber-600">Set to 0 to show as "Sold Out" on storefront</p>
+              </div>
+              <div>
+                <%= vf.label :weight, 'Weight (g)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= vf.number_field :weight, step: 0.01, min: 0, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+              </div>
+            </div>
+
+            <div>
+              <%= vf.label :sku, 'Variant SKU', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+              <%= vf.text_field :sku, placeholder: 'Auto-generated if blank', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+            </div>
+
+            <div>
+              <%= vf.label :image, 'Variant Image', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+              <%= vf.file_field :image, accept: 'image/*', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+              <p class="mt-1 text-xs text-gray-500">Shown on product card. Falls back to product images if not set.</p>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <!-- Images -->
+      <div class="bg-white rounded-lg shadow-sm p-6 space-y-4">
+        <h3 class="text-base font-semibold text-gray-900 border-b border-gray-200 pb-3">Product Images</h3>
 
         <div>
           <%= f.label :images, class: 'block text-sm font-medium text-gray-700 mb-1' %>
@@ -67,7 +247,7 @@
                            class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500',
                            accept: 'image/*',
                            data: { "multi-image-preview-target": "input", action: "change->multi-image-preview#change" } %>
-          <p class="mt-1 text-xs text-gray-500">You can select multiple images</p>
+          <p class="mt-1 text-xs text-gray-500">Select multiple images. The first image is used on cards unless a variant image exists.</p>
         </div>
 
         <div class="flex items-center gap-6">
@@ -83,6 +263,7 @@
       </div>
     </div>
 
+    <!-- ─── Right Column: Preview ─── -->
     <div class="lg:col-span-5">
       <div class="bg-white rounded-lg shadow-sm p-6 lg:sticky lg:top-24">
         <div class="flex items-start justify-between">
@@ -120,6 +301,6 @@
 
   <div class="flex justify-end gap-3">
     <%= link_to 'Cancel', admin_products_path, class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50' %>
-    <%= f.submit 'Save Product', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+    <%= f.submit (product.new_record? ? 'Create Product' : 'Save Product'), class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
   </div>
 <% end %>

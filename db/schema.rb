@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_08_130002) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_10_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -128,6 +128,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_130002) do
 
   create_table "categories", force: :cascade do |t|
     t.boolean "active", default: true, null: false
+    t.jsonb "attribute_config", default: {}
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.text "description"
@@ -286,6 +287,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_130002) do
 
   create_table "product_variants", force: :cascade do |t|
     t.boolean "active", default: true, null: false
+    t.string "color"
     t.decimal "compare_at_price", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
@@ -293,30 +295,41 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_130002) do
     t.integer "position", default: 0
     t.decimal "price", precision: 10, scale: 2, default: "0.0", null: false
     t.bigint "product_id", null: false
+    t.jsonb "properties", default: {}
     t.integer "reorder_point", default: 10
     t.integer "reorder_quantity", default: 50
+    t.string "size"
     t.string "sku", null: false
     t.integer "stock_quantity", default: 0, null: false
     t.boolean "track_inventory", default: true
     t.datetime "updated_at", null: false
     t.decimal "weight", precision: 8, scale: 2
     t.index ["active"], name: "index_product_variants_on_active"
+    t.index ["color"], name: "index_product_variants_on_color"
     t.index ["deleted_at"], name: "index_product_variants_on_deleted_at"
     t.index ["product_id"], name: "index_product_variants_on_product_id"
+    t.index ["size"], name: "index_product_variants_on_size"
     t.index ["sku"], name: "index_product_variants_on_sku", unique: true
   end
 
   create_table "products", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.decimal "average_rating", precision: 3, scale: 2, default: "0.0"
+    t.string "base_material"
     t.bigint "category_id"
+    t.string "country_of_origin", default: "India"
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.text "description"
     t.boolean "featured", default: false, null: false
+    t.string "gemstone"
     t.bigint "hsn_code_id"
+    t.string "ideal_for"
     t.string "name", null: false
+    t.string "occasion"
+    t.string "plating"
     t.decimal "price", precision: 10, scale: 2, default: "0.0"
+    t.jsonb "properties", default: {}
     t.integer "ratings_count", default: 0
     t.text "short_description"
     t.string "sku"
@@ -324,10 +337,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_130002) do
     t.datetime "updated_at", null: false
     t.bigint "vendor_id"
     t.index ["active"], name: "index_products_on_active"
+    t.index ["base_material"], name: "index_products_on_base_material"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["deleted_at"], name: "index_products_on_deleted_at"
     t.index ["featured"], name: "index_products_on_featured"
+    t.index ["gemstone"], name: "index_products_on_gemstone"
     t.index ["hsn_code_id"], name: "index_products_on_hsn_code_id"
+    t.index ["ideal_for"], name: "index_products_on_ideal_for"
+    t.index ["occasion"], name: "index_products_on_occasion"
+    t.index ["plating"], name: "index_products_on_plating"
     t.index ["slug"], name: "index_products_on_slug", unique: true
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
   end
@@ -367,6 +385,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_08_130002) do
     t.index ["created_at"], name: "index_stock_adjustments_on_created_at"
     t.index ["product_variant_id"], name: "index_stock_adjustments_on_product_variant_id"
     t.index ["reason"], name: "index_stock_adjustments_on_reason"
+  end
+
+  create_table "store_settings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "filter_config", default: {}, null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "support_tickets", force: :cascade do |t|
