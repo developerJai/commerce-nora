@@ -21,9 +21,13 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :amazon # :local
-  config.active_storage.cdn_host = "d1y6u9igsz4v3o.cloudfront.net"
+  # Store uploaded files on S3 (see config/storage.yml for options).
+  config.active_storage.service = :amazon
+
+  # Use default redirect route for Active Storage.
+  # When browser hits /rails/active_storage/blobs/redirect/:signed_id/:filename,
+  # Rails 302-redirects to CloudFront CDN URL (configured in initializers/active_storage_cdn.rb).
+  # Local assets (CSS, JS) are NOT affected — only S3-hosted uploads go through CDN.
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = false

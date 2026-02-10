@@ -73,6 +73,7 @@ aws:
    secret_access_key: xxx
    bucket_name: xxx
    region: xxx
+   cdn_host: https://xxxxx
 ```
 
 ### 4. Setup Database
