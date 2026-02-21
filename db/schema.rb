@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_10_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -97,6 +97,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_160000) do
     t.index ["active"], name: "index_banners_on_active"
     t.index ["deleted_at"], name: "index_banners_on_deleted_at"
     t.index ["position"], name: "index_banners_on_position"
+  end
+
+  create_table "bundle_deal_items", force: :cascade do |t|
+    t.bigint "bundle_deal_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "position", default: 0
+    t.bigint "product_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.index ["bundle_deal_id", "product_id"], name: "index_bundle_deal_items_on_bundle_deal_id_and_product_id", unique: true
+    t.index ["bundle_deal_id"], name: "index_bundle_deal_items_on_bundle_deal_id"
+    t.index ["product_id"], name: "index_bundle_deal_items_on_product_id"
+  end
+
+  create_table "bundle_deals", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "cta_link", default: "/products"
+    t.string "cta_text", default: "Add to Cart"
+    t.text "description"
+    t.integer "discount_percentage", default: 0
+    t.decimal "discounted_price", precision: 10, scale: 2, null: false
+    t.string "icon_emoji", default: "💍"
+    t.decimal "original_price", precision: 10, scale: 2, null: false
+    t.integer "position", default: 0
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_bundle_deals_on_active"
+    t.index ["position"], name: "index_bundle_deals_on_position"
   end
 
   create_table "cart_items", force: :cascade do |t|
@@ -208,6 +237,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_160000) do
     t.index ["active"], name: "index_homepage_collections_on_active"
     t.index ["deleted_at"], name: "index_homepage_collections_on_deleted_at"
     t.index ["position"], name: "index_homepage_collections_on_position"
+  end
+
+  create_table "homepage_settings", force: :cascade do |t|
+    t.boolean "artisan_section_enabled", default: true, null: false
+    t.text "bundle_deals_description", default: "Buy matching sets and save big! Perfect combinations for weddings and festivals."
+    t.boolean "bundle_deals_enabled", default: true, null: false
+    t.string "bundle_deals_heading", default: "Complete Your Look"
+    t.string "bundle_deals_title", default: "Bundle and Save"
+    t.datetime "created_at", null: false
+    t.boolean "ethnic_section_enabled", default: true, null: false
+    t.string "flash_sale_cta_link", default: "/products"
+    t.string "flash_sale_cta_text", default: "Shop Now"
+    t.text "flash_sale_description", default: "Limited time offer on bestselling artificial jewellery. Shop now before it is gone!"
+    t.integer "flash_sale_discount", default: 50
+    t.boolean "flash_sale_enabled", default: true, null: false
+    t.datetime "flash_sale_ends_at"
+    t.string "flash_sale_heading", default: "Up to 50% OFF"
+    t.string "flash_sale_title", default: "Flash Sale"
+    t.boolean "gifts_section_enabled", default: true, null: false
+    t.string "hero_subtitle", default: "Exquisite artificial jewellery, thoughtful gifts, and beautiful ethnic wear for every occasion"
+    t.string "hero_tagline", default: "Timeless Elegance"
+    t.string "promo_banner_code", default: "WELCOME10"
+    t.string "promo_banner_cta_link", default: "/products"
+    t.string "promo_banner_cta_text", default: "Shop Now"
+    t.boolean "promo_banner_enabled", default: true, null: false
+    t.string "promo_banner_heading", default: "Get 10% Off"
+    t.string "promo_banner_title", default: "First Order Offer"
+    t.string "search_placeholder_prefix", default: "Search"
+    t.datetime "updated_at", null: false
   end
 
   create_table "hsn_codes", force: :cascade do |t|
@@ -323,6 +381,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_160000) do
     t.text "description"
     t.boolean "featured", default: false, null: false
     t.string "gemstone"
+    t.boolean "hot_selling", default: false, null: false
     t.bigint "hsn_code_id"
     t.string "ideal_for"
     t.string "name", null: false
@@ -342,6 +401,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_160000) do
     t.index ["deleted_at"], name: "index_products_on_deleted_at"
     t.index ["featured"], name: "index_products_on_featured"
     t.index ["gemstone"], name: "index_products_on_gemstone"
+    t.index ["hot_selling"], name: "index_products_on_hot_selling"
     t.index ["hsn_code_id"], name: "index_products_on_hsn_code_id"
     t.index ["ideal_for"], name: "index_products_on_ideal_for"
     t.index ["occasion"], name: "index_products_on_occasion"
@@ -467,6 +527,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_160000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "customers"
   add_foreign_key "admin_users", "vendors"
+  add_foreign_key "bundle_deal_items", "bundle_deals"
+  add_foreign_key "bundle_deal_items", "products"
   add_foreign_key "cart_items", "carts"
   add_foreign_key "cart_items", "product_variants"
   add_foreign_key "carts", "customers"

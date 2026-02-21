@@ -1,7 +1,10 @@
 <% coupon = session[:coupon_id] ? Coupon.find_by(id: session[:coupon_id]) : nil %>
+<% bundle_deal = session[:bundle_deal_id] ? BundleDeal.find_by(id: session[:bundle_deal_id]) : nil %>
 <% subtotal = cart.subtotal %>
-<% discount = coupon&.calculate_discount(subtotal) || 0 %>
-<% total = subtotal - discount %>
+<% coupon_discount = coupon&.calculate_discount(subtotal) || 0 %>
+<% bundle_discount = session[:bundle_discount].to_f %>
+<% total_discount = coupon_discount + bundle_discount %>
+<% total = subtotal - total_discount %>
 
 <div class="space-y-2 text-sm">
   <div class="flex justify-between">
@@ -9,10 +12,17 @@
     <span class="text-stone-800"><%= format_price(subtotal) %></span>
   </div>
   
-  <% if discount > 0 %>
+  <% if bundle_discount > 0 && bundle_deal %>
+    <div class="flex justify-between text-amber-600">
+      <span>Bundle: <%= bundle_deal.title %></span>
+      <span>-<%= format_price(bundle_discount) %></span>
+    </div>
+  <% end %>
+  
+  <% if coupon_discount > 0 %>
     <div class="flex justify-between text-emerald-600">
-      <span>Discount</span>
-      <span>-<%= format_price(discount) %></span>
+      <span>Coupon: <%= coupon.code %></span>
+      <span>-<%= format_price(coupon_discount) %></span>
     </div>
   <% end %>
   

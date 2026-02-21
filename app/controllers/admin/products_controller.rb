@@ -19,7 +19,8 @@ module Admin
         all: products.count,
         active: products.where(active: true).count,
         draft: products.where(active: false).count,
-        featured: products.where(featured: true).count
+        featured: products.where(featured: true).count,
+        hot_selling: products.where(hot_selling: true).count
       }
 
       products = case @status
@@ -29,6 +30,8 @@ module Admin
         products.where(active: false)
       when "featured"
         products.where(featured: true)
+      when "hot_selling"
+        products.where(hot_selling: true)
       else
         products
       end
@@ -101,7 +104,7 @@ module Admin
     def product_params
       permitted = [
         :name, :slug, :description, :short_description, :category_id,
-        :sku, :price, :active, :featured, :hsn_code_id,
+        :sku, :price, :active, :featured, :hot_selling, :hsn_code_id,
         :base_material, :plating, :gemstone, :occasion, :ideal_for, :country_of_origin,
         images: [],
         variants_attributes: [

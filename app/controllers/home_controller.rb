@@ -1,10 +1,13 @@
 class HomeController < ApplicationController
   def index
+    @homepage_settings = HomepageSetting.current
     @banners = Banner.visible.limit(5)
     @homepage_collections = HomepageCollection.visible.includes(items: { image_attachment: :blob })
     @featured_products = Product.active.featured.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).limit(10)
+    @hot_selling_products = Product.active.hot_selling.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).limit(8)
     @new_arrivals = Product.active.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).order(created_at: :desc).limit(10)
     @categories = Category.active.root.ordered.includes(image_attachment: :blob).limit(8)
+    @bundle_deals = BundleDeal.visible.limit(3)
 
     # Dynamic hero heading based on active categories
     active_categories = Category.active.root.ordered.pluck(:name)
@@ -24,9 +27,9 @@ class HomeController < ApplicationController
 
     @hero_heading = if hero_parts.length > 1
                        "Discover #{hero_parts[0..-2].join(', ')} & #{hero_parts.last}"
-                     else
+    else
                        "Discover Exquisite Jewellery"
-                     end
+    end
 
     # Dynamic search placeholder
     @search_placeholder = "Search #{hero_parts.join(', ')}..."

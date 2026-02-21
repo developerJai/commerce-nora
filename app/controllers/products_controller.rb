@@ -4,7 +4,7 @@ class ProductsController < ApplicationController
     @category_ids = Array(params[:category_ids]).reject(&:blank?)
     @min_price    = params[:min_price]
     @max_price    = params[:max_price]
-    @sort         = params[:sort].presence || 'rating'
+    @sort         = params[:sort].presence || "rating"
     @colors       = Array(params[:colors]).reject(&:blank?)
     @materials    = Array(params[:materials]).reject(&:blank?)
     @gemstones    = Array(params[:gemstones]).reject(&:blank?)
@@ -25,7 +25,7 @@ class ProductsController < ApplicationController
       images_attachments: :blob
     )
 
-    # ── Apply filters ────────────────────────────────────────────────
+    # ── Apply category filter ────────────────────────────────────────
     if @category_ids.any?
       # Expand selected categories to include the full family tree:
       # - Selecting a parent includes products on the parent + all its children
@@ -40,6 +40,7 @@ class ProductsController < ApplicationController
       products = products.where(category_id: expanded_ids)
     end
 
+    # ── Apply price filter ───────────────────────────────────────────
     if @min_price.present? || @max_price.present?
       price_filter = ProductVariant.where(active: true).group(:product_id)
       price_filter = price_filter.having("MIN(price) >= ?", @min_price.to_f) if @min_price.present?
@@ -47,31 +48,36 @@ class ProductsController < ApplicationController
       products = products.where(id: price_filter.select(:product_id))
     end
 
+    # ── Faceted counts (from base filtered set, before multiselect filters) ──
+    # Build facets before applying color/material/gemstone/occasion filters
+    # so that all options remain visible for multiselect support
+    @facets = build_facets(products)
+
+    # ── Apply multiselect filters (color, material, gemstone, occasion) ─────
     products = products.by_color(@colors) if @colors.any?
     products = products.by_attribute(:base_material, @materials) if @materials.any?
     products = products.by_attribute(:gemstone, @gemstones) if @gemstones.any?
     products = products.by_attribute(:occasion, @occasions) if @occasions.any?
+
+    # ── Apply remaining filters ──────────────────────────────────────
     products = products.by_discount(@discount) if @discount.present?
     products = products.by_rating(@rating) if @rating.present?
     products = products.in_stock_only if @in_stock
 
-    # ── Faceted counts (from filtered set, before sort/pagination) ──
-    @facets = build_facets(products)
-
     # ── Sort ─────────────────────────────────────────────────────────
     products = case @sort
-    when 'price_low'
-      products.left_joins(:variants).where(product_variants: { active: true }).group(:id).order('MIN(product_variants.price) ASC')
-    when 'price_high'
-      products.left_joins(:variants).where(product_variants: { active: true }).group(:id).order('MIN(product_variants.price) DESC')
-    when 'rating'
+    when "price_low"
+      products.left_joins(:variants).where(product_variants: { active: true }).group(:id).order("MIN(product_variants.price) ASC")
+    when "price_high"
+      products.left_joins(:variants).where(product_variants: { active: true }).group(:id).order("MIN(product_variants.price) DESC")
+    when "rating"
       products.order(average_rating: :desc)
-    when 'discount'
+    when "discount"
       products.left_joins(:variants)
               .where(product_variants: { active: true })
               .where("product_variants.compare_at_price > product_variants.price")
               .group(:id)
-              .order(Arel.sql('MAX((product_variants.compare_at_price - product_variants.price) / NULLIF(product_variants.compare_at_price, 0) * 100) DESC'))
+              .order(Arel.sql("MAX((product_variants.compare_at_price - product_variants.price) / NULLIF(product_variants.compare_at_price, 0) * 100) DESC"))
     else
       products.order(created_at: :desc)
     end

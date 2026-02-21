@@ -35,6 +35,7 @@ class Product < ApplicationRecord
                        .where("vendors.active IS NULL OR vendors.active = ?", true)
   }
   scope :featured, -> { where(featured: true) }
+  scope :hot_selling, -> { where(hot_selling: true) }
   scope :with_category, ->(category_id) { where(category_id: category_id) if category_id.present? }
   scope :search, ->(query) {
     where("name ILIKE :q OR description ILIKE :q OR short_description ILIKE :q", q: "%#{query}%") if query.present?

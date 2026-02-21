@@ -1,0 +1,204 @@
+<% content_for(:title) { "Homepage Settings" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">Homepage Settings</h1>
+    <%= link_to 'Edit Settings', edit_admin_homepage_settings_path, class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700' %>
+  </div>
+
+  <!-- Flash Sale Settings -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <svg class="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Flash Sale Section
+      </h2>
+      <span class="px-3 py-1 rounded-full text-sm font-medium <%= @settings.flash_sale_enabled? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+        <%= @settings.flash_sale_enabled? ? 'Enabled' : 'Disabled' %>
+      </span>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <span class="text-gray-500">Title:</span>
+        <span class="ml-2 font-medium text-gray-900"><%= @settings.flash_sale_title %></span>
+      </div>
+      <div>
+        <span class="text-gray-500">Heading:</span>
+        <span class="ml-2 font-medium text-gray-900"><%= @settings.flash_sale_heading %></span>
+      </div>
+      <div>
+        <span class="text-gray-500">Discount:</span>
+        <span class="ml-2 font-medium text-rose-600"><%= @settings.formatted_discount %></span>
+      </div>
+      <div>
+        <span class="text-gray-500">CTA Button:</span>
+        <span class="ml-2 font-medium text-gray-900"><%= @settings.flash_sale_cta_text %></span>
+      </div>
+      <div class="md:col-span-2">
+        <span class="text-gray-500">Description:</span>
+        <p class="mt-1 text-gray-900"><%= @settings.flash_sale_description %></p>
+      </div>
+      <% if @settings.flash_sale_ends_at.present? %>
+        <div>
+          <span class="text-gray-500">Ends At:</span>
+          <span class="ml-2 font-medium text-gray-900"><%= @settings.flash_sale_ends_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Promotional Banner Settings -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+        </svg>
+        Promotional Banner
+      </h2>
+      <span class="px-3 py-1 rounded-full text-sm font-medium <%= @settings.promo_banner_enabled? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+        <%= @settings.promo_banner_enabled? ? 'Enabled' : 'Disabled' %>
+      </span>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <span class="text-gray-500">Title:</span>
+        <span class="ml-2 font-medium text-gray-900"><%= @settings.promo_banner_title %></span>
+      </div>
+      <div>
+        <span class="text-gray-500">Heading:</span>
+        <span class="ml-2 font-medium text-gray-900"><%= @settings.promo_banner_heading %></span>
+      </div>
+      <div>
+        <span class="text-gray-500">Promo Code:</span>
+        <span class="ml-2 font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-900"><%= @settings.promo_banner_code %></span>
+      </div>
+      <div>
+        <span class="text-gray-500">CTA Button:</span>
+        <span class="ml-2 font-medium text-gray-900"><%= @settings.promo_banner_cta_text %></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bundle Deals Settings -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+        Bundle Deals Section
+      </h2>
+      <div class="flex items-center gap-3">
+        <%= link_to 'Manage Deals', admin_bundle_deals_path, class: 'text-sm text-indigo-600 hover:text-indigo-800' %>
+        <span class="px-3 py-1 rounded-full text-sm font-medium <%= @settings.bundle_deals_enabled? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+          <%= @settings.bundle_deals_enabled? ? 'Enabled' : 'Disabled' %>
+        </span>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <span class="text-gray-500">Title:</span>
+        <span class="ml-2 font-medium text-gray-900"><%= @settings.bundle_deals_title %></span>
+      </div>
+      <div>
+        <span class="text-gray-500">Heading:</span>
+        <span class="ml-2 font-medium text-gray-900"><%= @settings.bundle_deals_heading %></span>
+      </div>
+      <div class="md:col-span-2">
+        <span class="text-gray-500">Description:</span>
+        <p class="mt-1 text-gray-900"><%= @settings.bundle_deals_description %></p>
+      </div>
+    </div>
+    
+    <div class="mt-4 pt-4 border-t border-gray-200">
+      <p class="text-sm text-gray-600">
+        <%= BundleDeal.active.count %> active bundle deals out of <%= BundleDeal.count %> total
+      </p>
+    </div>
+  </div>
+
+  <!-- Section Toggles -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+        Homepage Sections Visibility
+      </h2>
+    </div>
+    <p class="text-sm text-gray-500 mb-4">Toggle sections on/off from the storefront homepage</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Gifts & Celebrations -->
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
+            <span class="text-xl">🎁</span>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900">Perfect Presents</p>
+            <p class="text-xs text-gray-500">Gifts & Celebrations</p>
+          </div>
+        </div>
+        <span class="px-3 py-1 rounded-full text-sm font-medium <%= @settings.gifts_section_enabled? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+          <%= @settings.gifts_section_enabled? ? 'Enabled' : 'Disabled' %>
+        </span>
+      </div>
+
+      <!-- Flash Sale -->
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+            <span class="text-xl">⚡</span>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900">Flash Sale</p>
+            <p class="text-xs text-gray-500">Discount Banner</p>
+          </div>
+        </div>
+        <span class="px-3 py-1 rounded-full text-sm font-medium <%= @settings.flash_sale_enabled? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+          <%= @settings.flash_sale_enabled? ? 'Enabled' : 'Disabled' %>
+        </span>
+      </div>
+
+      <!-- Artisan Collection -->
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+            <span class="text-xl">💎</span>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900">Handcrafted with Love</p>
+            <p class="text-xs text-gray-500">Beautiful Jewellery Collection</p>
+          </div>
+        </div>
+        <span class="px-3 py-1 rounded-full text-sm font-medium <%= @settings.artisan_section_enabled? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+          <%= @settings.artisan_section_enabled? ? 'Enabled' : 'Disabled' %>
+        </span>
+      </div>
+
+      <!-- Ethnic Wear -->
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+            <span class="text-xl">👗</span>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900">Ethnic Wear</p>
+            <p class="text-xs text-gray-500">Collection</p>
+          </div>
+        </div>
+        <span class="px-3 py-1 rounded-full text-sm font-medium <%= @settings.ethnic_section_enabled? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+          <%= @settings.ethnic_section_enabled? ? 'Enabled' : 'Disabled' %>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

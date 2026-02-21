@@ -1,0 +1,192 @@
+<%= form_with model: [:admin, bundle_deal], class: 'space-y-6', multipart: true do |f| %>
+  <% if bundle_deal.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <ul class="text-sm text-red-700 list-disc list-inside">
+        <% bundle_deal.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left Column: Basic Info -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white rounded-lg shadow-sm p-6 space-y-6">
+        <div>
+          <%= f.label :title, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.text_field :title, required: true, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        </div>
+
+        <div>
+          <%= f.label :description, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= f.text_field :description, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <%= f.label :original_price, 'Original Price (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.number_field :original_price, step: 0.01, min: 0, required: true, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+          </div>
+          
+          <div>
+            <%= f.label :discounted_price, 'Discounted Price (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.number_field :discounted_price, step: 0.01, min: 0, required: true, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+          </div>
+          
+          <div>
+            <%= f.label :discount_percentage, 'Discount %', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.number_field :discount_percentage, min: 0, max: 100, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+            <p class="mt-1 text-xs text-gray-500">Auto-calculated if left blank</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <%= f.label :cta_text, 'CTA Button Text', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :cta_text, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+          </div>
+          
+          <div>
+            <%= f.label :cta_link, 'CTA Link (fallback)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :cta_link, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+            <p class="mt-1 text-xs text-gray-500">Used if no products added</p>
+          </div>
+          
+          <div>
+            <%= f.label :position, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.number_field :position, min: 0, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+            <p class="mt-1 text-xs text-gray-500">Lower numbers appear first</p>
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          <%= f.check_box :active, class: 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded' %>
+          <%= f.label :active, 'Active (Show on Storefront)', class: 'ml-2 text-sm text-gray-700' %>
+        </div>
+      </div>
+
+      <!-- Products in Bundle with Searchable Select -->
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Products in Bundle</h3>
+        <p class="text-sm text-gray-500 mb-4">Add products that are included in this bundle deal. When customers click "Add to Cart", all these products will be added together.</p>
+        
+        <div id="bundle-deal-items" class="space-y-4">
+          <%= f.fields_for :bundle_deal_items do |item_form| %>
+            <div class="bundle-deal-item flex gap-4 items-start p-4 bg-gray-50 rounded-lg">
+              <div class="flex-1">
+                <%= item_form.label :product_id, 'Product', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= item_form.select :product_id, 
+                    Product.active.order(:name).map { |p| [p.name, p.id] },
+                    { include_blank: 'Search product...' },
+                    class: 'tom-select w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+              </div>
+              <div class="w-32">
+                <%= item_form.label :quantity, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= item_form.number_field :quantity, min: 1, value: item_form.object.quantity || 1,
+                    class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+              </div>
+              <div class="pt-6">
+                <%= item_form.check_box :_destroy, class: 'sr-only' %>
+                <button type="button" class="text-red-600 hover:text-red-800 text-sm" onclick="this.closest('.bundle-deal-item').querySelector('input[type=\"checkbox\"]').checked = true; this.closest('.bundle-deal-item').style.display='none';">
+                  Remove
+                </button>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <button type="button" class="mt-4 text-indigo-600 hover:text-indigo-800 text-sm font-medium" onclick="addBundleItem()">
+          + Add Product
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Column: Image Upload -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow-sm p-6 lg:sticky lg:top-24">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Bundle Image</h3>
+        
+        <div class="space-y-4">
+          <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+            <% if bundle_deal.image.attached? %>
+              <%= image_tag bundle_deal.image, class: 'w-full h-full object-cover' %>
+            <% else %>
+              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-100 to-amber-100">
+                <svg class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+            <% end %>
+          </div>
+          
+          <div>
+            <%= f.label :image, 'Upload Image', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.file_field :image, accept: 'image/*', class: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm' %>
+            <p class="mt-1 text-xs text-gray-500">Max 2MB. Recommended: 800x600px</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to 'Cancel', admin_bundle_deals_path, class: 'px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50' %>
+    <%= f.submit bundle_deal.new_record? ? 'Create Deal' : 'Save Changes', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+  </div>
+<% end %>
+
+<script>
+function addBundleItem() {
+  const container = document.getElementById('bundle-deal-items');
+  const index = container.children.length;
+  const template = `
+    <div class="bundle-deal-item flex gap-4 items-start p-4 bg-gray-50 rounded-lg">
+      <div class="flex-1">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Product</label>
+        <select name="bundle_deal[bundle_deal_items_attributes][${index}][product_id]" class="tom-select-new w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+          <option value="">Search product...</option>
+          <%= Product.active.order(:name).map { |p| "<option value='#{p.id}'>#{escape_javascript(p.name)}</option>" }.join.html_safe %>
+        </select>
+      </div>
+      <div class="w-32">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+        <input type="number" name="bundle_deal[bundle_deal_items_attributes][${index}][quantity]" min="1" value="1" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+      </div>
+      <div class="pt-6">
+        <button type="button" class="text-red-600 hover:text-red-800 text-sm" onclick="this.closest('.bundle-deal-item').remove()">
+          Remove
+        </button>
+      </div>
+    </div>
+  `;
+  container.insertAdjacentHTML('beforeend', template);
+  
+  // Initialize Tom Select on new element
+  const newSelect = container.lastElementChild.querySelector('.tom-select-new');
+  if (newSelect && typeof TomSelect !== 'undefined') {
+    new TomSelect(newSelect, {
+      create: false,
+      sortField: {
+        field: "text",
+        direction: "asc"
+      }
+    });
+  }
+}
+
+// Initialize Tom Select on page load
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.tom-select').forEach(function(select) {
+    if (typeof TomSelect !== 'undefined') {
+      new TomSelect(select, {
+        create: false,
+        sortField: {
+          field: "text",
+          direction: "asc"
+        }
+      });
+    }
+  });
+});
+</script>

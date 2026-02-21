@@ -1,72 +1,66 @@
+<% if @homepage_settings&.bundle_deals_enabled? && @bundle_deals.any? %>
 <!-- Section: Bundle Deals -->
 <section class="py-12 sm:py-16 bg-gradient-to-b from-amber-50 to-rose-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-10">
-      <span class="inline-block px-4 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium mb-4">Bundle and Save</span>
-      <h2 class="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold text-stone-900 mb-4">Complete Your Look</h2>
-      <p class="text-stone-600 max-w-2xl mx-auto">Buy matching sets and save big! Perfect combinations for weddings and festivals.</p>
+      <span class="inline-block px-4 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium mb-4"><%= @homepage_settings.bundle_deals_title %></span>
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold text-stone-900 mb-4"><%= @homepage_settings.bundle_deals_heading %></h2>
+      <p class="text-stone-600 max-w-2xl mx-auto"><%= @homepage_settings.bundle_deals_description %></p>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-        <div class="relative">
-          <div class="aspect-video bg-gradient-to-br from-rose-200 to-amber-200 flex items-center justify-center">
-            <span class="text-6xl">💍</span>
-          </div>
-          <div class="absolute top-3 right-3 bg-rose-600 text-white px-3 py-1 rounded-full text-sm font-bold">SAVE 30%</div>
-        </div>
-        <div class="p-6">
-          <h3 class="font-serif font-semibold text-lg text-stone-900 mb-2">Wedding Essential Set</h3>
-          <p class="text-stone-500 text-sm mb-4">Necklace, Earrings and Maang Tikka</p>
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="text-rose-700 font-bold text-xl">Rs. 2,499</span>
-              <span class="text-stone-400 text-sm line-through ml-2">Rs. 3,599</span>
+      <% @bundle_deals.each do |deal| %>
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+          <div class="relative">
+            <div class="aspect-video bg-gradient-to-br from-rose-200 to-amber-200 flex items-center justify-center overflow-hidden">
+              <% if deal.image.attached? %>
+                <%= image_tag deal.image, class: 'w-full h-full object-cover' %>
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-200 to-amber-200">
+                  <svg class="w-20 h-20 text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                  </svg>
+                </div>
+              <% end %>
             </div>
-            <%= link_to "Add to Cart", products_path, class: "px-4 py-2 bg-rose-700 text-white rounded-full text-sm font-medium hover:bg-rose-800" %>
+            <div class="absolute top-3 right-3 bg-rose-600 text-white px-3 py-1 rounded-full text-sm font-bold"><%= deal.savings_display %></div>
           </div>
-        </div>
-      </div>
-      
-      <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-        <div class="relative">
-          <div class="aspect-video bg-gradient-to-br from-amber-200 to-rose-200 flex items-center justify-center">
-            <span class="text-6xl">📿</span>
-          </div>
-          <div class="absolute top-3 right-3 bg-rose-600 text-white px-3 py-1 rounded-full text-sm font-bold">SAVE 25%</div>
-        </div>
-        <div class="p-6">
-          <h3 class="font-serif font-semibold text-lg text-stone-900 mb-2">Festive Combo</h3>
-          <p class="text-stone-500 text-sm mb-4">Bangles and Earrings Pair</p>
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="text-rose-700 font-bold text-xl">Rs. 1,299</span>
-              <span class="text-stone-400 text-sm line-through ml-2">Rs. 1,749</span>
+          <div class="p-6">
+            <h3 class="font-serif font-semibold text-lg text-stone-900 mb-2"><%= deal.title %></h3>
+            <p class="text-stone-500 text-sm mb-4"><%= deal.description %></p>
+            
+            <% if deal.products.any? %>
+              <div class="mb-4">
+                <p class="text-xs text-stone-500 mb-2">Includes:</p>
+                <div class="flex flex-wrap gap-2">
+                  <% deal.bundle_deal_items.ordered.limit(3).each do |item| %>
+                    <span class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded"><%= item.product.name %></span>
+                  <% end %>
+                  <% if deal.bundle_deal_items.count > 3 %>
+                    <span class="text-xs text-stone-400">+<%= deal.bundle_deal_items.count - 3 %> more</span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-rose-700 font-bold text-xl"><%= deal.formatted_discounted_price %></span>
+                <span class="text-stone-400 text-sm line-through ml-2"><%= deal.formatted_original_price %></span>
+              </div>
+              
+              <% if deal.products.any? %>
+                <%= button_to add_bundle_cart_path(deal), class: "px-4 py-2 bg-rose-700 text-white rounded-full text-sm font-medium hover:bg-rose-800" do %>
+                  <%= deal.cta_text %>
+                <% end %>
+              <% else %>
+                <%= link_to deal.cta_text, deal.cta_link, class: "px-4 py-2 bg-rose-700 text-white rounded-full text-sm font-medium hover:bg-rose-800" %>
+              <% end %>
             </div>
-            <%= link_to "Add to Cart", products_path, class: "px-4 py-2 bg-rose-700 text-white rounded-full text-sm font-medium hover:bg-rose-800" %>
           </div>
         </div>
-      </div>
-      
-      <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-        <div class="relative">
-          <div class="aspect-video bg-gradient-to-br from-rose-200 via-amber-200 to-rose-200 flex items-center justify-center">
-            <span class="text-6xl">💎</span>
-          </div>
-          <div class="absolute top-3 right-3 bg-rose-600 text-white px-3 py-1 rounded-full text-sm font-bold">SAVE 40%</div>
-        </div>
-        <div class="p-6">
-          <h3 class="font-serif font-semibold text-lg text-stone-900 mb-2">Complete Jewelry Set</h3>
-          <p class="text-stone-500 text-sm mb-4">Full Bridal Collection 8 pieces</p>
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="text-rose-700 font-bold text-xl">Rs. 4,999</span>
-              <span class="text-stone-400 text-sm line-through ml-2">Rs. 8,499</span>
-            </div>
-            <%= link_to "Add to Cart", products_path, class: "px-4 py-2 bg-rose-700 text-white rounded-full text-sm font-medium hover:bg-rose-800" %>
-          </div>
-        </div>
-      </div>
+      <% end %>
     </div>
   </div>
 </section>
+<% end %>
