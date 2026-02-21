@@ -10,9 +10,9 @@ class Product < ApplicationRecord
   upload_key_prefix do
     vendor_id ? "vendors/#{vendor_id}/products" : "products"
   end
-  has_many :variants, class_name: 'ProductVariant', dependent: :destroy
+  has_many :variants, class_name: "ProductVariant", dependent: :destroy
   has_many :reviews, dependent: :destroy
-  has_many :wishlist_items, dependent: :destroy, class_name: 'Wishlist'
+  has_many :wishlist_items, dependent: :destroy, class_name: "Wishlist"
   has_many :wishing_customers, through: :wishlist_items, source: :customer
   has_many_attached :images
 
@@ -89,7 +89,7 @@ class Product < ApplicationRecord
   # Collect available filter values from a product scope (for faceted counts)
   def self.available_filter_values(attr_name)
     if Category::PRODUCT_COLUMN_ATTRIBUTES.include?(attr_name.to_s)
-      where.not(attr_name => [nil, ""]).group(attr_name).count
+      where.not(attr_name => [ nil, "" ]).group(attr_name).count
     else
       # JSONB property
       where("properties ->> ? IS NOT NULL AND properties ->> ? != ''", attr_name, attr_name)
@@ -101,7 +101,7 @@ class Product < ApplicationRecord
   def self.available_colors
     joins(:variants)
       .where(product_variants: { active: true })
-      .where.not(product_variants: { color: [nil, ""] })
+      .where.not(product_variants: { color: [ nil, "" ] })
       .group("product_variants.color").count
   end
 
@@ -225,8 +225,15 @@ class Product < ApplicationRecord
     self.sku = sku_candidate || "#{prefix}-#{SecureRandom.hex(3).upcase}"
   end
 
+  MAX_IMAGES = 15
+
   def validate_images
     return unless images.attached?
+
+    if images.count > MAX_IMAGES
+      errors.add(:images, "cannot exceed #{MAX_IMAGES} images")
+      return
+    end
 
     images.each do |img|
       next unless img.blob
