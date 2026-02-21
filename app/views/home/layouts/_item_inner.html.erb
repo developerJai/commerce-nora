@@ -7,12 +7,13 @@
 <%# Background Image or Premium Placeholder %>
 <% if has_image %>
   <%= image_tag item.image,
-    class: "w-full #{aspect} object-cover transition-transform duration-700 ease-out group-hover:scale-105",
+    class: "#{aspect} object-cover transition-transform duration-700 ease-out group-hover:scale-105",
+    style: "object-position: center center;",
     loading: "lazy",
     alt: item.title || "Collection image" %>
 <% else %>
   <%# Rich dark placeholder with decorative elements — looks premium even without an image %>
-  <div class="w-full <%= aspect %> relative bg-gradient-to-br from-stone-800 via-stone-700 to-rose-900/80 overflow-hidden">
+  <div class="<%= aspect %> relative bg-gradient-to-br from-stone-800 via-stone-700 to-rose-900/80 overflow-hidden">
     <%# Decorative shimmer circles %>
     <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-rose-500/10"></div>
     <div class="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-amber-500/10"></div>
