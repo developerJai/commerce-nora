@@ -1,10 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["input", "main", "placeholder", "thumbs"]
+  static targets = ["input", "main", "placeholder", "thumbs", "error"]
+  static values = { maxFiles: { type: Number, default: 15 } }
 
   connect() {
+    this.createdObjectUrls = []
     this.syncVisibility()
+  }
+
+  disconnect() {
+    // Clean up object URLs to prevent memory leaks
+    this.revokeAllObjectUrls()
   }
 
   change() {
@@ -15,21 +22,40 @@ export default class extends Controller {
       return
     }
 
+    // Validate file count
+    if (files.length > this.maxFilesValue) {
+      this.showError(`Please select no more than ${this.maxFilesValue} images.`)
+      this.inputTarget.value = ""
+      return
+    }
+
+    // Validate file types
     const invalidType = files.find((f) => !f.type || !f.type.startsWith("image/"))
     if (invalidType) {
+      this.showError("Please select only image files (JPEG, PNG, GIF, etc.).")
       this.inputTarget.value = ""
-      window.alert("Please select only image files.")
       return
     }
 
+    // Validate file sizes
     const oversize = files.find((f) => f.size > 2 * 1024 * 1024)
     if (oversize) {
+      this.showError("Each image must be smaller than 2 MB.")
       this.inputTarget.value = ""
-      window.alert("Each image must be smaller than 2 MB.")
       return
     }
 
-    const urls = files.map((f) => URL.createObjectURL(f))
+    // Clear previous error and object URLs
+    this.clearError()
+    this.revokeAllObjectUrls()
+
+    // Create new object URLs and store them for cleanup
+    const urls = files.map((f) => {
+      const url = URL.createObjectURL(f)
+      this.createdObjectUrls.push(url)
+      return url
+    })
+
     this.mainTarget.src = urls[0]
 
     if (this.hasThumbsTarget) {
@@ -74,5 +100,29 @@ export default class extends Controller {
       this.mainTarget.classList.add("hidden")
       if (this.hasPlaceholderTarget) this.placeholderTarget.classList.remove("hidden")
     }
+  }
+
+  showError(message) {
+    if (this.hasErrorTarget) {
+      this.errorTarget.textContent = message
+      this.errorTarget.classList.remove("hidden")
+    } else {
+      // Fallback to alert if no error target exists
+      window.alert(message)
+    }
+  }
+
+  clearError() {
+    if (this.hasErrorTarget) {
+      this.errorTarget.textContent = ""
+      this.errorTarget.classList.add("hidden")
+    }
+  }
+
+  revokeAllObjectUrls() {
+    this.createdObjectUrls.forEach(url => {
+      URL.revokeObjectURL(url)
+    })
+    this.createdObjectUrls = []
   }
 }

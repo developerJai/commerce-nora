@@ -1,6 +1,6 @@
 module Admin
   class ProductsController < BaseController
-    before_action :set_product, only: [:show, :edit, :update, :destroy]
+    before_action :set_product, only: [ :show, :edit, :update, :destroy ]
 
     def index
       @q = params[:q]
@@ -23,11 +23,11 @@ module Admin
       }
 
       products = case @status
-      when 'active'
+      when "active"
         products.where(active: true)
-      when 'draft'
+      when "draft"
         products.where(active: false)
-      when 'featured'
+      when "featured"
         products.where(featured: true)
       else
         products
@@ -86,7 +86,7 @@ module Admin
       @product = params[:product_id].present? ? vendor_scoped(Product).find_by(id: params[:product_id]) : Product.new
       @product ||= Product.new
 
-      render partial: 'admin/products/attribute_fields', locals: {
+      render partial: "admin/products/attribute_fields", locals: {
         category: @category,
         product: @product
       }, layout: false
@@ -106,7 +106,8 @@ module Admin
         images: [],
         variants_attributes: [
           :id, :name, :sku, :price, :compare_at_price, :stock_quantity,
-          :weight, :color, :size, :active, :position, :image, :_destroy
+          :weight, :color, :size, :active, :position, :image, :_destroy,
+          :track_inventory, :reorder_point, :reorder_quantity
         ]
       ]
       permitted << :vendor_id if admin_role? && !vendor_context?

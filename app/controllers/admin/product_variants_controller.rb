@@ -1,7 +1,7 @@
 module Admin
   class ProductVariantsController < BaseController
     before_action :set_product
-    before_action :set_variant, only: [:edit, :update, :destroy, :toggle_status, :update_stock]
+    before_action :set_variant, only: [ :edit, :update, :destroy, :toggle_status, :update_stock ]
 
     def index
       @variants = @product.variants.ordered
@@ -64,7 +64,8 @@ module Admin
     def variant_params
       result = params.require(:product_variant).permit(
         :name, :sku, :price, :compare_at_price, :stock_quantity,
-        :weight, :color, :size, :active, :position, :image
+        :weight, :color, :size, :active, :position, :image,
+        :track_inventory, :reorder_point, :reorder_quantity
       )
 
       if params[:product_variant][:properties].is_a?(ActionController::Parameters)

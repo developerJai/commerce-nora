@@ -192,6 +192,17 @@
               <% end %>
             </div>
 
+            <%# Display variant errors at the top of the variant section %>
+            <% if vf.object.errors.any? %>
+              <div class="rounded-md bg-red-50 p-3 mb-4">
+                <ul class="text-sm text-red-700 list-disc list-inside">
+                  <% vf.object.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
             <div>
               <%= vf.label :name, 'Variant Name', class: 'block text-sm font-medium text-gray-700 mb-1' %>
               <%= vf.text_field :name, placeholder: 'Auto-generated from color/size if blank (e.g. "Gold / Free Size")', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
@@ -200,8 +211,12 @@
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <%= vf.label :price, 'Selling Price (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-                <%= vf.number_field :price, step: 0.01, min: 0, required: true, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
-                <p class="mt-1 text-xs text-gray-500">Customer-facing price shown on storefront</p>
+                <%= vf.number_field :price, step: 0.01, min: 0, required: true, class: "w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 #{vf.object.errors[:price].any? ? 'border-red-500' : 'border-gray-300'}" %>
+                <% if vf.object.errors[:price].any? %>
+                  <p class="mt-1 text-sm text-red-600"><%= vf.object.errors[:price].join(", ") %></p>
+                <% else %>
+                  <p class="mt-1 text-xs text-gray-500">Customer-facing price shown on storefront</p>
+                <% end %>
               </div>
               <div>
                 <%= vf.label :compare_at_price, 'MRP / Compare Price (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
@@ -224,7 +239,29 @@
 
             <div>
               <%= vf.label :sku, 'Variant SKU', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-              <%= vf.text_field :sku, placeholder: 'Auto-generated if blank', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+              <%= vf.text_field :sku, placeholder: 'Auto-generated if blank', class: "w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 #{vf.object.errors[:sku].any? ? 'border-red-500' : 'border-gray-300'}" %>
+              <% if vf.object.errors[:sku].any? %>
+                <p class="mt-1 text-sm text-red-600"><%= vf.object.errors[:sku].join(", ") %></p>
+              <% end %>
+            </div>
+
+            <!-- Inventory Management for inline variant -->
+            <div class="border-t border-gray-200 pt-4 mt-4">
+              <h4 class="text-sm font-semibold text-gray-900 mb-3">Inventory Management</h4>
+              
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <%= vf.label :track_inventory, class: 'flex items-center' do %>
+                    <%= vf.check_box :track_inventory, class: 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded' %>
+                    <span class="ml-2 text-sm text-gray-700">Track Inventory</span>
+                  <% end %>
+                  <p class="text-xs text-gray-500 ml-6 mt-1">Auto-adjust on orders</p>
+                </div>
+                <div>
+                  <%= vf.label :reorder_point, 'Reorder Alert Level', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                  <%= vf.number_field :reorder_point, min: 0, value: vf.object.reorder_point || 10, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -247,7 +284,11 @@
                            class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500',
                            accept: 'image/*',
                            data: { "multi-image-preview-target": "input", action: "change->multi-image-preview#change" } %>
-          <p class="mt-1 text-xs text-gray-500">Select multiple images. The first image is used on cards unless a variant image exists.</p>
+          <p class="mt-1 text-xs text-gray-500">Select up to 15 images. The first image is used on cards unless a variant image exists.</p>
+          <div data-multi-image-preview-target="error" class="hidden mt-2 text-sm text-red-600"></div>
+          <% if product.errors[:images].any? %>
+            <p class="mt-1 text-sm text-red-600"><%= product.errors[:images].join(", ") %></p>
+          <% end %>
         </div>
 
         <div class="flex items-center gap-6">

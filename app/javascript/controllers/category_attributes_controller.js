@@ -8,9 +8,18 @@ export default class extends Controller {
   static values = { url: String, productId: String }
 
   connect() {
-    // Load attributes if a category is already selected (e.g. edit form)
+    // Only auto-load attributes if:
+    // 1. A category is selected
+    // 2. AND attributes section is empty (not already rendered server-side with values)
+    // This prevents overwriting server-rendered values on edit forms
     if (this.categorySelectTarget.value) {
-      this.loadAttributes()
+      const hasExistingContent = this.hasProductAttributesTarget && 
+        this.productAttributesTarget.querySelectorAll('input, select').length > 0
+      
+      if (!hasExistingContent) {
+        // Small delay to ensure DOM is fully ready, especially after Turbo navigation
+        setTimeout(() => this.loadAttributes(), 0)
+      }
     }
   }
 
@@ -30,6 +39,9 @@ export default class extends Controller {
       }
       return
     }
+
+    // Save current form values before reloading to preserve user input
+    const savedValues = this.saveCurrentValues()
 
     const url = new URL(this.urlValue, window.location.origin)
     url.searchParams.set("category_id", categoryId)
@@ -61,10 +73,56 @@ export default class extends Controller {
         if (this.hasVariantAttributesTarget && variantSection) {
           this.variantAttributesTarget.innerHTML = variantSection.innerHTML
         }
+
+        // Restore previously entered values to preserve user input after validation errors
+        this.restoreValues(savedValues)
       }
     } catch (error) {
       console.error("Failed to load attribute fields:", error)
     }
+  }
+
+  // Save current input values to preserve them when reloading attributes
+  saveCurrentValues() {
+    const values = {}
+    
+    if (this.hasProductAttributesTarget) {
+      this.productAttributesTarget.querySelectorAll('input, select').forEach(input => {
+        if (input.name && !input.name.includes('__template__')) {
+          values[input.name] = input.value
+        }
+      })
+    }
+    
+    if (this.hasVariantAttributesTarget) {
+      this.variantAttributesTarget.querySelectorAll('input, select').forEach(input => {
+        if (input.name && !input.name.includes('__template__')) {
+          values[input.name] = input.value
+        }
+      })
+    }
+    
+    return values
+  }
+
+  // Restore previously saved input values
+  restoreValues(values) {
+    Object.entries(values).forEach(([name, value]) => {
+      // Try to find input by exact name match
+      let input = document.querySelector(`[name="${CSS.escape(name)}"]`)
+      
+      if (input && value !== undefined && value !== null) {
+        if (input.tagName === 'SELECT') {
+          // For selects, check if the option exists before setting
+          const option = input.querySelector(`option[value="${CSS.escape(value)}"]`)
+          if (option) {
+            input.value = value
+          }
+        } else {
+          input.value = value
+        }
+      }
+    })
   }
 
   emptyState(message) {
