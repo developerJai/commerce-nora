@@ -1,5 +1,84 @@
-<% content_for(:title) { "Jewellery & Traditional Wear" } %>
+<% content_for(:title) { "Artificial Jewellery, Gifts & Ethnic Wear" } %>
 <% content_for(:hide_header_search) { true } %>
+
+<!-- CSS Animations - Cross Browser Support -->
+<style>
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-20px) translateX(10px); }
+  }
+  @keyframes float-medium {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-15px) translateX(-15px); }
+  }
+  @keyframes float-fast {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-25px) translateX(5px); }
+  }
+  @keyframes sparkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  @keyframes rotate-slow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { filter: drop-shadow(0 0 5px rgba(225, 29, 72, 0.3)); }
+    50% { filter: drop-shadow(0 0 20px rgba(225, 29, 72, 0.6)); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes heart-beat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .animate-float-slow { 
+    animation: float-slow 8s ease-in-out infinite;
+    -webkit-animation: float-slow 8s ease-in-out infinite;
+  }
+  .animate-float-medium { 
+    animation: float-medium 6s ease-in-out infinite;
+    -webkit-animation: float-medium 6s ease-in-out infinite;
+  }
+  .animate-float-fast { 
+    animation: float-fast 4s ease-in-out infinite;
+    -webkit-animation: float-fast 4s ease-in-out infinite;
+  }
+  .animate-sparkle { 
+    animation: sparkle 2s ease-in-out infinite;
+    -webkit-animation: sparkle 2s ease-in-out infinite;
+  }
+  .animate-rotate-slow { 
+    animation: rotate-slow 20s linear infinite;
+    -webkit-animation: rotate-slow 20s linear infinite;
+  }
+  .animate-pulse-glow { 
+    animation: pulse-glow 3s ease-in-out infinite;
+    -webkit-animation: pulse-glow 3s ease-in-out infinite;
+  }
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+    -webkit-animation: shimmer 3s ease-in-out infinite;
+  }
+  .animate-heart-beat {
+    animation: heart-beat 1.5s ease-in-out infinite;
+    -webkit-animation: heart-beat 1.5s ease-in-out infinite;
+  }
+  .animate-bounce-subtle {
+    animation: bounce-subtle 2s ease-in-out infinite;
+    -webkit-animation: bounce-subtle 2s ease-in-out infinite;
+  }
+</style>
+
 
 <!-- Hero Section -->
 <section class="bg-gradient-to-b from-rose-50 to-stone-50">
@@ -10,7 +89,7 @@
         <%= @hero_heading %>
       </h1>
       <p class="text-stone-600 mb-8 max-w-xl mx-auto leading-relaxed">
-        Curated picks for weddings, festivals, everyday elegance, and gifting
+        Exquisite artificial jewellery, thoughtful gifts, and beautiful ethnic wear for every occasion
       </p>
       
       <!-- Search Bar -->
@@ -86,32 +165,8 @@
   <% end %>
 <% end %>
 
-<!-- Shop by Category -->
-<section class="py-8 sm:py-12">
-  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-    <div class="text-center mb-6 sm:mb-8">
-      <h2 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Shop by Category</h2>
-    </div>
-    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 sm:gap-6">
-      <% @categories.each do |category| %>
-        <%= link_to category_path(category.slug), class: 'group text-center' do %>
-          <div class="aspect-square rounded-full flex items-center justify-center mb-3 group-hover:from-rose-100 group-hover:to-amber-100 transition mx-auto w-16 h-16 sm:w-20 sm:h-20 overflow-hidden">
-            <% if category.image.attached? %>
-              <%= image_tag category.image, class: 'w-full h-full object-cover rounded-full' %>
-            <% else %>
-              <div class="w-full h-full bg-gradient-to-br from-rose-50 to-amber-50 flex items-center justify-center">
-                <svg class="w-7 h-7 sm:w-9 sm:h-9 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
-                </svg>
-              </div>
-            <% end %>
-          </div>
-          <p class="text-xs sm:text-sm font-medium text-stone-700 group-hover:text-rose-800 transition"><%= category.name %></p>
-        <% end %>
-      <% end %>
-    </div>
-  </div>
-</section>
+<!-- Section: Artisan Collection -->
+<%= render "home/sections/artisan" %>
 
 <!-- Bestsellers -->
 <section class="py-8 sm:py-12 bg-white">
@@ -131,6 +186,9 @@
     </div>
   </div>
 </section>
+
+<!-- Section: Gifts & Celebrations -->
+<%= render "home/sections/gifts" %>
 
 <!-- Promotional Banner -->
 <section class="py-8 sm:py-12">
@@ -172,6 +230,12 @@
 </section>
 <% end %>
 
+<!-- Section: Ethnic Wear Collection -->
+<%= render "home/sections/ethnic" %>
+
+<!-- Section: Our Promise -->
+<%= render "home/sections/promise" %>
+
 <!-- Why Choose Us -->
 <section class="py-10 sm:py-14 bg-stone-100">
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -183,8 +247,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
         </div>
-        <h3 class="font-medium text-stone-900 text-sm mb-1">100% Certified</h3>
-        <p class="text-stone-500 text-xs">BIS Hallmarked Gold</p>
+        <h3 class="font-medium text-stone-900 text-sm mb-1">Quality Assured</h3>
+        <p class="text-stone-500 text-xs">Carefully crafted pieces</p>
       </div>
       <div class="text-center">
         <div class="w-14 h-14 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-sm">
@@ -192,8 +256,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
         </div>
-        <h3 class="font-medium text-stone-900 text-sm mb-1">Lifetime Exchange</h3>
-        <p class="text-stone-500 text-xs">On all products</p>
+        <h3 class="font-medium text-stone-900 text-sm mb-1">7-Day Exchange</h3>
+        <p class="text-stone-500 text-xs">7 days exchange</p>
       </div>
       <div class="text-center">
         <div class="w-14 h-14 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-sm">
@@ -210,8 +274,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
         </div>
-        <h3 class="font-medium text-stone-900 text-sm mb-1">30-Day Returns</h3>
-        <p class="text-stone-500 text-xs">Easy money back</p>
+        <h3 class="font-medium text-stone-900 text-sm mb-1">Easy Refund</h3>
+        <p class="text-stone-500 text-xs">Quick refund process</p>
       </div>
     </div>
   </div>
