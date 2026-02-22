@@ -92,7 +92,6 @@ Rails.application.routes.draw do
 
     # Homepage Settings
     resource :homepage_settings, only: [ :show, :edit, :update ]
-    resources :bundle_deals
 
     # Inventory Management
     resources :inventory, only: [ :index ] do
@@ -161,7 +160,6 @@ Rails.application.routes.draw do
   # Cart
   resource :cart, only: [ :show ] do
     post "add/:variant_id", action: :add, as: :add_to
-    post "add_bundle/:bundle_deal_id", action: :add_bundle, as: :add_bundle
     patch "update/:variant_id", action: :update_item, as: :update_item
     delete "remove/:variant_id", action: :remove, as: :remove_from
     delete "clear", action: :clear, as: :clear

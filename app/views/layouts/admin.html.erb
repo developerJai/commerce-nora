@@ -53,7 +53,7 @@
         <% if admin_role? %>
           <%= render 'admin/shared/sidebar_link', path: admin_banners_path, icon: 'banners', label: 'Banners', active: controller_name == 'banners' %>
           <%= render 'admin/shared/sidebar_link', path: admin_homepage_collections_path, icon: 'collections', label: 'Collections', active: controller_name.in?(['homepage_collections', 'homepage_collection_items']) %>
-          <%= render 'admin/shared/sidebar_link', path: admin_homepage_settings_path, icon: 'settings', label: 'Homepage', active: controller_name.in?(['homepage_settings', 'bundle_deals']) %>
+          <%= render 'admin/shared/sidebar_link', path: admin_homepage_settings_path, icon: 'settings', label: 'Homepage', active: controller_name == 'homepage_settings' %>
         <% end %>
 
         <div class="pt-4">

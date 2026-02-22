@@ -120,29 +120,6 @@ class CartsController < ApplicationController
     redirect_to cart_path, notice: "Coupon removed"
   end
 
-  # POST /cart/add_bundle/:bundle_deal_id
-  def add_bundle
-    @bundle_deal = BundleDeal.active.find(params[:bundle_deal_id])
-
-    # Add each product in the bundle to cart
-    @bundle_deal.bundle_deal_items.includes(:product).each do |item|
-      variant = item.product.default_variant
-      if variant
-        current_cart.add_item(variant, item.quantity)
-      end
-    end
-
-    # Apply bundle discount as a session variable
-    session[:bundle_deal_id] = @bundle_deal.id
-    session[:bundle_discount] = @bundle_deal.savings_amount.to_f
-
-    @current_cart = nil
-
-    redirect_to cart_path, notice: "#{@bundle_deal.title} bundle added to cart! You saved #{@bundle_deal.savings_display}"
-  rescue ActiveRecord::RecordNotFound
-    redirect_to root_path, alert: "Bundle deal not found"
-  end
-
   private
 
   def set_variant

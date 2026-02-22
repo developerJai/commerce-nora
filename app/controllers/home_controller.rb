@@ -7,7 +7,6 @@ class HomeController < ApplicationController
     @hot_selling_products = Product.active.hot_selling.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).limit(8)
     @new_arrivals = Product.active.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).order(created_at: :desc).limit(10)
     @categories = Category.active.root.ordered.includes(image_attachment: :blob).limit(8)
-    @bundle_deals = BundleDeal.visible.limit(3)
 
     # Dynamic hero heading based on active categories
     active_categories = Category.active.root.ordered.pluck(:name)

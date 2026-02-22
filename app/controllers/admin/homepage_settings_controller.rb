@@ -29,8 +29,6 @@ module Admin
         :flash_sale_cta_link, :flash_sale_ends_at,
         :promo_banner_enabled, :promo_banner_title, :promo_banner_heading,
         :promo_banner_code, :promo_banner_cta_text, :promo_banner_cta_link,
-        :bundle_deals_enabled, :bundle_deals_title, :bundle_deals_heading,
-        :bundle_deals_description,
         :gifts_section_enabled, :artisan_section_enabled, :ethnic_section_enabled
       )
     end
