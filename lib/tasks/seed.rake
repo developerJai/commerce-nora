@@ -777,7 +777,19 @@ namespace :seed do
     ]
 
     products_data.each_with_index do |pdata, pidx|
-      product = Product.find_or_create_by!(slug: pdata[:slug]) do |p|
+      variants_attrs = pdata[:variants].map.with_index do |vdata, index|
+        {
+          name: vdata[:name],
+          sku: "#{pdata[:slug].upcase.gsub('-', '')}-#{index + 1}",
+          price: vdata[:price],
+          compare_at_price: vdata[:compare_at_price],
+          stock_quantity: vdata[:stock_quantity],
+          active: true,
+          position: index
+        }
+      end
+
+      Product.find_or_create_by!(slug: pdata[:slug]) do |p|
         p.name = pdata[:name]
         p.description = pdata[:description]
         p.short_description = pdata[:short_description]
@@ -787,17 +799,7 @@ namespace :seed do
         p.featured = pdata[:featured]
         p.hsn_code = default_hsn
         p.vendor_id = target_vendor_id || (vendors.any? ? vendors[pidx % vendors.size].id : nil)
-      end
-
-      pdata[:variants].each_with_index do |vdata, index|
-        ProductVariant.find_or_create_by!(product: product, name: vdata[:name]) do |v|
-          v.sku = "#{product.slug.upcase.gsub('-', '')}-#{index + 1}"
-          v.price = vdata[:price]
-          v.compare_at_price = vdata[:compare_at_price]
-          v.stock_quantity = vdata[:stock_quantity]
-          v.active = true
-          v.position = index
-        end
+        p.variants_attributes = variants_attrs
       end
     end
     puts "  ✓ #{products_data.size} curated products with variants"
@@ -824,7 +826,20 @@ namespace :seed do
         base_price = (1500 + (idx % 25_000)).round(2)
         featured = (idx % 11 == 0)
 
-        product = Product.find_or_create_by!(slug: slug) do |p|
+        variant_count = 2 + (idx % 2)
+        variants_attrs = (1..variant_count).map do |n|
+          {
+            name: "Option #{n}",
+            sku: "#{slug.upcase.gsub('-', '')}-#{n}",
+            price: base_price + ((n - 1) * 500),
+            compare_at_price: (n == 1 && idx % 5 == 0) ? (base_price + 1500) : nil,
+            stock_quantity: 20 + (idx % 80),
+            active: true,
+            position: n - 1
+          }
+        end
+
+        Product.find_or_create_by!(slug: slug) do |p|
           p.name = name
           p.description = "#{name} — designed for everyday elegance with premium finishing and luxurious comfort."
           p.short_description = "#{adjectives[idx % adjectives.size]} #{nouns[idx % nouns.size].downcase}"
@@ -834,19 +849,7 @@ namespace :seed do
           p.featured = featured
           p.hsn_code = default_hsn
           p.vendor_id = target_vendor_id || (vendors.any? ? vendors[idx % vendors.size].id : nil)
-        end
-
-        variant_count = 2 + (idx % 2)
-        (1..variant_count).each do |n|
-          vname = "Option #{n}"
-          ProductVariant.find_or_create_by!(product: product, name: vname) do |v|
-            v.sku = "#{slug.upcase.gsub('-', '')}-#{n}"
-            v.price = base_price + ((n - 1) * 500)
-            v.compare_at_price = (n == 1 && idx % 5 == 0) ? (base_price + 1500) : nil
-            v.stock_quantity = 20 + (idx % 80)
-            v.active = true
-            v.position = n - 1
-          end
+          p.variants_attributes = variants_attrs
         end
       end
       puts "  ✓ #{to_create} bulk products created"
@@ -1072,13 +1075,14 @@ namespace :seed do
 
   # ─────────────────────────────────────────────────────────────
 
-  desc "Run all seed sections in order (homepage → hsn_codes → vendors → products → orders)"
+  desc "Run all seed sections in order (homepage → hsn_codes → vendors → products → orders → razorpay)"
   task all: :environment do
     Rake::Task["seed:homepage"].invoke
     Rake::Task["seed:hsn_codes"].invoke
     Rake::Task["seed:vendors"].invoke
     Rake::Task["seed:products"].invoke
     Rake::Task["seed:orders"].invoke
+    Rake::Task["razorpay:test_config"].invoke
 
     puts ""
     puts "=" * 60
