@@ -28,7 +28,7 @@
             </svg>
             Back to orders
           <% end %>
-          <%= link_to download_invoice_order_path(@order), class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition whitespace-nowrap' do %>
+          <%= link_to invoice_path(@order.order_number), target: '_blank', rel: 'noopener', class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition whitespace-nowrap' do %>
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
@@ -38,30 +38,62 @@
       </div>
 
       <!-- Order Timeline -->
-      <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 mb-6">
-        <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Status</h2>
-        <div class="flex items-center justify-between">
-          <% statuses = ['confirmed', 'processing', 'shipped', 'delivered'] %>
-          <% current_index = statuses.index(@order.status) || -1 %>
-          <% statuses.each_with_index do |status, index| %>
-            <div class="flex flex-col items-center flex-1 <%= index < statuses.length - 1 ? 'relative' : '' %>">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center <%= index <= current_index ? 'bg-rose-800 text-white' : 'bg-stone-200 text-stone-500' %>">
-                <% if index < current_index %>
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                <% else %>
-                  <%= index + 1 %>
-                <% end %>
+      <% unless @order.cancelled? %>
+        <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 mb-6">
+          <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Status</h2>
+          <div class="relative flex items-start justify-between">
+            <% statuses = ['confirmed', 'processing', 'shipped', 'delivered'] %>
+            <% current_index = statuses.index(@order.status) || -1 %>
+            
+            <!-- Progress Bar Background Line -->
+            <div class="absolute top-4 left-0 right-0 h-0.5 bg-stone-200 -z-0"></div>
+            
+            <!-- Progress Bar Fill Line (industry standard: fill up to current step) -->
+            <% if current_index >= 0 %>
+              <div class="absolute top-4 left-0 h-0.5 bg-rose-800 -z-0 transition-all duration-500" style="width: <%= [(current_index.to_f / (statuses.length - 1) * 100), 100].min %>%;"></div>
+            <% end %>
+            
+            <% statuses.each_with_index do |status, index| %>
+              <div class="flex flex-col items-center z-10" style="width: <%= 100.0 / statuses.length %>%;">
+                <!-- Step Circle -->
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 <%= index <= current_index ? 'bg-rose-800 text-white ring-4 ring-rose-100' : 'bg-stone-200 text-stone-500' %>">
+                  <% if index < current_index %>
+                    <!-- Completed step: checkmark -->
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                  <% elsif index == current_index %>
+                    <!-- Current step: filled with number -->
+                    <%= index + 1 %>
+                  <% else %>
+                    <!-- Future step: outlined number -->
+                    <%= index + 1 %>
+                  <% end %>
+                </div>
+                <!-- Step Label -->
+                <p class="mt-3 text-xs text-center font-medium <%= index <= current_index ? 'text-rose-800' : 'text-stone-500' %>">
+                  <%= status.titleize %>
+                </p>
               </div>
-              <p class="mt-2 text-xs text-center font-medium <%= index <= current_index ? 'text-rose-800' : 'text-stone-500' %>"><%= status.titleize %></p>
-              <% if index < statuses.length - 1 %>
-                <div class="absolute top-4 left-1/2 w-full h-0.5 <%= index < current_index ? 'bg-rose-800' : 'bg-stone-200' %>"></div>
-              <% end %>
-            </div>
-          <% end %>
+            <% end %>
+          </div>
         </div>
-      </div>
+      <% else %>
+        <!-- Cancelled Order Status -->
+        <div class="bg-red-50 rounded-xl border border-red-200 p-5 sm:p-6 mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-serif font-semibold text-red-900">Order Cancelled</h2>
+              <p class="text-sm text-red-700">This order has been cancelled and will not be processed.</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
@@ -69,7 +101,10 @@
           <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
             <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Items</h2>
             <ul class="divide-y divide-stone-100">
-              <% @order_items.each do |item| %>
+              <% @order_items.each do |item|
+                tax_rate = item.product_variant&.product&.hsn_code&.gst_rate || 3.0
+                item_tax = (item.total_price.to_f * tax_rate / 100.0).round(2)
+              %>
                 <li class="py-4">
                   <div class="flex items-start gap-4">
                     <div class="w-16 h-16 sm:w-20 sm:h-20 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
@@ -79,10 +114,18 @@
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="font-medium text-stone-900"><%= item.product_name %></p>
-                      <p class="text-sm text-stone-500"><%= item.variant_name %></p>
+                      <p class="text-sm text-stone-500">
+                        <%= item.variant_name %>
+                        <span class="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">
+                          <%= tax_rate %>% GST
+                        </span>
+                      </p>
                       <p class="text-sm text-stone-500">Qty: <%= item.quantity %> × <%= format_price(item.unit_price) %></p>
                     </div>
-                    <p class="font-semibold text-stone-900"><%= format_price(item.total_price) %></p>
+                    <div class="text-right">
+                      <p class="font-semibold text-stone-900"><%= format_price(item.total_price) %></p>
+                      <p class="text-xs text-stone-500">+ <%= format_price(item_tax) %> tax</p>
+                    </div>
                   </div>
                   
                   <% if @can_review && item.product_variant && !@reviewed_variants.include?(item.product_variant.product_id) %>
@@ -132,31 +175,109 @@
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">
                 <span class="text-stone-600">Subtotal</span>
-                <span class="text-stone-900"><%= format_price(@order.subtotal) %></span>
+                <span class="text-stone-900 font-medium"><%= format_price(@order.subtotal) %></span>
               </div>
               <% if @order.discount_amount > 0 %>
                 <div class="flex justify-between text-emerald-600">
-                  <span>Discount</span>
-                  <span>-<%= format_price(@order.discount_amount) %></span>
+                  <span>Discount<%= @order.coupon ? " (#{@order.coupon.code})" : '' %></span>
+                  <span class="font-medium">-<%= format_price(@order.discount_amount) %></span>
                 </div>
               <% end %>
               <div class="flex justify-between">
                 <span class="text-stone-600">Shipping</span>
-                <span class="<%= @order.shipping_amount > 0 ? 'text-stone-900' : 'text-emerald-600 font-medium' %>"><%= @order.shipping_amount > 0 ? format_price(@order.shipping_amount) : 'Free' %></span>
+                <span class="font-medium <%= @order.shipping_amount > 0 ? 'text-stone-900' : 'text-emerald-600' %>"><%= @order.shipping_amount > 0 ? format_price(@order.shipping_amount) : 'Free' %></span>
               </div>
-              <div class="border-t border-stone-200 pt-2 flex justify-between">
-                <span class="font-semibold text-stone-900">Total</span>
-                <span class="font-semibold text-stone-900 text-lg"><%= format_price(@order.total_amount) %></span>
+              <div class="flex justify-between">
+                <span class="text-stone-600">Tax</span>
+                <span class="text-stone-900 font-medium"><%= format_price(@order.tax_amount) %></span>
+              </div>
+              
+              <div class="border-t-2 border-stone-200 pt-2 mt-2 flex justify-between">
+                <span class="font-bold text-stone-900">Total</span>
+                <span class="font-bold text-stone-900 text-lg"><%= format_price(@order.total_amount) %></span>
+              </div>
+              <p class="text-xs text-stone-500 text-right">Inclusive of all taxes</p>
+              
+              <!-- View Detailed Breakdown -->
+              <div class="mt-3 pt-3 border-t border-stone-200">
+                <button type="button" 
+                        id="view-order-breakdown-btn"
+                        class="text-sm text-rose-700 hover:text-rose-900 underline font-medium flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  View detailed pricing breakdown
+                </button>
               </div>
             </div>
 
-            <div class="mt-5 p-4 bg-stone-50 rounded-lg">
-              <p class="text-sm text-stone-600">
-                <span class="font-medium">Payment Method:</span> Cash on Delivery
-              </p>
-              <p class="text-sm text-stone-600 mt-1">
-                <span class="font-medium">Payment Status:</span> <%= @order.payment_status.titleize %>
-              </p>
+            <!-- Payment Info & Actions -->
+            <div class="mt-5 space-y-3">
+              <!-- Payment Method & Status - Compact Layout -->
+              <div class="p-3 bg-stone-50 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <% if @order.payment_method == 'razorpay' %>
+                      <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                      </svg>
+                    <% else %>
+                      <svg class="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z"/>
+                      </svg>
+                    <% end %>
+                    <div>
+                      <p class="text-xs text-stone-500">Payment</p>
+                      <p class="text-sm font-medium text-stone-900">
+                        <% case @order.payment_method %>
+                        <% when 'razorpay' %>
+                          Online (Razorpay)
+                        <% when 'cod' %>
+                          Cash on Delivery
+                        <% else %>
+                          <%= @order.payment_method&.titleize || 'Not specified' %>
+                        <% end %>
+                      </p>
+                    </div>
+                  </div>
+                  <span class="px-2 py-1 rounded text-xs font-medium
+                    <%= case @order.payment_status
+                      when 'paid' then 'bg-emerald-100 text-emerald-700'
+                      when 'pending' then 'bg-amber-100 text-amber-700'
+                      when 'failed' then 'bg-red-100 text-red-700'
+                      else 'bg-stone-100 text-stone-700'
+                    end %>">
+                    <%= @order.payment_status.titleize %>
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Refund Information -->
+              <% if @order.refund_status != 'not_refunded' %>
+                <div class="p-3 bg-stone-50 rounded-lg border border-stone-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <p class="text-xs font-medium text-stone-700">Refund</p>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium
+                      <%= case @order.refund_status
+                        when 'initiated' then 'bg-amber-100 text-amber-700'
+                        when 'paid' then 'bg-emerald-100 text-emerald-700'
+                        when 'failed' then 'bg-red-100 text-red-700'
+                        else 'bg-stone-100 text-stone-700'
+                      end %>">
+                      <%= @order.refund_status.titleize %>
+                    </span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-stone-600">Amount</span>
+                    <span class="text-sm font-bold text-stone-900"><%= format_price(@order.refund_amount) %></span>
+                  </div>
+                  <% if @order.refund_paid_at.present? %>
+                    <p class="text-xs text-stone-500 mt-1">Processed: <%= @order.refund_paid_at.strftime('%b %d, %Y') %></p>
+                  <% elsif @order.refund_initiated_at.present? %>
+                    <p class="text-xs text-stone-500 mt-1">Initiated: <%= @order.refund_initiated_at.strftime('%b %d, %Y') %></p>
+                  <% end %>
+                </div>
+              <% end %>
             </div>
 
             <% if @order.shipped_at.present? %>
@@ -200,32 +321,287 @@
             <% end %>
 
             <% if @order.can_cancel? %>
-              <div class="mt-5 pt-5 border-t border-stone-200">
-                <%= form_with url: cancel_order_path(@order), method: :patch, data: { turbo_confirm: "Are you sure you want to cancel this order? This action cannot be undone." } do |f| %>
-                  <label for="cancellation_reason" class="block text-sm font-medium text-stone-700 mb-2">Reason for cancellation</label>
-                  <select name="cancellation_reason" id="cancellation_reason" required
-                          class="w-full px-3 py-2 text-sm border border-stone-300 rounded-lg bg-white text-stone-700 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 mb-3">
-                    <option value="" disabled selected>Select a reason...</option>
-                    <% Order::CANCELLATION_REASONS.each do |reason| %>
-                      <option value="<%= reason %>"><%= reason %></option>
-                    <% end %>
-                  </select>
-                  <button type="submit"
-                          class="w-full px-4 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition cursor-pointer">
+              <div class="mt-4 pt-4 border-t border-stone-200">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex-1">
+                    <p class="text-xs text-stone-500">Need to cancel?</p>
+                  </div>
+                  <button type="button" id="cancel-order-btn"
+                          class="px-4 py-2 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition cursor-pointer whitespace-nowrap">
                     Cancel Order
                   </button>
-                <% end %>
-                <p class="text-xs text-stone-500 mt-2 text-center">You can cancel before the order is shipped</p>
+                </div>
+              </div>
+
+              <!-- Cancel Order Modal -->
+              <div id="cancel-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                  <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                      <h3 class="text-lg font-semibold text-stone-900">Cancel Order</h3>
+                      <button type="button" id="close-cancel-modal" class="text-stone-400 hover:text-stone-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <p class="text-sm text-stone-600 mb-4">Please tell us why you're cancelling this order:</p>
+
+                    <%= form_with url: cancel_order_path(@order), method: :patch, id: "cancel-order-form" do |f| %>
+                      <div class="mb-4">
+                        <select name="cancellation_reason" id="cancellation_reason" required
+                                class="w-full px-3 py-2.5 text-sm border border-stone-300 rounded-lg bg-white text-stone-700 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400">
+                          <option value="" disabled selected>Select a reason...</option>
+                          <% Order::CANCELLATION_REASONS.each do |reason| %>
+                            <option value="<%= reason %>"><%= reason %></option>
+                          <% end %>
+                        </select>
+                      </div>
+
+                      <% if @order.payment_method == 'razorpay' && @order.payment_status == 'paid' %>
+                        <div class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                          <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div>
+                              <p class="text-sm font-medium text-amber-900">Refund Information</p>
+                              <p class="text-xs text-amber-700 mt-1">
+                                Since you paid online (<%= format_price(@order.total_amount) %>), your refund will be processed to your original payment method within 5-7 business days after the order is cancelled.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      <% end %>
+
+                      <div class="flex gap-3">
+                        <button type="button" id="cancel-modal-cancel"
+                                class="flex-1 px-4 py-2.5 bg-stone-100 text-stone-700 text-sm font-medium rounded-lg hover:bg-stone-200 transition">
+                          Go Back
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
+                          Confirm Cancellation
+                        </button>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
               </div>
             <% end %>
 
-            <div class="mt-5 pt-5 border-t border-stone-200">
-              <p class="text-sm text-stone-500 mb-2">Need help with this order?</p>
-              <%= link_to 'Contact Support', new_support_ticket_path(order_id: @order.id), class: 'text-rose-700 hover:text-rose-900 text-sm font-medium' %>
+            <div class="mt-4 pt-4 border-t border-stone-200">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-stone-500">Need help?</span>
+                <%= link_to new_support_ticket_path(order_id: @order.id), class: 'inline-flex items-center gap-1 text-rose-700 hover:text-rose-900 text-sm font-medium' do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                  </svg>
+                  Support
+                <% end %>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Pricing Breakdown Modal -->
+  <div id="order-breakdown-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <!-- Header -->
+        <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+          <h3 class="text-lg font-semibold text-gray-900">Detailed Pricing Breakdown</h3>
+          <button type="button" id="close-order-breakdown-modal" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-6 space-y-4">
+          <!-- Order Summary -->
+          <div class="bg-gray-50 border rounded-xl p-4">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3">Order Summary</h4>
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Subtotal</span>
+                <span class="font-medium text-gray-900"><%= format_price(@order.subtotal) %></span>
+              </div>
+              <% if @order.discount_amount.to_f > 0 %>
+                <div class="flex justify-between text-sm text-emerald-600">
+                  <span>Discount</span>
+                  <span class="font-medium">-<%= format_price(@order.discount_amount) %></span>
+                </div>
+              <% end %>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Shipping</span>
+                <span class="font-medium text-gray-900"><%= @order.shipping_amount.to_f > 0 ? format_price(@order.shipping_amount) : 'FREE' %></span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tax Details -->
+          <% tax_data = @order.tax_breakdown_display %>
+          <% if tax_data.present? && tax_data["summary"].present? %>
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <h4 class="text-sm font-semibold text-blue-900 mb-3">Tax Details (IGST/CGST+SGST)</h4>
+              <% tax_data["summary"].each do |tax| %>
+                <div class="flex justify-between items-center py-2 border-t border-blue-100 first:border-0 first:pt-0">
+                  <div>
+                    <span class="text-sm text-blue-800">GST @ <%= tax['rate'] %>% (<%= tax['item_count'] %> items)</span>
+                    <span class="text-xs text-blue-600 block">Taxable: <%= format_price(tax['total_taxable']) %></span>
+                  </div>
+                  <span class="text-sm font-medium text-blue-900"><%= format_price(tax['total_tax']) %></span>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+          
+          <!-- Payment Details (for online payments) -->
+          <% if @order.razorpay? && @order.paid? %>
+            <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+              <h4 class="text-sm font-semibold text-indigo-900 mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                Payment Details
+              </h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between items-center">
+                  <span class="text-indigo-700">Payment Method</span>
+                  <span class="font-medium text-indigo-900">Online (Razorpay)</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-indigo-700">Payment Status</span>
+                  <span class="px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700">Paid</span>
+                </div>
+                <% if @order.razorpay_payment_id.present? %>
+                  <div class="pt-2 border-t border-indigo-200">
+                    <span class="text-xs text-indigo-600 block mb-1">Razorpay Payment ID</span>
+                    <span class="font-mono text-sm text-indigo-900 bg-white px-2 py-1 rounded border border-indigo-200 block"><%= @order.razorpay_payment_id %></span>
+                  </div>
+                <% end %>
+                <% if @order.razorpay_order_id.present? %>
+                  <div class="pt-1">
+                    <span class="text-xs text-indigo-600 block mb-1">Razorpay Order ID</span>
+                    <span class="font-mono text-xs text-indigo-700 bg-white px-2 py-1 rounded border border-indigo-200 block"><%= @order.razorpay_order_id %></span>
+                  </div>
+                <% end %>
+                <div class="pt-2 mt-2 border-t border-indigo-200">
+                  <p class="text-xs text-indigo-600">
+                    <span class="font-medium">Note:</span> Please save the Payment ID for your records. This may be required for any payment-related queries or refund requests.
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% elsif @order.cod? %>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <h4 class="text-sm font-semibold text-amber-900 mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z"/>
+                </svg>
+                Payment Details
+              </h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between items-center">
+                  <span class="text-amber-700">Payment Method</span>
+                  <span class="font-medium text-amber-900">Cash on Delivery</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-amber-700">Amount to Pay</span>
+                  <span class="font-medium text-amber-900"><%= format_price(@order.total_amount) %></span>
+                </div>
+                <p class="text-xs text-amber-700 pt-2 border-t border-amber-200">
+                  <span class="font-medium">Note:</span> Please keep exact change ready. Payment will be collected at the time of delivery.
+                </p>
+              </div>
+            </div>
+          <% end %>
+          
+          <!-- Total -->
+          <div class="border-t-2 border-gray-200 pt-4">
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-semibold text-gray-900">Total Amount Paid</span>
+              <span class="text-2xl font-bold text-gray-900"><%= format_price(@order.total_amount) %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing Breakdown Modal JavaScript -->
+  <script>
+    function initOrderPageModals() {
+      // Pricing breakdown modal
+      const breakdownBtn = document.getElementById('view-order-breakdown-btn');
+      const breakdownModal = document.getElementById('order-breakdown-modal');
+      const closeBreakdownBtn = document.getElementById('close-order-breakdown-modal');
+      
+      if (breakdownBtn && breakdownModal) {
+        breakdownBtn.addEventListener('click', function() {
+          breakdownModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        });
+      }
+      
+      if (closeBreakdownBtn && breakdownModal) {
+        closeBreakdownBtn.addEventListener('click', function() {
+          breakdownModal.classList.add('hidden');
+          document.body.style.overflow = '';
+        });
+      }
+      
+      if (breakdownModal) {
+        breakdownModal.addEventListener('click', function(e) {
+          if (e.target === breakdownModal) {
+            breakdownModal.classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+
+      // Cancel modal
+      const cancelBtn = document.getElementById('cancel-order-btn');
+      const cancelModal = document.getElementById('cancel-modal');
+      const closeCancelModal = document.getElementById('close-cancel-modal');
+      const cancelModalBtn = document.getElementById('cancel-modal-cancel');
+
+      if (cancelBtn && cancelModal) {
+        cancelBtn.addEventListener('click', function() {
+          cancelModal.classList.remove('hidden');
+        });
+      }
+
+      if (closeCancelModal && cancelModal) {
+        closeCancelModal.addEventListener('click', function() {
+          cancelModal.classList.add('hidden');
+        });
+      }
+
+      if (cancelModalBtn && cancelModal) {
+        cancelModalBtn.addEventListener('click', function() {
+          cancelModal.classList.add('hidden');
+        });
+      }
+
+      // Close cancel modal when clicking outside
+      if (cancelModal) {
+        cancelModal.addEventListener('click', function(e) {
+          if (e.target === cancelModal) {
+            cancelModal.classList.add('hidden');
+          }
+        });
+      }
+    }
+
+    // Initialize on both initial load and Turbo navigation
+    document.addEventListener('DOMContentLoaded', initOrderPageModals);
+    document.addEventListener('turbo:load', initOrderPageModals);
+  </script>
 </div>

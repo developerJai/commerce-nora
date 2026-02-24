@@ -56,18 +56,24 @@
       <th class="description">Description</th>
       <th class="quantity">Qty</th>
       <th class="unit-price">Unit Price</th>
+      <th class="tax">Tax</th>
       <th class="total">Total</th>
     </tr>
   </thead>
   <tbody>
-    <% @order_items.each do |item| %>
+    <% @order_items.each do |item|
+      tax_rate = item.product_variant&.product&.hsn_code&.gst_rate || 3.0
+      item_tax = (item.total_price.to_f * tax_rate / 100.0).round(2)
+    %>
       <tr>
         <td class="description">
           <%= item.product_name %><br>
           <small style="color: #6b7280;"><%= item.variant_name %></small>
+          <small style="color: #6b7280; display: block;">+ <%= format_price(item_tax) %> tax</small>
         </td>
         <td class="quantity"><%= item.quantity %></td>
         <td class="unit-price"><%= format_price(item.unit_price) %></td>
+        <td class="tax"><%= tax_rate %>% GST</td>
         <td class="total"><%= format_price(item.total_price) %></td>
       </tr>
     <% end %>

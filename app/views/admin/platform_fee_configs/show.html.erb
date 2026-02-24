@@ -1,0 +1,99 @@
+<% content_for(:title) { "Platform Fee Settings" } %>
+
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Platform Fee Settings</h1>
+      <p class="mt-1 text-sm text-gray-500">Configure commission rates and payout thresholds</p>
+    </div>
+    <%= link_to edit_admin_platform_fee_config_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700" do %>
+      ✏️ Edit Settings
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">Current Configuration</h3>
+    </div>
+    <div class="px-4 py-5 sm:px-6">
+      <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+        <div class="bg-indigo-50 rounded-lg p-4">
+          <dt class="text-sm font-medium text-indigo-800">Platform Commission</dt>
+          <dd class="mt-2 text-3xl font-bold text-indigo-900"><%= @config.platform_commission_percent %>%</dd>
+          <dd class="mt-1 text-xs text-indigo-700">Percentage deducted from each order for platform fees</dd>
+        </div>
+
+        <div class="bg-orange-50 rounded-lg p-4">
+          <dt class="text-sm font-medium text-orange-800">Payment Gateway Fee</dt>
+          <dd class="mt-2 text-3xl font-bold text-orange-900"><%= @config.gateway_fee_percent %>%</dd>
+          <dd class="mt-1 text-xs text-orange-700">Razorpay or other payment gateway charges</dd>
+        </div>
+
+        <div class="bg-purple-50 rounded-lg p-4">
+          <dt class="text-sm font-medium text-purple-800">GST on Gateway Fee</dt>
+          <dd class="mt-2 text-3xl font-bold text-purple-900"><%= @config.gateway_gst_percent %>%</dd>
+          <dd class="mt-1 text-xs text-purple-700">GST applied to the gateway fee amount</dd>
+        </div>
+
+        <div class="bg-green-50 rounded-lg p-4">
+          <dt class="text-sm font-medium text-green-800">Total Fee per Order</dt>
+          <dd class="mt-2 text-3xl font-bold text-green-900"><%= @config.platform_commission_percent + @config.gateway_fee_percent + (@config.gateway_fee_percent * @config.gateway_gst_percent / 100) %>%</dd>
+          <dd class="mt-1 text-xs text-green-700">Combined platform + gateway fees (approximate)</dd>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4">
+          <dt class="text-sm font-medium text-gray-800">Minimum Payout</dt>
+          <dd class="mt-2 text-3xl font-bold text-gray-900">₹<%= number_with_precision(@config.minimum_payout_amount, precision: 2) %></dd>
+          <dd class="mt-1 text-xs text-gray-700">Minimum amount vendors can request in a payout</dd>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4">
+          <dt class="text-sm font-medium text-gray-800">Maximum Payout</dt>
+          <dd class="mt-2 text-3xl font-bold text-gray-900">₹<%= number_with_precision(@config.maximum_payout_amount, precision: 2) %></dd>
+          <dd class="mt-1 text-xs text-gray-700">Maximum amount vendors can request in a payout</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Fee Calculation Example -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">Fee Calculation Example</h3>
+      <p class="mt-1 text-sm text-gray-500">How fees are calculated for a sample order of ₹1,000</p>
+    </div>
+    <div class="p-6">
+      <% example_total = 1000 %>
+      <% platform_fee = example_total * @config.platform_commission_percent / 100 %>
+      <% gateway_fee = example_total * @config.gateway_fee_percent / 100 %>
+      <% gateway_gst = gateway_fee * @config.gateway_gst_percent / 100 %>
+      <% total_fees = platform_fee + gateway_fee + gateway_gst %>
+      <% vendor_earnings = example_total - total_fees %>
+
+      <div class="space-y-4">
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+          <span class="font-medium text-gray-700">Order Total</span>
+          <span class="font-bold text-gray-900">₹<%= number_with_precision(example_total, precision: 2) %></span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-red-50 rounded">
+          <span class="text-red-700">Platform Fee (<%= @config.platform_commission_percent %>%)</span>
+          <span class="font-bold text-red-700">-₹<%= number_with_precision(platform_fee, precision: 2) %></span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-red-50 rounded">
+          <span class="text-red-700">Gateway Fee (<%= @config.gateway_fee_percent %>%)</span>
+          <span class="font-bold text-red-700">-₹<%= number_with_precision(gateway_fee, precision: 2) %></span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-red-50 rounded">
+          <span class="text-red-700">GST on Gateway (<%= @config.gateway_gst_percent %>%)</span>
+          <span class="font-bold text-red-700">-₹<%= number_with_precision(gateway_gst, precision: 2) %></span>
+        </div>
+        <div class="border-t-2 border-gray-300 pt-4">
+          <div class="flex justify-between items-center p-4 bg-green-50 rounded-lg border-2 border-green-200">
+            <span class="font-bold text-green-800 text-lg">Vendor Receives</span>
+            <span class="font-bold text-green-900 text-2xl">₹<%= number_with_precision(vendor_earnings, precision: 2) %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

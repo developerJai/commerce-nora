@@ -1,0 +1,98 @@
+<% content_for(:title) { "Edit Fee Settings" } %>
+
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-gray-900">Edit Platform Fee Settings</h1>
+    <%= link_to admin_platform_fee_config_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+      ← Cancel
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg">
+    <%= form_with model: @config, url: admin_platform_fee_config_path, method: :patch, class: "space-y-6 p-6" do |f| %>
+      <% if @config.errors.any? %>
+        <div class="rounded-md bg-red-50 p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">There were <%= pluralize(@config.errors.count, "error") %> with your submission</h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="list-disc pl-5 space-y-1">
+                  <% @config.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+        <div>
+          <%= f.label :platform_commission_percent, "Platform Commission (%)", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <%= f.number_field :platform_commission_percent, step: 0.01, min: 0, max: 100, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md" %>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 sm:text-sm">%</span>
+            </div>
+          </div>
+          <p class="mt-1 text-xs text-gray-500">Percentage charged on each order as platform commission</p>
+        </div>
+
+        <div>
+          <%= f.label :gateway_fee_percent, "Gateway Fee (%)", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <%= f.number_field :gateway_fee_percent, step: 0.01, min: 0, max: 100, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md" %>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 sm:text-sm">%</span>
+            </div>
+          </div>
+          <p class="mt-1 text-xs text-gray-500">Payment gateway fee (Razorpay, etc.)</p>
+        </div>
+
+        <div>
+          <%= f.label :gateway_gst_percent, "GST on Gateway Fee (%)", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <%= f.number_field :gateway_gst_percent, step: 0.01, min: 0, max: 100, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md" %>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 sm:text-sm">%</span>
+            </div>
+          </div>
+          <p class="mt-1 text-xs text-gray-500">GST applied to the gateway fee</p>
+        </div>
+
+        <div>
+          <%= f.label :minimum_payout_amount, "Minimum Payout Amount (₹)", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 sm:text-sm">₹</span>
+            </div>
+            <%= f.number_field :minimum_payout_amount, step: 0.01, min: 1, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md" %>
+          </div>
+          <p class="mt-1 text-xs text-gray-500">Minimum amount vendors can request</p>
+        </div>
+
+        <div>
+          <%= f.label :maximum_payout_amount, "Maximum Payout Amount (₹)", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 sm:text-sm">₹</span>
+            </div>
+            <%= f.number_field :maximum_payout_amount, step: 0.01, min: 1, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md" %>
+          </div>
+          <p class="mt-1 text-xs text-gray-500">Maximum amount vendors can request</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <%= link_to "Cancel", admin_platform_fee_config_path, class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+        <%= f.submit "Save Settings", class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -3,7 +3,9 @@
 <div class="space-y-6">
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-bold text-gray-900">Orders</h1>
-    <%= link_to 'Create Draft', new_admin_draft_order_path, class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700' %>
+    <% if admin_role? && !vendor_context? %>
+      <%= link_to 'Create Draft', new_admin_draft_order_path, class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700' %>
+    <% end %>
   </div>
 
   <!-- Status Filter -->

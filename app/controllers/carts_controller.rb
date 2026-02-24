@@ -5,6 +5,13 @@ class CartsController < ApplicationController
   def show
     @cart = current_cart
     @cart_items = @cart.cart_items.includes(product_variant: [ :product, image_attachment: :blob ])
+
+    # Check if cart has multiple vendors
+    @vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
+    @multi_vendor = @vendor_ids.size > 1
+
+    # Check if coupons are enabled in settings
+    @coupons_enabled = StoreSetting.instance.coupons_enabled?
   end
 
   def coupons

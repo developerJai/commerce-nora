@@ -1,118 +1,264 @@
-<% content_for(:title) { "Store Filter Settings" } %>
+<% content_for(:title) { "Store Settings" } %>
 
 <div class="max-w-3xl">
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Storefront Filter Settings</h1>
-    <p class="mt-1 text-sm text-gray-500">Choose which filter components are visible to customers on the product listing page.</p>
+    <h1 class="text-2xl font-bold text-gray-900">Store Settings</h1>
+    <p class="mt-1 text-sm text-gray-500">Configure store filters and payment methods.</p>
   </div>
 
   <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, class: "space-y-6" do |f| %>
-    <div class="bg-white shadow rounded-lg divide-y divide-gray-100">
-      <%
-        config = @store_setting.effective_filter_config
-        filter_items = [
-          {
-            key: "show_availability",
-            label: "In Stock Toggle",
-            description: "Let customers filter to see only products that are currently in stock.",
-            icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          },
-          {
-            key: "show_categories",
-            label: "Categories",
-            description: "Show parent category checkboxes so customers can browse by product type.",
-            icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-          },
-          {
-            key: "show_subcategories",
-            label: "Subcategories",
-            description: "Expand parent categories to reveal nested subcategories. Requires 'Categories' to be enabled.",
-            icon: "M4 6h16M4 10h16M4 14h16M4 18h16",
-            depends_on: "show_categories"
-          },
-          {
-            key: "show_price_range",
-            label: "Price Range",
-            description: "Dual-slider that lets customers set minimum and maximum price bounds.",
-            icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          },
-          {
-            key: "show_color",
-            label: "Color Swatches",
-            description: "Color chip badges with visual swatches and faceted product counts.",
-            icon: "M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-          },
-          {
-            key: "show_material",
-            label: "Material",
-            description: "Checkbox list of base materials (e.g., Brass, Alloy, Copper) with product counts.",
-            icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-          },
-          {
-            key: "show_stone_type",
-            label: "Stone Type / Gemstone",
-            description: "Checkbox list of stone types (e.g., AD Stone, CZ, Pearl) with product counts.",
-            icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-          },
-          {
-            key: "show_occasion",
-            label: "Occasion",
-            description: "Checkbox list of occasions (e.g., Wedding, Daily Wear, Festival) with product counts.",
-            icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          },
-          {
-            key: "show_discount",
-            label: "Discount",
-            description: "Radio buttons to filter by minimum discount percentage (10%, 20%, etc.).",
-            icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-          },
-          {
-            key: "show_rating",
-            label: "Customer Rating",
-            description: "Radio buttons to filter by minimum star rating (2★, 3★, 4★ & above).",
-            icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-          }
-        ]
-      %>
+    
+    <!-- Company Details Section -->
+    <div>
+      <h2 class="text-lg font-bold text-gray-900 mb-4">Company Details</h2>
+      <p class="text-sm text-gray-500 mb-4">Company information used on invoices and tax documents.</p>
+      
+      <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <div>
+          <%= f.label :gst_number, "Company GST Number", class: "block text-sm font-semibold text-gray-900 mb-1" %>
+          <%= f.text_field :gst_number, 
+              placeholder: "e.g., 27AABCU9603R1ZX",
+              class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+          <p class="text-xs text-gray-500 mt-1">15-digit GST identification number displayed on all invoices.</p>
+        </div>
 
-      <% filter_items.each do |item| %>
-        <div class="px-5 py-4 flex items-start gap-4 group hover:bg-gray-50 transition-colors">
-          <!-- Icon -->
+        <div>
+          <%= f.label :company_address, "Company Address", class: "block text-sm font-semibold text-gray-900 mb-1" %>
+          <%= f.text_area :company_address, 
+              rows: 3,
+              placeholder: "Full company address for invoices...",
+              class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+        </div>
+
+        <div>
+          <%= f.label :company_phone, "Company Phone", class: "block text-sm font-semibold text-gray-900 mb-1" %>
+          <%= f.text_field :company_phone, 
+              placeholder: "e.g., +91 98765 43210",
+              class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coupon Settings Section -->
+    <div class="mt-8">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">Coupon Settings</h2>
+      <p class="text-sm text-gray-500 mb-4">Configure coupon code functionality for customers.</p>
+      
+      <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex items-start gap-4">
           <div class="flex-shrink-0 mt-0.5">
-            <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>"/>
+            <div class="w-9 h-9 rounded-lg bg-rose-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
               </svg>
             </div>
           </div>
 
-          <!-- Label + Description -->
           <div class="flex-1 min-w-0">
-            <label for="filter_<%= item[:key] %>" class="text-sm font-semibold text-gray-900 cursor-pointer">
-              <%= item[:label] %>
-            </label>
-            <p class="text-xs text-gray-500 mt-0.5 leading-relaxed"><%= item[:description] %></p>
-            <% if item[:depends_on] %>
-              <p class="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Requires "<%= filter_items.find { |fi| fi[:key] == item[:depends_on] }&.dig(:label) %>" to be enabled
-              </p>
-            <% end %>
+            <span class="text-sm font-semibold text-gray-900">
+              Enable Coupon Codes
+            </span>
+            <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">
+              Allow customers to apply coupon codes in the shopping cart. When enabled, customers can enter coupon codes like SAVE20 to get discounts. 
+              <span class="text-amber-600 font-medium">Note: Coupons are automatically disabled for multi-vendor orders to prevent calculation issues.</span>
+            </p>
           </div>
 
-          <!-- Toggle Switch -->
           <div class="flex-shrink-0 pt-1">
-            <label for="filter_<%= item[:key] %>" class="relative inline-flex items-center cursor-pointer">
-              <%= check_box_tag "store_setting[filter_config][#{item[:key]}]", "1",
-                  config[item[:key]],
-                  id: "filter_#{item[:key]}",
-                  class: "sr-only peer" %>
-              <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+            <%= f.label :enable_coupons, class: "relative inline-flex items-center cursor-pointer" do %>
+              <%= f.check_box :enable_coupons,
+                  { checked: @store_setting.coupons_enabled?,
+                    class: "sr-only peer" },
+                  "1", "0" %>
+              <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-rose-600 transition-colors duration-200"></div>
               <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
-            </label>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Methods Section -->
+    <div class="mt-8">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">Payment Methods</h2>
+      <p class="text-sm text-gray-500 mb-4">Enable or disable payment options available at checkout.</p>
+      
+      <div class="bg-white shadow rounded-lg divide-y divide-gray-100">
+        <%
+          payment_config = @store_setting.effective_payment_config
+          payment_items = [
+            {
+              key: "enable_razorpay",
+              label: "Online Payments (Razorpay)",
+              description: "Allow customers to pay via UPI, Credit/Debit Cards, Netbanking, and Wallets through Razorpay.",
+              icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z",
+              color: "blue"
+            },
+            {
+              key: "enable_cod",
+              label: "Cash on Delivery",
+              description: "Allow customers to pay with cash or UPI when they receive their order.",
+              icon: "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z",
+              color: "amber"
+            }
+          ]
+        %>
+
+        <% payment_items.each do |item| %>
+          <div class="px-5 py-4 flex items-start gap-4 group hover:bg-gray-50 transition-colors">
+            <div class="flex-shrink-0 mt-0.5">
+              <div class="w-9 h-9 rounded-lg bg-<%= item[:color] %>-50 flex items-center justify-center group-hover:bg-<%= item[:color] %>-100 transition-colors">
+                <svg class="w-5 h-5 text-<%= item[:color] %>-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <label for="payment_<%= item[:key] %>" class="text-sm font-semibold text-gray-900 cursor-pointer">
+                <%= item[:label] %>
+              </label>
+              <p class="text-xs text-gray-500 mt-0.5 leading-relaxed"><%= item[:description] %></p>
+            </div>
+
+            <div class="flex-shrink-0 pt-1">
+              <label for="payment_<%= item[:key] %>" class="relative inline-flex items-center cursor-pointer">
+                <%= check_box_tag "store_setting[payment_config][#{item[:key]}]", "1",
+                    payment_config[item[:key]],
+                    id: "payment_#{item[:key]}",
+                    class: "sr-only peer" %>
+                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-<%= item[:color] %>-600 transition-colors duration-200"></div>
+                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
+              </label>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <% if !@store_setting.any_payment_method_enabled? %>
+        <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-red-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+              <p class="text-sm font-semibold text-red-800">Warning: No Payment Methods Enabled</p>
+              <p class="text-xs text-red-700 mt-1">Customers will not be able to place orders. Please enable at least one payment method.</p>
+            </div>
           </div>
         </div>
       <% end %>
+    </div>
+
+    <!-- Storefront Filters Section -->
+    <div class="mt-8">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">Storefront Filters</h2>
+      <p class="text-sm text-gray-500 mb-4">Choose which filter components are visible to customers on the product listing page.</p>
+
+      <div class="bg-white shadow rounded-lg divide-y divide-gray-100">
+        <%
+          config = @store_setting.effective_filter_config
+          filter_items = [
+            {
+              key: "show_availability",
+              label: "In Stock Toggle",
+              description: "Let customers filter to see only products that are currently in stock.",
+              icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            },
+            {
+              key: "show_categories",
+              label: "Categories",
+              description: "Show parent category checkboxes so customers can browse by product type.",
+              icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+            },
+            {
+              key: "show_subcategories",
+              label: "Subcategories",
+              description: "Expand parent categories to reveal nested subcategories. Requires 'Categories' to be enabled.",
+              icon: "M4 6h16M4 10h16M4 14h16M4 18h16",
+              depends_on: "show_categories"
+            },
+            {
+              key: "show_price_range",
+              label: "Price Range",
+              description: "Dual-slider that lets customers set minimum and maximum price bounds.",
+              icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            },
+            {
+              key: "show_color",
+              label: "Color Swatches",
+              description: "Color chip badges with visual swatches and faceted product counts.",
+              icon: "M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v2a4 4 0 01-4 4H4a2 2 0 01-2-2v-2.343c0-.89.32-1.733.89-2.404l3.535-3.535a4 4 0 015.657 0l.707.707M7 7h.01"
+            },
+            {
+              key: "show_material",
+              label: "Material",
+              description: "Checkbox list of base materials (e.g., Brass, Alloy, Copper) with product counts.",
+              icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+            },
+            {
+              key: "show_stone_type",
+              label: "Stone Type / Gemstone",
+              description: "Checkbox list of stone types (e.g., AD Stone, CZ, Pearl) with product counts.",
+              icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            },
+            {
+              key: "show_occasion",
+              label: "Occasion",
+              description: "Checkbox list of occasions (e.g., Wedding, Daily Wear, Festival) with product counts.",
+              icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            },
+            {
+              key: "show_discount",
+              label: "Discount",
+              description: "Radio buttons to filter by minimum discount percentage (10%, 20%, etc.).",
+              icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+            },
+            {
+              key: "show_rating",
+              label: "Customer Rating",
+              description: "Radio buttons to filter by minimum star rating (2★, 3★, 4★ & above).",
+              icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+            }
+          ]
+        %>
+
+        <% filter_items.each do |item| %>
+          <div class="px-5 py-4 flex items-start gap-4 group hover:bg-gray-50 transition-colors">
+            <div class="flex-shrink-0 mt-0.5">
+              <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <label for="filter_<%= item[:key] %>" class="text-sm font-semibold text-gray-900 cursor-pointer">
+                <%= item[:label] %>
+              </label>
+              <p class="text-xs text-gray-500 mt-0.5 leading-relaxed"><%= item[:description] %></p>
+              <% if item[:depends_on] %>
+                <p class="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  Requires "<%= filter_items.find { |fi| fi[:key] == item[:depends_on] }&.dig(:label) %>" to be enabled
+                </p>
+              <% end %>
+            </div>
+
+            <div class="flex-shrink-0 pt-1">
+              <label for="filter_<%= item[:key] %>" class="relative inline-flex items-center cursor-pointer">
+                <%= check_box_tag "store_setting[filter_config][#{item[:key]}]", "1",
+                    config[item[:key]],
+                    id: "filter_#{item[:key]}",
+                    class: "sr-only peer" %>
+                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
+              </label>
+            </div>
+          </div>
+        <% end %>
+      </div>
     </div>
 
     <!-- Save button -->

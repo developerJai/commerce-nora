@@ -16,7 +16,7 @@
 <body class="h-full bg-gray-100" data-controller="sidebar">
   <div class="min-h-full">
     <!-- Sidebar -->
-    <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0" 
+    <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0 overflow-y-auto" 
            data-sidebar-target="sidebar"
            id="sidebar">
       <!-- Logo -->
@@ -50,16 +50,18 @@
           <%= render 'admin/shared/sidebar_link', path: admin_categories_path, icon: 'categories', label: 'Categories', active: controller_name == 'categories' %>
         <% end %>
         <%= render 'admin/shared/sidebar_link', path: admin_inventory_index_path, icon: 'inventory', label: 'Inventory', active: controller_name == 'inventory' %>
-        <% if admin_role? %>
-          <%= render 'admin/shared/sidebar_link', path: admin_banners_path, icon: 'banners', label: 'Banners', active: controller_name == 'banners' %>
-          <%= render 'admin/shared/sidebar_link', path: admin_homepage_collections_path, icon: 'collections', label: 'Collections', active: controller_name.in?(['homepage_collections', 'homepage_collection_items']) %>
-          <%= render 'admin/shared/sidebar_link', path: admin_homepage_settings_path, icon: 'settings', label: 'Homepage', active: controller_name == 'homepage_settings' %>
-        <% end %>
 
         <div class="pt-4">
           <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Sales</p>
         </div>
-        <%= render 'admin/shared/sidebar_link', path: admin_orders_path, icon: 'orders', label: 'Orders', active: controller_name == 'orders' && action_name != 'drafts' %>
+        <%= render 'admin/shared/sidebar_link', path: admin_orders_path, icon: 'orders', label: 'Orders', active: controller_name == 'orders' && action_name != 'drafts' && action_name != 'refunds' %>
+        <% if admin_role? %>
+          <%= render 'admin/shared/sidebar_link', path: admin_checkout_sessions_path, icon: 'payments', label: 'Checkout Sessions', active: controller_name == 'checkout_sessions' %>
+        <% end %>
+        <% if admin_role? %>
+          <% pending_refunds = Order.placed.where(refund_status: 'initiated').count %>
+          <%= render 'admin/shared/sidebar_link', path: refunds_admin_orders_path, icon: 'refunds', label: 'Refunds', active: controller_name == 'orders' && action_name == 'refunds', badge: pending_refunds > 0 ? pending_refunds : nil %>
+        <% end %>
         <% if admin_role? %>
           <%= render 'admin/shared/sidebar_link', path: admin_draft_orders_path, icon: 'draft', label: 'Draft Orders', active: controller_name == 'draft_orders' %>
           <%= render 'admin/shared/sidebar_link', path: admin_coupons_path, icon: 'coupons', label: 'Coupons', active: controller_name == 'coupons' %>
@@ -80,13 +82,42 @@
         <%= render 'admin/shared/sidebar_link', path: admin_reviews_path, icon: 'reviews', label: 'Reviews', active: controller_name == 'reviews' %>
         <%= render 'admin/shared/sidebar_link', path: admin_support_tickets_path, icon: 'support', label: 'Support', active: controller_name == 'support_tickets' %>
         
+        <% if vendor_role? || session[:acting_as_vendor_id] %>
+          <div class="pt-4">
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Earnings</p>
+          </div>
+          <%= render 'admin/shared/sidebar_link', path: admin_vendor_earnings_path, icon: 'earnings', label: 'My Earnings', active: controller_name == 'vendor_earnings' && action_name == 'index' %>
+          <%= render 'admin/shared/sidebar_link', path: admin_payouts_vendor_earnings_path, icon: 'payouts', label: 'Payout History', active: controller_name == 'vendor_earnings' && action_name == 'payouts' %>
+        <% end %>
+
         <% if admin_role? %>
+          <div class="pt-4">
+            <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Settings</p>
+          </div>
+          
+          <div class="px-3 py-1">
+            <p class="text-xs text-slate-500 uppercase tracking-wider">Homepage</p>
+          </div>
+          <%= render 'admin/shared/sidebar_link', path: admin_banners_path, icon: 'banners', label: 'Banners', active: controller_name == 'banners' %>
+          <%= render 'admin/shared/sidebar_link', path: admin_homepage_collections_path, icon: 'collections', label: 'Collections', active: controller_name.in?(['homepage_collections', 'homepage_collection_items']) %>
+          <%= render 'admin/shared/sidebar_link', path: admin_homepage_settings_path, icon: 'settings', label: 'Homepage Sections', active: controller_name == 'homepage_settings' %>
+          
+          <div class="px-3 py-1 mt-2">
+            <p class="text-xs text-slate-500 uppercase tracking-wider">Store</p>
+          </div>
+          <%= render 'admin/shared/sidebar_link', path: admin_store_settings_path, icon: 'store_settings', label: 'Storefront', active: controller_name == 'store_settings' %>
+          
+          <div class="px-3 py-1 mt-2">
+            <p class="text-xs text-slate-500 uppercase tracking-wider">Platform</p>
+          </div>
+          <%= render 'admin/shared/sidebar_link', path: admin_platform_fee_config_path, icon: 'settings', label: 'Fee Settings', active: controller_name == 'platform_fee_configs' %>
+          <%= render 'admin/shared/sidebar_link', path: admin_payouts_path, icon: 'payouts', label: 'Payouts', active: controller_name == 'payouts' %>
+
           <div class="pt-4">
             <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Management</p>
           </div>
           <%= render 'admin/shared/sidebar_link', path: admin_vendors_path, icon: 'vendors', label: 'Vendors', active: controller_name == 'vendors' %>
           <%= render 'admin/shared/sidebar_link', path: admin_hsn_codes_path, icon: 'hsn', label: 'HSN Codes', active: controller_name == 'hsn_codes' %>
-          <%= render 'admin/shared/sidebar_link', path: admin_store_settings_path, icon: 'store_settings', label: 'Store Filters', active: controller_name == 'store_settings' %>
 
           <div class="pt-4">
             <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Analytics</p>

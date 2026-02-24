@@ -1,0 +1,234 @@
+<% content_for(:title) { "Review Order" } %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+  <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 mb-6 sm:mb-8">Review Your Order</h1>
+
+  <%= form_with url: checkout_path, method: :post, id: "checkout-form" do |f| %>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Shipping Address -->
+        <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-serif font-semibold text-stone-900">Shipping Address</h2>
+            <%= link_to 'Change', address_checkout_path, class: 'text-sm text-rose-700 hover:text-rose-900 font-medium' %>
+          </div>
+          <div class="p-4 bg-stone-50 rounded-lg">
+            <p class="font-medium text-stone-900"><%= @address.full_name %></p>
+            <p class="text-stone-600 text-sm mt-1"><%= @address.full_address %></p>
+            <% if @address.phone.present? %>
+              <p class="text-stone-600 text-sm"><%= @address.phone %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+          <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Payment Method</h2>
+          
+          <div class="space-y-3">
+            <label class="flex items-center p-4 border border-stone-200 rounded-lg cursor-pointer hover:bg-stone-50 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50">
+              <%= f.radio_button :payment_method, 'cod', checked: true, class: 'h-4 w-4 text-rose-600 border-stone-300 focus:ring-rose-500', id: 'payment_cod' %>
+              <div class="ml-3 flex-1">
+                <div class="flex items-center">
+                  <span class="font-medium text-stone-900">Cash on Delivery</span>
+                  <span class="ml-auto text-xs text-stone-500">Pay when you receive</span>
+                </div>
+                <p class="text-sm text-stone-600 mt-1">Pay with cash/UPI when your order is delivered</p>
+              </div>
+            </label>
+
+            <label class="flex items-center p-4 border border-stone-200 rounded-lg cursor-pointer hover:bg-stone-50 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50">
+              <%= f.radio_button :payment_method, 'razorpay', class: 'h-4 w-4 text-rose-600 border-stone-300 focus:ring-rose-500', id: 'payment_razorpay' %>
+              <div class="ml-3 flex-1">
+                <div class="flex items-center">
+                  <span class="font-medium text-stone-900">Pay Online</span>
+                  <span class="ml-auto text-xs text-stone-500">UPI, Card, Netbanking</span>
+                </div>
+                <p class="text-sm text-stone-600 mt-1">Secure payment via Razorpay</p>
+              </div>
+              <div class="ml-4 flex-shrink-0">
+                <svg class="h-6 w-auto" viewBox="0 0 100 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <text x="0" y="22" fill="#072654" font-size="16" font-weight="bold">Razorpay</text>
+                </svg>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+          <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Items</h2>
+          <ul class="divide-y divide-stone-100">
+            <% @cart.cart_items.each do |item| %>
+              <li class="py-4 flex items-center gap-4">
+                <div class="w-16 h-16 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
+                  <% if item.product_variant.product.images.attached? %>
+                    <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
+                  <% end %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium text-stone-900"><%= item.product_variant.product.name %></p>
+                  <p class="text-sm text-stone-500"><%= item.product_variant.name %> × <%= item.quantity %></p>
+                </div>
+                <p class="font-medium text-stone-900"><%= format_price(item.total_price) %></p>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+
+        <!-- Order Notes -->
+        <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+          <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Notes (Optional)</h2>
+          <%= f.text_area :notes, rows: 3, placeholder: 'Any special instructions for your order...', 
+              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 lg:sticky lg:top-24">
+          <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Summary</h2>
+          
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-stone-600">Subtotal</span>
+              <span class="text-stone-900"><%= format_price(@subtotal) %></span>
+            </div>
+            <% if @discount > 0 %>
+              <div class="flex justify-between text-emerald-600">
+                <span>Discount (<%= @coupon.code %>)</span>
+                <span>-<%= format_price(@discount) %></span>
+              </div>
+            <% end %>
+            <div class="flex justify-between">
+              <span class="text-stone-600">Shipping</span>
+              <span class="<%= @shipping.to_f > 0 ? 'text-stone-900' : 'text-emerald-600 font-medium' %>"><%= @shipping.to_f > 0 ? format_price(@shipping) : 'Free' %></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-600">Tax</span>
+              <span class="text-stone-900"><%= format_price(@tax) %></span>
+            </div>
+            <div class="border-t border-stone-200 pt-2 flex justify-between">
+              <span class="font-semibold text-stone-900">Total</span>
+              <span class="font-semibold text-stone-900 text-lg"><%= format_price(@total) %></span>
+            </div>
+          </div>
+
+          <div id="payment-info" class="mt-5 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p class="text-sm text-amber-800">
+              <span class="font-medium" id="payment-title">Cash on Delivery:</span>
+              <span id="payment-desc">Pay when you receive your order</span>
+            </p>
+          </div>
+
+          <%= f.submit 'Place Order', id: 'place-order-btn', class: 'mt-5 w-full py-3 px-4 bg-rose-800 text-white font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer' %>
+          
+          <p class="mt-4 text-xs text-stone-500 text-center">
+            By placing this order, you agree to our Terms of Service and Privacy Policy
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- Razorpay Checkout Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('checkout-form');
+    const placeOrderBtn = document.getElementById('place-order-btn');
+    const paymentCod = document.getElementById('payment_cod');
+    const paymentRazorpay = document.getElementById('payment_razorpay');
+    const paymentInfo = document.getElementById('payment-info');
+    const paymentTitle = document.getElementById('payment-title');
+    const paymentDesc = document.getElementById('payment-desc');
+
+    // Update payment info when selection changes
+    function updatePaymentInfo() {
+      if (paymentRazorpay.checked) {
+        paymentInfo.className = 'mt-5 p-4 bg-blue-50 border border-blue-200 rounded-lg';
+        paymentTitle.textContent = 'Online Payment:';
+        paymentDesc.textContent = 'Secure payment via Razorpay (UPI, Card, Netbanking)';
+        placeOrderBtn.value = 'Pay Securely';
+      } else {
+        paymentInfo.className = 'mt-5 p-4 bg-amber-50 border border-amber-200 rounded-lg';
+        paymentTitle.textContent = 'Cash on Delivery:';
+        paymentDesc.textContent = 'Pay when you receive your order';
+        placeOrderBtn.value = 'Place Order';
+      }
+    }
+
+    paymentCod.addEventListener('change', updatePaymentInfo);
+    paymentRazorpay.addEventListener('change', updatePaymentInfo);
+
+    form.addEventListener('submit', async function(e) {
+      if (paymentRazorpay.checked) {
+        e.preventDefault();
+        placeOrderBtn.disabled = true;
+        placeOrderBtn.textContent = 'Processing...';
+
+        try {
+          const formData = new FormData(form);
+          
+          const response = await fetch('/checkout', {
+            method: 'POST',
+            headers: {
+              'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
+              'Accept': 'application/json'
+            },
+            body: formData
+          });
+
+          const data = await response.json();
+
+          if (!data.success) {
+            alert('Error: ' + (data.error || 'Something went wrong'));
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.textContent = 'Pay Securely';
+            return;
+          }
+
+          // Initialize Razorpay checkout
+          const options = {
+            key: data.razorpay_key,
+            order_id: data.orders[0].order_id,
+            amount: data.orders[0].amount,
+            currency: 'INR',
+            name: data.orders[0].name,
+            description: data.orders[0].description,
+            prefill: data.orders[0].prefill,
+            notes: data.orders[0].notes,
+            theme: {
+              color: '#9f1239' // rose-800
+            },
+            handler: function(response) {
+              // Payment successful
+              window.location.href = `/razorpay/success?razorpay_payment_id=${response.razorpay_payment_id}&razorpay_order_id=${response.razorpay_order_id}&razorpay_signature=${response.razorpay_signature}`;
+            },
+            modal: {
+              ondismiss: function() {
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.textContent = 'Pay Securely';
+              }
+            }
+          };
+
+          const rzp = new Razorpay(options);
+
+          rzp.on('payment.failed', function(response) {
+            window.location.href = `/razorpay/failure?razorpay_order_id=${response.error.metadata.order_id}&error_description=${encodeURIComponent(response.error.description)}`;
+          });
+
+          rzp.open();
+
+        } catch (error) {
+          console.error('Payment error:', error);
+          alert('Something went wrong. Please try again.');
+          placeOrderBtn.disabled = false;
+          placeOrderBtn.textContent = 'Pay Securely';
+        }
+      }
+    });
+  });
+</script>

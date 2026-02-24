@@ -64,22 +64,36 @@ Both authenticate as `AdminUser`. Vendors at `/vendor/login`, admins at `/admin/
 | `HomepageCollection` | has_many :items; layout_type: grid_4/grid_3/grid_2/bento/asymmetric |
 | `HomepageCollectionItem` | belongs_to :homepage_collection; has_one_attached :image |
 | `Customer` | has_secure_password; has_many :addresses, :orders, :reviews, :wishlists |
-| `Order` | lifecycle: pending→confirmed→processing→shipped→delivered; HSN tax; split by vendor |
+| `Order` | lifecycle: pending→confirmed→processing→shipped→delivered; belongs_to :checkout_session; HSN tax; split by vendor; fee breakdown (platform/gateway/gst); vendor_earnings; refund_status |
 | `OrderItem` | denormalized vendor_id |
 | `Cart` / `CartItem` | token-based; optional customer |
 | `Coupon` | percentage or fixed; usage tracking |
 | `Review` | moderated; updates product average_rating |
 | `SupportTicket` / `TicketMessage` | customer↔vendor↔admin; polymorphic sender |
+| `CheckoutSession` | groups multiple vendor orders under one payment; tracks payment/refund state |
 | `StoreSetting` | singleton; `filter_config` JSONB controls storefront filter visibility |
 
 All models include `SoftDeletable` concern.
 
-### Order Splitting at Checkout
+### Multi-Vendor Order & Payment System
 
-Cart items grouped by `product.vendor_id`. One order per vendor:
-- Shared `checkout_batch_id` links orders from same checkout
-- Coupon discount proportional per vendor subtotal
-- Tax per item's `hsn_code.gst_rate` (default 3%)
+**Architecture**: One customer payment covers multiple vendor orders (Amazon/Flipkart style)
+
+**Flow**:
+1. Cart items grouped by `product.vendor_id`
+2. One `Order` created per vendor
+3. Single `CheckoutSession` groups all orders
+4. One Razorpay payment for total amount
+5. Each vendor manages their order independently
+6. Partial refunds supported (cancel individual orders)
+7. Per-vendor payouts with fee deductions
+
+**Key Models**:
+- `CheckoutSession` - Groups orders, tracks payment state
+- `Order` - Per-vendor order with fee breakdown
+- `PaymentLog` - Audit trail per order
+
+**See**: [multi-vendor-payments](../multi-vendor-payments/SKILL.md) for detailed architecture
 
 ### Homepage (`HomeController#index`)
 
@@ -123,6 +137,7 @@ lib/tasks/                  — seed tasks
 
 Detailed documentation for major features lives in separate skill files:
 
+- **[multi-vendor-payments](../multi-vendor-payments/SKILL.md)** — Multi-vendor checkout, single payment for multiple orders, Razorpay integration, partial refunds, per-vendor payouts, fee calculations
 - **[category-attributes](../category-attributes/SKILL.md)** — Dynamic attribute config system, per-category options, dual storage, form loading, admin config editor
 - **[product-variants](../product-variants/SKILL.md)** — Product/variant creation, inline default variant, pricing, stock, auto-generation, forms
 - **[search-and-filtering](../search-and-filtering/SKILL.md)** — Search scopes, autocomplete, storefront filters, admin-configurable filter visibility, category tree expansion, known gaps

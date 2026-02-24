@@ -42,24 +42,22 @@
                   </div>
                 </div>
               </div>
-              <div class="p-4 sm:p-6">
-                <div class="flex items-center gap-3 overflow-x-auto">
-                  <% order.order_items.limit(4).each do |item| %>
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
-                      <% if item.product_variant&.product&.images&.attached? %>
-                        <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
-                      <% end %>
-                    </div>
-                  <% end %>
-                  <% if order.order_items.count > 4 %>
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-stone-100 rounded-lg flex-shrink-0 flex items-center justify-center text-stone-500 text-sm font-medium">
-                      +<%= order.order_items.count - 4 %>
-                    </div>
-                  <% end %>
+              <div class="p-3 sm:p-4">
+                <!-- Order Items Summary -->
+                <div class="mb-3">
+                  <p class="text-sm text-stone-600 line-clamp-2">
+                    <% items_list = order.order_items.map { |item| "#{item.product_name} (#{item.quantity})" } %>
+                    <%= items_list.join(", ") %>
+                  </p>
                 </div>
-                <div class="mt-4 flex items-center justify-between">
-                  <p class="text-sm text-stone-500"><%= order.order_items.count %> item(s)</p>
-                  <p class="font-semibold text-stone-900">Total: <%= format_price(order.total_amount) %></p>
+                
+                <div class="flex items-center justify-between pt-2 border-t border-stone-100">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded">
+                      <%= order.order_items.sum(:quantity) %> item<%= order.order_items.sum(:quantity) > 1 ? 's' : '' %>
+                    </span>
+                  </div>
+                  <p class="font-semibold text-stone-900"><%= format_price(order.total_amount) %></p>
                 </div>
               </div>
             </div>

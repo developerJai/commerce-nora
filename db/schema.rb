@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_24_065734) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -171,6 +171,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
+  create_table "checkout_sessions", force: :cascade do |t|
+    t.string "batch_id"
+    t.string "cart_token"
+    t.datetime "created_at", null: false
+    t.bigint "customer_id", null: false
+    t.text "error_message"
+    t.datetime "failed_at"
+    t.text "notes"
+    t.datetime "paid_at"
+    t.string "payment_method"
+    t.string "razorpay_order_id"
+    t.string "razorpay_payment_id"
+    t.string "status"
+    t.decimal "total_amount"
+    t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_checkout_sessions_on_customer_id"
+  end
+
   create_table "coupons", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.string "code", null: false
@@ -287,6 +305,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
     t.bigint "product_variant_id"
     t.integer "quantity", default: 1, null: false
     t.string "sku"
+    t.decimal "tax_amount", precision: 10, scale: 2, default: "0.0"
+    t.jsonb "tax_details", default: {}
+    t.decimal "tax_rate", precision: 5, scale: 2, default: "0.0"
     t.decimal "total_price", precision: 10, scale: 2, null: false
     t.decimal "unit_price", precision: 10, scale: 2, null: false
     t.datetime "updated_at", null: false
@@ -305,18 +326,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
     t.string "cancellation_reason"
     t.datetime "cancelled_at"
     t.string "checkout_batch_id"
+    t.bigint "checkout_session_id"
     t.bigint "coupon_id"
     t.datetime "created_at", null: false
     t.bigint "customer_id"
     t.datetime "deleted_at"
     t.datetime "delivered_at"
     t.decimal "discount_amount", precision: 10, scale: 2, default: "0.0", null: false
+    t.jsonb "fee_breakdown", default: {}
+    t.decimal "gateway_fee_amount", precision: 10, scale: 2, default: "0.0"
+    t.decimal "gateway_gst_amount", precision: 10, scale: 2, default: "0.0"
     t.boolean "is_draft", default: false, null: false
     t.text "notes"
     t.string "order_number", null: false
+    t.integer "payment_attempts", default: 0
+    t.text "payment_error_message"
+    t.datetime "payment_failed_at"
     t.string "payment_method", default: "cod", null: false
+    t.string "payment_signature"
     t.string "payment_status", default: "pending", null: false
+    t.string "payout_status", default: "pending"
     t.datetime "placed_at"
+    t.decimal "platform_fee_amount", precision: 10, scale: 2, default: "0.0"
+    t.string "razorpay_order_id"
+    t.string "razorpay_payment_id"
+    t.decimal "refund_amount", precision: 10, scale: 2, default: "0.0"
+    t.datetime "refund_initiated_at"
+    t.datetime "refund_paid_at"
+    t.bigint "refund_processed_by"
+    t.text "refund_remarks"
+    t.string "refund_status", default: "not_refunded"
+    t.string "refund_transaction_id"
     t.datetime "shipped_at"
     t.string "shipper_name"
     t.bigint "shipping_address_id"
@@ -326,21 +366,54 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
     t.string "status", default: "pending", null: false
     t.decimal "subtotal", precision: 10, scale: 2, default: "0.0", null: false
     t.decimal "tax_amount", precision: 10, scale: 2, default: "0.0", null: false
+    t.jsonb "tax_breakdown", default: {}
     t.decimal "total_amount", precision: 10, scale: 2, default: "0.0", null: false
     t.string "tracking_number"
     t.string "tracking_url"
     t.datetime "updated_at", null: false
+    t.decimal "vendor_earnings", precision: 10, scale: 2, default: "0.0"
     t.bigint "vendor_id"
     t.index ["billing_address_id"], name: "index_orders_on_billing_address_id"
     t.index ["checkout_batch_id"], name: "index_orders_on_checkout_batch_id"
+    t.index ["checkout_session_id"], name: "index_orders_on_checkout_session_id"
     t.index ["coupon_id"], name: "index_orders_on_coupon_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["deleted_at"], name: "index_orders_on_deleted_at"
     t.index ["is_draft"], name: "index_orders_on_is_draft"
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
+    t.index ["payout_status"], name: "index_orders_on_payout_status"
+    t.index ["razorpay_order_id"], name: "index_orders_on_razorpay_order_id"
+    t.index ["razorpay_payment_id"], name: "index_orders_on_razorpay_payment_id"
+    t.index ["refund_status"], name: "index_orders_on_refund_status"
     t.index ["shipping_address_id"], name: "index_orders_on_shipping_address_id"
     t.index ["status"], name: "index_orders_on_status"
+    t.index ["tax_breakdown"], name: "index_orders_on_tax_breakdown", using: :gin
     t.index ["vendor_id"], name: "index_orders_on_vendor_id"
+  end
+
+  create_table "payment_logs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.string "event_type", null: false
+    t.bigint "order_id", null: false
+    t.jsonb "request_data", default: {}
+    t.jsonb "response_data", default: {}
+    t.string "status", default: "success"
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_payment_logs_on_created_at"
+    t.index ["order_id", "event_type"], name: "index_payment_logs_on_order_id_and_event_type"
+    t.index ["order_id"], name: "index_payment_logs_on_order_id"
+  end
+
+  create_table "platform_fee_configs", force: :cascade do |t|
+    t.boolean "absorb_fees", default: true, null: false
+    t.datetime "created_at", null: false
+    t.decimal "gateway_fee_percent", precision: 5, scale: 2, default: "2.0", null: false
+    t.decimal "gateway_gst_percent", precision: 5, scale: 2, default: "18.0", null: false
+    t.decimal "maximum_payout_amount", precision: 10, scale: 2, default: "50000.0", null: false
+    t.decimal "minimum_payout_amount", precision: 10, scale: 2, default: "500.0", null: false
+    t.decimal "platform_commission_percent", precision: 5, scale: 2, default: "10.0", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "product_variants", force: :cascade do |t|
@@ -448,8 +521,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
   end
 
   create_table "store_settings", force: :cascade do |t|
+    t.text "company_address"
+    t.string "company_phone"
     t.datetime "created_at", null: false
+    t.boolean "enable_coupons", default: true
     t.jsonb "filter_config", default: {}, null: false
+    t.string "gst_number"
+    t.jsonb "payment_config", default: {}
     t.datetime "updated_at", null: false
   end
 
@@ -494,6 +572,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
     t.index ["support_ticket_id"], name: "index_ticket_messages_on_support_ticket_id"
   end
 
+  create_table "vendor_payout_orders", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "order_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "vendor_payout_id", null: false
+    t.index ["order_id"], name: "index_vendor_payout_orders_on_order_id"
+    t.index ["vendor_payout_id", "order_id"], name: "index_vendor_payout_orders_on_vendor_payout_id_and_order_id", unique: true
+    t.index ["vendor_payout_id"], name: "index_vendor_payout_orders_on_vendor_payout_id"
+  end
+
+  create_table "vendor_payouts", force: :cascade do |t|
+    t.text "admin_notes"
+    t.datetime "approved_at"
+    t.datetime "created_at", null: false
+    t.decimal "gateway_fee_total", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "gateway_gst_total", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "net_payout", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "paid_at"
+    t.decimal "platform_fee_total", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "rejected_at"
+    t.string "status", default: "pending", null: false
+    t.decimal "total_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "transaction_reference"
+    t.datetime "updated_at", null: false
+    t.bigint "vendor_id", null: false
+    t.index ["status"], name: "index_vendor_payouts_on_status"
+    t.index ["vendor_id", "status"], name: "index_vendor_payouts_on_vendor_id_and_status"
+    t.index ["vendor_id"], name: "index_vendor_payouts_on_vendor_id"
+  end
+
   create_table "vendors", force: :cascade do |t|
     t.boolean "active", default: true
     t.string "address_line1"
@@ -533,13 +641,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
   add_foreign_key "cart_items", "product_variants"
   add_foreign_key "carts", "customers"
   add_foreign_key "categories", "categories", column: "parent_id"
+  add_foreign_key "checkout_sessions", "customers"
   add_foreign_key "homepage_collection_items", "homepage_collections"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "product_variants"
   add_foreign_key "order_items", "vendors"
+  add_foreign_key "orders", "checkout_sessions"
   add_foreign_key "orders", "coupons"
   add_foreign_key "orders", "customers"
   add_foreign_key "orders", "vendors"
+  add_foreign_key "payment_logs", "orders"
   add_foreign_key "product_variants", "products"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "hsn_codes"
@@ -552,6 +663,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_225000) do
   add_foreign_key "support_tickets", "orders"
   add_foreign_key "support_tickets", "vendors"
   add_foreign_key "ticket_messages", "support_tickets"
+  add_foreign_key "vendor_payout_orders", "orders"
+  add_foreign_key "vendor_payout_orders", "vendor_payouts"
+  add_foreign_key "vendor_payouts", "vendors"
   add_foreign_key "wishlists", "customers"
   add_foreign_key "wishlists", "products"
 end

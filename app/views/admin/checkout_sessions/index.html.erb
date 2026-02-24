@@ -1,0 +1,73 @@
+<% content_for(:title) { "Checkout Sessions" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Checkout Sessions</h1>
+      <p class="text-sm text-gray-500">Track payments, failures, and conversions</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
+      <p class="text-sm text-gray-500">Total Sessions</p>
+      <p class="text-2xl font-bold text-gray-900"><%= @analytics[:total_sessions] %></p>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-emerald-500">
+      <p class="text-sm text-gray-500">Successful</p>
+      <p class="text-2xl font-bold text-emerald-600"><%= @analytics[:successful] %></p>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-red-500">
+      <p class="text-sm text-gray-500">Failed</p>
+      <p class="text-2xl font-bold text-red-600"><%= @analytics[:failed] %></p>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-amber-500">
+      <p class="text-sm text-gray-500">Pending</p>
+      <p class="text-2xl font-bold text-amber-600"><%= @analytics[:pending] %></p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Session ID</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Orders</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @checkout_sessions.each do |session| %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+              <%= session.batch_id.first(8) %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= session.customer&.email || "Guest" %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= session.orders.count %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= number_to_currency(session.total_amount, unit: "₹") %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_badge_class(session.status) %>">
+                <%= session.status.titleize %>
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <%= link_to "View", admin_checkout_session_path(session), class: "text-blue-600 hover:text-blue-900" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

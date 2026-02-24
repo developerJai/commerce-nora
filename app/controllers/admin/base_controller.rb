@@ -1,10 +1,10 @@
 module Admin
   class BaseController < ApplicationController
-    layout 'admin'
+    layout "admin"
 
     before_action :require_admin
 
-    helper_method :current_admin, :current_vendor, :admin_role?, :vendor_role?, :vendor_context?
+    helper_method :current_admin, :current_vendor, :admin_role?, :vendor_role?, :vendor_context?, :current_vendor_user?
 
     private
 
@@ -31,6 +31,11 @@ module Admin
 
     # True when data should be scoped to a vendor (vendor logged in OR admin impersonating)
     def vendor_context?
+      current_vendor.present?
+    end
+
+    # True when a vendor is accessing (either direct login or admin impersonating)
+    def current_vendor_user?
       current_vendor.present?
     end
 

@@ -42,9 +42,21 @@ Rails.application.routes.draw do
         patch :deliver
         patch :cancel
         patch :rollback
+        post :initiate_refund
+        post :mark_refund_paid
+        post :mark_refund_failed
+        get :download_customer_invoice, defaults: { format: "pdf" }
+        get :download_vendor_invoice, defaults: { format: "pdf" }
       end
       collection do
         get :drafts
+        get :refunds
+      end
+    end
+
+    resources :checkout_sessions, only: [ :index, :show ] do
+      member do
+        get :analytics
       end
     end
 
@@ -123,6 +135,25 @@ Rails.application.routes.draw do
       end
     end
 
+    # Platform Fee Configuration
+    resource :platform_fee_config, only: [ :show, :edit, :update ], path: :fee_settings
+
+    # Vendor Earnings & Payouts (for vendors)
+    get "earnings", to: "vendor_earnings#index", as: :vendor_earnings
+    get "earnings/new_payout", to: "vendor_earnings#new_payout", as: :new_payout_vendor_earnings
+    post "earnings/create_payout", to: "vendor_earnings#create_payout", as: :create_payout_vendor_earnings
+    get "earnings/payouts", to: "vendor_earnings#payouts", as: :payouts_vendor_earnings
+    get "earnings/payouts/:id", to: "vendor_earnings#show_payout", as: :show_payout_vendor_earnings
+
+    # Admin Payout Management
+    resources :payouts, only: [ :index, :show ] do
+      member do
+        patch :approve
+        patch :reject
+        patch :mark_paid
+      end
+    end
+
     get "reports", to: "reports#index"
     get "reports/sales", to: "reports#sales"
     get "reports/products", to: "reports#products"
@@ -171,7 +202,7 @@ Rails.application.routes.draw do
   # Checkout
   resource :checkout, only: [ :show, :create ] do
     get "address", action: :address
-    post "address", action: :save_address
+    post "address", action: :save_address, as: :save_address
     get "confirm", action: :confirm
   end
 
@@ -183,6 +214,10 @@ Rails.application.routes.draw do
     end
     resources :reviews, only: [ :new, :create ], controller: "order_reviews"
   end
+
+  # Unified Invoice Endpoint (accessible by customers, vendors, and admins)
+  # GET /invoices/:order_number - Role-based invoice download
+  resources :invoices, only: [ :show ], param: :order_number, defaults: { format: "pdf" }
 
   # Addresses
   resources :addresses, param: :token
@@ -209,6 +244,13 @@ Rails.application.routes.draw do
   get "about", to: "pages#about"
   get "privacy", to: "pages#privacy"
   get "terms", to: "pages#terms"
+
+  # Razorpay integration
+  namespace :razorpay do
+    post "webhook", to: "webhooks#handle"
+    get "success", to: "callbacks#success"
+    get "failure", to: "callbacks#failure"
+  end
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
