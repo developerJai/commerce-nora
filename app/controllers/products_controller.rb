@@ -48,9 +48,22 @@ class ProductsController < ApplicationController
       products = products.where(id: price_filter.select(:product_id))
     end
 
-    # ── Faceted counts (from base filtered set, before multiselect filters) ──
-    # Build facets before applying color/material/gemstone/occasion filters
-    # so that all options remain visible for multiselect support
+    # ── Apply remaining filters (before facets for accurate counts) ───
+    # These filters affect category/facet counts so apply them first
+    products = products.by_discount(@discount) if @discount.present?
+    products = products.by_rating(@rating) if @rating.present?
+    products = products.in_stock_only if @in_stock
+
+    # ── Calculate category counts from filtered products ─────────────
+    # PERFORMANCE: Use a single query with subquery instead of plucking all IDs
+    @category_counts = Product.active
+                               .where(id: products.reorder(nil).select(:id))
+                               .group(:category_id)
+                               .count
+
+    # ── Faceted counts (after category/price/stock/discount/rating, before multiselect) ──
+    # Build facets from products that match all filters except multiselect ones
+    # This allows users to see available options even when some are selected
     @facets = build_facets(products)
 
     # ── Apply multiselect filters (color, material, gemstone, occasion) ─────
@@ -59,31 +72,41 @@ class ProductsController < ApplicationController
     products = products.by_attribute(:gemstone, @gemstones) if @gemstones.any?
     products = products.by_attribute(:occasion, @occasions) if @occasions.any?
 
-    # ── Apply remaining filters ──────────────────────────────────────
-    products = products.by_discount(@discount) if @discount.present?
-    products = products.by_rating(@rating) if @rating.present?
-    products = products.in_stock_only if @in_stock
-
     # ── Sort ─────────────────────────────────────────────────────────
+    # When sorting by price/discount, we need to handle the case where filters may have added DISTINCT
+    # PostgreSQL requires ORDER BY expressions to appear in SELECT when using DISTINCT
+    # Solution: Get filtered IDs first, then re-query with ordering and eager loading
     products = case @sort
-    when "price_low"
-      products.left_joins(:variants).where(product_variants: { active: true }).group(:id).order("MIN(product_variants.price) ASC")
-    when "price_high"
-      products.left_joins(:variants).where(product_variants: { active: true }).group(:id).order("MIN(product_variants.price) DESC")
+    when "price_low", "price_high"
+      direction = @sort == "price_low" ? "ASC" : "DESC"
+      # PERFORMANCE: Pluck IDs first (fast), then re-query with proper ordering
+      # This avoids DISTINCT + ORDER BY conflicts entirely
+      product_ids = products.reorder(nil).pluck(:id)
+      Product.active
+             .includes(:category, { variants: { image_attachment: :blob } }, images_attachments: :blob)
+             .where(id: product_ids)
+             .left_joins(:variants)
+             .where(product_variants: { active: true })
+             .group(:id)
+             .order(Arel.sql("MIN(product_variants.price) #{direction}"))
     when "rating"
       products.order(average_rating: :desc)
     when "discount"
-      products.left_joins(:variants)
-              .where(product_variants: { active: true })
-              .where("product_variants.compare_at_price > product_variants.price")
-              .group(:id)
-              .order(Arel.sql("MAX((product_variants.compare_at_price - product_variants.price) / NULLIF(product_variants.compare_at_price, 0) * 100) DESC"))
+      # PERFORMANCE: Same approach as price sorting - pluck IDs first
+      product_ids = products.reorder(nil).pluck(:id)
+      Product.active
+             .includes(:category, { variants: { image_attachment: :blob } }, images_attachments: :blob)
+             .where(id: product_ids)
+             .left_joins(:variants)
+             .where(product_variants: { active: true })
+             .where("product_variants.compare_at_price > product_variants.price")
+             .group(:id)
+             .order(Arel.sql("MAX((product_variants.compare_at_price - product_variants.price) / NULLIF(product_variants.compare_at_price, 0) * 100) DESC"))
     else
       products.order(created_at: :desc)
     end
 
     @pagy, @products = pagy(products, limit: 16)
-    @category_counts = Product.active.group(:category_id).count
     @category_tree = Category.grouped_for_filters(product_counts: @category_counts)
 
     # ── Filter visibility (admin-configurable) ───────────────────────
