@@ -1,3 +1,5 @@
+<%= turbo_stream.remove "wishlist-item-#{@product.id}" %>
+
 <%= turbo_stream.update "wishlist-toggle-#{@product.id}" do %>
   <%= render 'shared/wishlist_toggle', product: @product, icon_only: @icon_only %>
 <% end %>
