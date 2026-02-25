@@ -7,19 +7,21 @@
       <div class="text-center mb-8">
         <div class="w-14 h-14 mx-auto mb-4 bg-rose-50 rounded-full flex items-center justify-center">
           <svg class="w-7 h-7 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 007-7z"/>
           </svg>
         </div>
         <h1 class="text-2xl font-serif font-semibold text-stone-900">Welcome Back</h1>
         <p class="text-stone-500 mt-2 text-sm">Sign in to your account to continue</p>
       </div>
 
-      <%= form_with url: login_path, method: :post, class: 'space-y-5' do |f| %>
+      <%= form_with url: login_path, method: :post, class: 'space-y-5',
+          data: { controller: 'signup-form', action: 'submit->signup-form#submit' } do |f| %>
         <div>
           <%= f.label :email, class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
           <%= f.email_field :email, autofocus: true, autocomplete: 'email', required: true,
               placeholder: 'Enter your email',
-              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+              data: { signup_form_target: 'email' } %>
         </div>
 
         <div>
@@ -27,8 +29,12 @@
           <div class="relative">
             <%= f.password_field :password, autocomplete: 'current-password', required: true,
                 placeholder: 'Enter your password',
-                class: 'w-full px-4 py-2.5 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
-            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600" onclick="togglePassword('password', this)">
+                class: 'w-full px-4 py-2.5 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+                id: 'password',
+                data: { signup_form_target: 'password' } %>
+            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600" 
+                    data-action="click->signup-form#togglePassword" 
+                    data-field-id="password">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -37,7 +43,8 @@
           </div>
         </div>
 
-        <%= f.submit 'Sign In', class: 'w-full py-3 px-4 bg-rose-800 text-white font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer' %>
+        <%= f.submit 'Sign In', class: 'w-full py-3 px-4 bg-rose-800 text-white font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer',
+            data: { signup_form_target: 'form' } %>
       <% end %>
 
       <p class="mt-6 text-center text-sm text-stone-600">
@@ -47,69 +54,3 @@
     </div>
   </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.querySelector('form');
-  const emailField = document.querySelector('#email');
-  const passwordField = document.querySelector('#password');
-  
-  // Prevent spaces in email and password fields
-  [emailField, passwordField].forEach(field => {
-    if (field) {
-      field.addEventListener('input', function(e) {
-        // Remove spaces from input
-        this.value = this.value.replace(/\s/g, '');
-      });
-      
-      field.addEventListener('keydown', function(e) {
-        // Prevent space key
-        if (e.key === ' ') {
-          e.preventDefault();
-        }
-      });
-    }
-  });
-  
-  form.addEventListener('submit', function(e) {
-    // Validate required fields
-    const errors = [];
-    
-    if (emailField && emailField.value.trim() === '') {
-      errors.push('Email is required');
-    }
-    
-    if (passwordField && passwordField.value.trim() === '') {
-      errors.push('Password is required');
-    }
-    
-    if (errors.length > 0) {
-      e.preventDefault();
-      alert(errors.join('\n'));
-    }
-  });
-});
-
-function togglePassword(fieldId, button) {
-  const field = document.getElementById(fieldId);
-  const isPassword = field.type === 'password';
-  
-  field.type = isPassword ? 'text' : 'password';
-  
-  // Toggle eye icon
-  if (isPassword) {
-    button.innerHTML = `
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
-      </svg>
-    `;
-  } else {
-    button.innerHTML = `
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-      </svg>
-    `;
-  }
-}
-</script>
