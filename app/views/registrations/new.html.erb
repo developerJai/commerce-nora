@@ -1,5 +1,30 @@
 <% content_for(:title) { "Create Account" } %>
 
+<!-- Add intl-tel-input CSS -->
+<%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css", "data-turbo-track": "reload" %>
+
+<style>
+.iti {
+  width: 100%;
+}
+.iti__flag-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0;
+}
+.iti__selected-flag {
+  padding: 0 10px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+}
+.iti__country-list {
+  z-index: 1000;
+}
+</style>
+
 <div class="min-h-[60vh] flex items-center justify-center px-4 py-12">
   <div class="w-full max-w-md">
     <div class="bg-white rounded-xl border border-stone-200 p-8">
@@ -57,23 +82,42 @@
 
         <div>
           <%= f.label :phone, class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
-          <%= f.telephone_field :phone, autocomplete: 'tel', placeholder: 'Phone number (optional)',
-              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+          <div class="relative">
+            <%= f.telephone_field :phone, autocomplete: 'tel', placeholder: 'Phone number (optional)',
+                class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm', id: 'phone' %>
+            <div id="phone-error" class="mt-1.5 text-xs text-red-600 hidden"></div>
+          </div>
         </div>
 
         <div>
           <%= f.label :password, class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
-          <%= f.password_field :password, autocomplete: 'new-password', required: true,
-              placeholder: 'Create password',
-              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+          <div class="relative">
+            <%= f.password_field :password, autocomplete: 'new-password', required: true,
+                placeholder: 'Create password',
+                class: 'w-full px-4 py-2.5 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600" onclick="togglePassword('customer_password', this)">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
           <p class="mt-1.5 text-xs text-stone-500">Minimum 8 characters</p>
         </div>
 
         <div>
           <%= f.label :password_confirmation, 'Confirm Password', class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
-          <%= f.password_field :password_confirmation, autocomplete: 'new-password', required: true,
-              placeholder: 'Confirm password',
-              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+          <div class="relative">
+            <%= f.password_field :password_confirmation, autocomplete: 'new-password', required: true,
+                placeholder: 'Confirm password',
+                class: 'w-full px-4 py-2.5 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600" onclick="togglePassword('customer_password_confirmation', this)">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <%= f.submit 'Create Account', class: 'w-full py-3 px-4 bg-rose-800 text-white font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer' %>
@@ -86,3 +130,257 @@
     </div>
   </div>
 </div>
+
+<!-- Add intl-tel-input JS -->
+<%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js", "data-turbo-track": "reload" %>
+<%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js", "data-turbo-track": "reload" %>
+
+<script>
+// Wait for both DOM and intl-tel-input to be ready
+function initializePhoneInput() {
+  if (typeof window.intlTelInput !== 'undefined') {
+    const phoneField = document.querySelector('#phone');
+    const phoneError = document.querySelector('#phone-error');
+    
+    if (phoneField) {
+      // Destroy existing instance if it exists
+      if (window.phoneInputInstance) {
+        window.phoneInputInstance.destroy();
+      }
+      
+      // Initialize intl-tel-input
+      const phoneInput = window.intlTelInput(phoneField, {
+        initialCountry: 'us',
+        separateDialCode: true,
+        utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js',
+        preferredCountries: ['us', 'gb', 'in', 'ca', 'au'],
+        customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
+          return 'Enter phone number';
+        },
+        formatOnInit: true
+      });
+      
+      // Phone number validation
+      function validatePhone() {
+        if (phoneField.value.trim()) {
+          if (!phoneInput.isValidNumber()) {
+            const errorCode = phoneInput.getValidationError();
+            let errorMessage = 'Invalid phone number';
+            
+            // Specific error messages
+            switch(errorCode) {
+              case 0:
+                errorMessage = 'Invalid country code';
+                break;
+              case 1:
+                errorMessage = 'Phone number too short';
+                break;
+              case 2:
+                errorMessage = 'Phone number too long';
+                break;
+              case 3:
+                errorMessage = 'Invalid phone number format';
+                break;
+            }
+            
+            // Special validation for India (10 digits)
+            const countryData = phoneInput.getSelectedCountryData();
+            if (countryData.iso2 === 'in') {
+              const phoneNumber = phoneField.value.replace(/\D/g, '');
+              if (phoneNumber.length !== 10) {
+                errorMessage = 'Indian phone numbers must be exactly 10 digits';
+              }
+            }
+            
+            phoneError.textContent = errorMessage;
+            phoneError.classList.remove('hidden');
+            phoneField.classList.add('border-red-500');
+            return false;
+          } else {
+            phoneError.classList.add('hidden');
+            phoneField.classList.remove('border-red-500');
+            return true;
+          }
+        } else {
+          phoneError.classList.add('hidden');
+          phoneField.classList.remove('border-red-500');
+          return true; // Phone is optional
+        }
+      }
+      
+      // Validate phone on input and blur
+      phoneField.addEventListener('input', validatePhone);
+      phoneField.addEventListener('blur', validatePhone);
+      
+      // Store phoneInput instance globally for form submission
+      window.phoneInputInstance = phoneInput;
+    }
+  } else {
+    // If library not loaded, retry after 100ms
+    setTimeout(initializePhoneInput, 100);
+  }
+}
+
+// Initialize phone input and other functionality
+function initializeForm() {
+  initializePhoneInput();
+  
+  const form = document.querySelector('form');
+  
+  // Add input event listeners to prevent spaces
+  const firstNameField = document.querySelector('#customer_first_name');
+  const lastNameField = document.querySelector('#customer_last_name');
+  const emailField = document.querySelector('#customer_email');
+  const passwordField = document.querySelector('#customer_password');
+  const passwordConfirmationField = document.querySelector('#customer_password_confirmation');
+  
+  // Prevent spaces in first name, last name, and password fields
+  [firstNameField, lastNameField, passwordField, passwordConfirmationField].forEach(field => {
+    if (field) {
+      field.addEventListener('input', function(e) {
+        // Remove spaces from input
+        this.value = this.value.replace(/\s/g, '');
+      });
+      
+      field.addEventListener('keydown', function(e) {
+        // Prevent space key
+        if (e.key === ' ') {
+          e.preventDefault();
+        }
+      });
+    }
+  });
+  
+  // Prevent spaces in email field (except trim)
+  if (emailField) {
+    emailField.addEventListener('input', function(e) {
+      // Remove spaces from email
+      this.value = this.value.replace(/\s/g, '');
+    });
+    
+    emailField.addEventListener('keydown', function(e) {
+      // Prevent space key
+      if (e.key === ' ') {
+        e.preventDefault();
+      }
+    });
+  }
+  
+  form.addEventListener('submit', function(e) {
+    // Validate phone number
+    if (window.phoneInputInstance) {
+      const phoneField = document.querySelector('#phone');
+      const phoneError = document.querySelector('#phone-error');
+      
+      if (phoneField.value.trim()) {
+        if (!window.phoneInputInstance.isValidNumber()) {
+          const errorCode = window.phoneInputInstance.getValidationError();
+          let errorMessage = 'Invalid phone number';
+          
+          switch(errorCode) {
+            case 0:
+              errorMessage = 'Invalid country code';
+              break;
+            case 1:
+              errorMessage = 'Phone number too short';
+              break;
+            case 2:
+              errorMessage = 'Phone number too long';
+              break;
+            case 3:
+              errorMessage = 'Invalid phone number format';
+              break;
+          }
+          
+          const countryData = window.phoneInputInstance.getSelectedCountryData();
+          if (countryData.iso2 === 'in') {
+            const phoneNumber = phoneField.value.replace(/\D/g, '');
+            if (phoneNumber.length !== 10) {
+              errorMessage = 'Indian phone numbers must be exactly 10 digits';
+            }
+          }
+          
+          phoneError.textContent = errorMessage;
+          phoneError.classList.remove('hidden');
+          phoneField.classList.add('border-red-500');
+          e.preventDefault();
+          phoneField.focus();
+          return;
+        } else {
+          // Format phone number with country code
+          const fullNumber = window.phoneInputInstance.getNumber();
+          phoneField.value = fullNumber;
+        }
+      }
+    }
+    
+    // Validate no spaces in required fields
+    const errors = [];
+    
+    if (firstNameField && firstNameField.value.trim() === '') {
+      errors.push('First name is required');
+    }
+    
+    if (lastNameField && lastNameField.value.trim() === '') {
+      errors.push('Last name is required');
+    }
+    
+    if (emailField && emailField.value.trim() === '') {
+      errors.push('Email is required');
+    }
+    
+    if (passwordField && passwordField.value.length < 8) {
+      errors.push('Password must be at least 8 characters');
+    }
+    
+    if (passwordConfirmationField && passwordConfirmationField.value !== passwordField.value) {
+      errors.push('Password confirmation does not match');
+    }
+    
+    if (errors.length > 0) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+}
+
+// Handle both regular DOM ready and Turbo events
+if (typeof Turbo !== 'undefined') {
+  // Turbo Drive events
+  document.addEventListener('turbo:load', initializeForm);
+  document.addEventListener('turbo:render', initializeForm);
+} else {
+  // Fallback for non-Turbo environments
+  document.addEventListener('DOMContentLoaded', initializeForm);
+}
+
+// Also initialize immediately if DOM is already ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeForm);
+} else {
+  initializeForm();
+}
+
+function togglePassword(fieldId, button) {
+  const field = document.getElementById(fieldId);
+  const isPassword = field.type === 'password';
+  
+  field.type = isPassword ? 'text' : 'password';
+  
+  // Toggle eye icon
+  if (isPassword) {
+    button.innerHTML = `
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+      </svg>
+    `;
+  } else {
+    button.innerHTML = `
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+      </svg>
+    `;
+  }
+}
+</script>
