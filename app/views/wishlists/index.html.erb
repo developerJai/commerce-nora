@@ -35,7 +35,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
           <% @wishlist_items.each do |wishlist_item| %>
             <% product = wishlist_item.product %>
-            <div class="relative">
+            <div id="wishlist-item-<%= product.id %>" class="relative">
               <%= button_to wishlist_path(product_id: product.id), method: :delete,
                   data: { turbo_confirm: "Remove this item from your wishlist?" },
                   class: "absolute top-2 right-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/90 hover:bg-white border border-stone-200 text-stone-700 hover:text-rose-800 shadow-sm transition" do %>
