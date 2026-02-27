@@ -117,7 +117,9 @@
       </div>
 
       <!-- Category Pills -->
-      <div class="mt-8 flex flex-wrap sm:flex-wrap justify-start sm:justify-center justify-center gap-2 sm:gap-3 overflow-x-auto sm:overflow-x-visible scrollbar-hide">
+      <!-- <div class="mt-8 flex flex-wrap sm:flex-wrap justify-start sm:justify-center justify-center gap-2 sm:gap-3 overflow-x-auto sm:overflow-x-visible scrollbar-hide"> -->
+        
+      <div class="mt-8 flex flex-wrap justify-center gap-2 sm:gap-3">
         <% Category.active.root.ordered.limit(8).each do |category| %>
           <%= link_to category.name, category_path(category.slug), 
               class: 'px-4 py-2 bg-white text-stone-600 text-sm rounded-full border border-stone-200 hover:border-rose-300 hover:text-rose-800 transition shadow-sm' %>
