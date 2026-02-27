@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
   <title><%= content_for(:title) || "Noralooks" %> | Jewellery & Traditional Wear</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -23,11 +23,19 @@
   <style>
     .font-serif { font-family: 'Playfair Display', serif; }
     .font-sans { font-family: 'Inter', sans-serif; }
+    <% if request.user_agent&.include?("Hotwire") %>
+      /* Only affects Hotwire Native app */
+      body {
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto !important;
+        height: auto !important;
+      }
+  <% end %>
   </style>
 </head>
-<body class="min-h-full flex flex-col bg-stone-50 font-sans">
+<body class="flex flex-col bg-stone-50 font-sans">
   <!-- Top Bar -->
-  <div class="bg-rose-900 text-center py-2 px-3">
+  <div class="hidden sm:block bg-rose-900 text-center py-2 px-3">
     <p class="text-xs sm:text-sm text-rose-100">
       <span class="text-amber-300 font-medium">Free Shipping</span> on orders above ₹999 | 
       <span class="hidden sm:inline">Lifetime Exchange & </span>Easy Returns
@@ -70,16 +78,29 @@
         <% end %>
 
         <!-- Mobile search -->
-        <button type="button" 
-                class="sm:hidden p-2 text-stone-600 hover:text-rose-800"
-                onclick="document.getElementById('mobile-search').classList.toggle('hidden')">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-        </button>
+        <div class="sm:hidden flex-1 max-w-xs" data-controller="search-autocomplete">
+          <%= form_with url: search_path, method: :get, class: 'relative' do |f| %>
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <%= f.search_field :q, value: params[:q], 
+                  placeholder: 'Search...', 
+                  class: 'w-full h-10 pl-10 pr-4 bg-stone-100 text-stone-800 rounded-full border-0 focus:ring-2 focus:ring-rose-400 focus:bg-white placeholder:text-stone-400 text-sm transition',
+                  autocomplete: 'off',
+                  data: { 
+                    search_autocomplete_target: 'input',
+                    action: 'input->search-autocomplete#search focus->search-autocomplete#search'
+                  } %>
+            </div>
+            <div data-search-autocomplete-target="results" 
+                 class="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-stone-200 overflow-hidden hidden z-50">
+            </div>
+          <% end %>
+        </div>
 
         <!-- Right side -->
-        <div class="flex items-center gap-1">
+        <div class="hidden sm:flex items-center gap-1">
           <!-- Account -->
           <div class="relative" data-controller="dropdown">
             <button class="flex items-center gap-1.5 px-2 sm:px-3 py-2 text-stone-700 hover:text-rose-800 transition" data-action="click->dropdown#toggle">
@@ -156,7 +177,7 @@
     </div>
 
     <!-- Categories Nav with Subcategory Dropdowns -->
-    <nav class="border-t border-stone-100">
+    <nav class="hidden sm:block border-t border-stone-100">
       <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="flex items-center gap-1 sm:gap-4 h-10 overflow-x-auto scrollbar-hide">
           <% active_class = 'px-3 py-1.5 text-sm text-rose-700 font-medium whitespace-nowrap' %>
@@ -209,7 +230,7 @@
   </main>
 
   <!-- Footer -->
-  <footer class="bg-stone-900 mt-12 sm:mt-16">
+  <footer class="hidden sm:block bg-stone-900 mt-12 sm:mt-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
       <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
         <div class="col-span-2 md:col-span-1">
