@@ -32,6 +32,8 @@ class WishlistsController < ApplicationController
     @icon_only = params[:icon_only].to_s == "true"
     
     wishlist_item.destroy
+    current_customer.wishlist_items.reload
+    @wishlist_items = current_customer.wishlist_items
     
     respond_to do |format|
       format.html { redirect_back(fallback_location: wishlists_path, notice: "Product removed from wishlist") }
@@ -41,6 +43,7 @@ class WishlistsController < ApplicationController
 
   def clear
     current_customer.wishlist_items.destroy_all
+    current_customer.wishlist_items.reload
     
     respond_to do |format|
       format.html { redirect_to wishlists_path, notice: "Wishlist cleared" }

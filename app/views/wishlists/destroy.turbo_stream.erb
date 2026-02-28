@@ -8,6 +8,45 @@
   <%= render 'shared/wishlist_count_badge' %>
 <% end %>
 
+<%= turbo_stream.update 'wishlist-header' do %>
+  <div>
+    <h1 class="text-2xl font-serif font-semibold text-stone-900">My Wishlist</h1>
+    <p class="text-sm text-stone-600 mt-1">
+      <% if @wishlist_items.any? %>
+        <%= pluralize(@wishlist_items.size, 'item') %> saved
+      <% else %>
+        Save items you love and revisit them anytime
+      <% end %>
+    </p>
+  </div>
+
+  <% if @wishlist_items.any? %>
+    <%= button_to clear_wishlists_path, method: :delete,
+        data: { turbo_confirm: "Are you sure you want to clear your entire wishlist?" },
+        class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition' do %>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+      </svg>
+      Clear Wishlist
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if @wishlist_items.empty? %>
+  <%= turbo_stream.update 'wishlist-content' do %>
+    <div class="bg-white rounded-xl border border-stone-200 p-8 text-center">
+      <div class="w-16 h-16 mx-auto bg-stone-100 rounded-full flex items-center justify-center mb-4">
+        <svg class="w-8 h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.0 0 00-6.364 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-stone-900 mb-2">Your wishlist is empty</h3>
+      <p class="text-stone-500 mb-4">Start adding items you love to keep track of them</p>
+      <%= link_to 'Browse Products', products_path, class: 'inline-flex items-center gap-2 px-4 py-2 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition' %>
+    </div>
+  <% end %>
+<% end %>
+
 <script>
   if (window.animateWishlistIcon) {
     window.animateWishlistIcon();

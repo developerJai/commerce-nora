@@ -7,7 +7,7 @@
     </div>
 
     <div class="flex-1">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+      <div id="wishlist-header" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h1 class="text-2xl font-serif font-semibold text-stone-900">My Wishlist</h1>
           <p class="text-sm text-stone-600 mt-1">
@@ -31,34 +31,36 @@
         <% end %>
       </div>
 
-      <% if @wishlist_items.any? %>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-          <% @wishlist_items.each do |wishlist_item| %>
-            <% product = wishlist_item.product %>
-            <div id="wishlist-item-<%= product.id %>" class="relative">
-              <%= button_to wishlist_path(product_id: product.id), method: :delete,
-                  data: { turbo_confirm: "Remove this item from your wishlist?" },
-                  class: "absolute top-2 right-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/90 hover:bg-white border border-stone-200 text-stone-700 hover:text-rose-800 shadow-sm transition" do %>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              <% end %>
-              <%= render 'shared/product_card', product: product, badge_side: :left %>
-            </div>
-          <% end %>
-        </div>
-      <% else %>
-        <div class="bg-white rounded-xl border border-stone-200 p-8 text-center">
-          <div class="w-16 h-16 mx-auto bg-stone-100 rounded-full flex items-center justify-center mb-4">
-            <svg class="w-8 h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.0 0 00-6.364 0z"/>
-            </svg>
+      <div id="wishlist-content">
+        <% if @wishlist_items.any? %>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+            <% @wishlist_items.each do |wishlist_item| %>
+              <% product = wishlist_item.product %>
+              <div id="wishlist-item-<%= product.id %>" class="relative">
+                <%= button_to wishlist_path(product_id: product.id), method: :delete,
+                    data: { turbo_confirm: "Remove this item from your wishlist?" },
+                    class: "absolute top-2 right-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/90 hover:bg-white border border-stone-200 text-stone-700 hover:text-rose-800 shadow-sm transition" do %>
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                <% end %>
+                <%= render 'shared/product_card', product: product, badge_side: :left %>
+              </div>
+            <% end %>
           </div>
-          <h3 class="text-lg font-semibold text-stone-900 mb-2">Your wishlist is empty</h3>
-          <p class="text-stone-500 mb-4">Start adding items you love to keep track of them</p>
-          <%= link_to 'Browse Products', products_path, class: 'inline-flex items-center gap-2 px-4 py-2 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition' %>
-        </div>
-      <% end %>
+        <% else %>
+          <div class="bg-white rounded-xl border border-stone-200 p-8 text-center">
+            <div class="w-16 h-16 mx-auto bg-stone-100 rounded-full flex items-center justify-center mb-4">
+              <svg class="w-8 h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.0 0 00-6.364 0z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-stone-900 mb-2">Your wishlist is empty</h3>
+            <p class="text-stone-500 mb-4">Start adding items you love to keep track of them</p>
+            <%= link_to 'Browse Products', products_path, class: 'inline-flex items-center gap-2 px-4 py-2 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition' %>
+          </div>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>
