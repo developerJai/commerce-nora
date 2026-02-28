@@ -78,7 +78,13 @@ class ProductsController < ApplicationController
       :category,
       { variants: { image_attachment: :blob } },
       images_attachments: :blob
-    ).find_by!(slug: params[:slug])
+    ).find_by(slug: params[:slug])
+
+    unless @product
+      redirect_to products_path, alert: "This product is currently unavailable."
+      return
+    end
+
     @variants = @product.variants.active.ordered
     @reviews = @product.approved_reviews.includes(:customer).recent.limit(10)
     @related_products = Product.active.where(category_id: @product.category_id)
