@@ -269,7 +269,7 @@
         <div class="grid grid-cols-2 gap-4 text-sm">
           <div class="p-3 bg-stone-50 rounded-lg">
             <p class="text-stone-500">SKU</p>
-            <p class="font-medium text-stone-900"><%= default_variant&.sku || 'N/A' %></p>
+            <p class="font-medium text-stone-900"><%= default_variant&.sku.presence || @product.sku.presence || 'N/A' %></p>
           </div>
           <% if @product.category %>
             <div class="p-3 bg-stone-50 rounded-lg">
