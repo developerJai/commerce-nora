@@ -93,7 +93,7 @@
       </p>
       
       <!-- Search Bar -->
-      <div class="max-w-lg mx-auto" data-controller="search-autocomplete">
+      <div class="hidden sm:block max-w-lg mx-auto" data-controller="search-autocomplete">
         <%= form_with url: search_path, method: :get, class: 'relative' do |f| %>
           <div class="relative">
             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,6 +117,8 @@
       </div>
 
       <!-- Category Pills -->
+      <!-- <div class="mt-8 flex flex-wrap sm:flex-wrap justify-start sm:justify-center justify-center gap-2 sm:gap-3 overflow-x-auto sm:overflow-x-visible scrollbar-hide"> -->
+        
       <div class="mt-8 flex flex-wrap justify-center gap-2 sm:gap-3">
         <% Category.active.root.ordered.limit(8).each do |category| %>
           <%= link_to category.name, category_path(category.slug), 

@@ -169,3 +169,32 @@ input:focus, select:focus, textarea:focus {
     transform: scale(1.15);
   }
 }
+
+/* Phone Input Styles for intl-tel-input */
+.iti {
+  width: 100%;
+}
+
+.iti__flag-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0;
+}
+
+.iti__selected-flag {
+  padding: 0 10px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+}
+
+.iti__country-list {
+  z-index: 1000;
+}
+
+/* Ensure phone input field has proper spacing when intl-tel-input is initialized */
+.iti__selected-dial-code {
+  margin-right: 6px;
+}
