@@ -1,6 +1,9 @@
 <% content_for(:title) { "Create Account" } %>
 
-<div class="min-h-[60vh] flex items-center justify-center px-4 py-12">
+<!-- Add intl-tel-input CSS -->
+<%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css", "data-turbo-track": "reload" %>
+
+<div class="min-h-screen flex items-center justify-center px-4 py-12">
   <div class="w-full max-w-md">
     <div class="bg-white rounded-xl border border-stone-200 p-8">
       <!-- Header -->
@@ -14,7 +17,8 @@
         <p class="text-stone-500 mt-2 text-sm">Join Noralooks for exclusive jewellery</p>
       </div>
 
-      <%= form_with model: @customer, url: signup_path, method: :post, class: 'space-y-5' do |f| %>
+      <%= form_with model: @customer, url: signup_path, method: :post, class: 'space-y-5',
+          data: { controller: 'signup-form', action: 'submit->signup-form#submit' } do |f| %>
         <% if @customer.errors.any? %>
           <div class="rounded-lg bg-red-50 border border-red-200 p-4">
             <div class="flex items-start gap-3">
@@ -39,12 +43,14 @@
           <div>
             <%= f.label :first_name, class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
             <%= f.text_field :first_name, required: true, placeholder: 'First name',
-                class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+                class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+                data: { signup_form_target: 'firstName' } %>
           </div>
           <div>
             <%= f.label :last_name, class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
             <%= f.text_field :last_name, required: true, placeholder: 'Last name',
-                class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+                class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+                data: { signup_form_target: 'lastName' } %>
           </div>
         </div>
 
@@ -52,31 +58,62 @@
           <%= f.label :email, class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
           <%= f.email_field :email, autofocus: true, autocomplete: 'email', required: true,
               placeholder: 'Enter your email',
-              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+              data: { signup_form_target: 'email' } %>
         </div>
 
         <div>
           <%= f.label :phone, class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
-          <%= f.telephone_field :phone, autocomplete: 'tel', placeholder: 'Phone number (optional)',
-              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+          <div class="relative">
+            <%= f.telephone_field :phone, autocomplete: 'tel', placeholder: 'Phone number (optional)',
+                class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+                id: 'phone',
+                data: { signup_form_target: 'phone', action: 'input->signup-form#validatePhone blur->signup-form#validatePhone' } %>
+            <div id="phone-error" class="mt-1.5 text-xs text-red-600 hidden" data-signup-form-target="phoneError"></div>
+          </div>
         </div>
 
         <div>
           <%= f.label :password, class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
-          <%= f.password_field :password, autocomplete: 'new-password', required: true,
-              placeholder: 'Create password',
-              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+          <div class="relative">
+            <%= f.password_field :password, autocomplete: 'new-password', required: true,
+                placeholder: 'Create password',
+                class: 'w-full px-4 py-2.5 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+                id: 'customer_password',
+                data: { signup_form_target: 'password' } %>
+            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600" 
+                    data-action="click->signup-form#togglePassword" 
+                    data-field-id="customer_password">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
           <p class="mt-1.5 text-xs text-stone-500">Minimum 8 characters</p>
         </div>
 
         <div>
           <%= f.label :password_confirmation, 'Confirm Password', class: 'block text-sm font-medium text-stone-700 mb-1.5' %>
-          <%= f.password_field :password_confirmation, autocomplete: 'new-password', required: true,
-              placeholder: 'Confirm password',
-              class: 'w-full px-4 py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm' %>
+          <div class="relative">
+            <%= f.password_field :password_confirmation, autocomplete: 'new-password', required: true,
+                placeholder: 'Confirm password',
+                class: 'w-full px-4 py-2.5 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+                id: 'customer_password_confirmation',
+                data: { signup_form_target: 'passwordConfirmation' } %>
+            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600" 
+                    data-action="click->signup-form#togglePassword" 
+                    data-field-id="customer_password_confirmation">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
-        <%= f.submit 'Create Account', class: 'w-full py-3 px-4 bg-rose-800 text-white font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer' %>
+        <%= f.submit 'Create Account', class: 'w-full py-3 px-4 bg-rose-800 text-white font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer',
+            data: { signup_form_target: 'form' } %>
       <% end %>
 
       <p class="mt-6 text-center text-sm text-stone-600">
