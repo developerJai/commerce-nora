@@ -61,7 +61,10 @@ class Product < ApplicationRecord
 
   # Filter by variant color
   scope :by_color, ->(colors) {
-    joins(:variants).where(product_variants: { active: true, color: colors }).distinct if colors.present?
+    return all unless colors.present?
+    joins(:variants)
+      .where(product_variants: { active: true, color: colors })
+      .distinct
   }
 
   # Filter by minimum discount percentage
@@ -99,6 +102,7 @@ class Product < ApplicationRecord
   end
 
   # Variant color facet counts
+  # Always joins variants to ensure consistent behavior
   def self.available_colors
     joins(:variants)
       .where(product_variants: { active: true })
@@ -108,6 +112,11 @@ class Product < ApplicationRecord
 
   def default_variant
     variants.active.order(:position).first || variants.first
+  end
+
+  # Get first in-stock variant (for display when in-stock filter is active)
+  def first_in_stock_variant
+    variants.active.where("stock_quantity > 0").order(:position).first
   end
 
   def price_range

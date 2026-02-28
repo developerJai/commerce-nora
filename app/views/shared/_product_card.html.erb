@@ -1,6 +1,10 @@
-<% variant = product.default_variant %>
-<% cart_item = current_cart.cart_items.find_by(product_variant_id: variant&.id) if variant %>
-<% badge_side = local_assigns.fetch(:badge_side, :right) %>
+<% 
+  # Use in-stock variant when in-stock filter is active
+  in_stock_filter_active = local_assigns.fetch(:in_stock_filter, false)
+  variant = in_stock_filter_active ? (product.first_in_stock_variant || product.default_variant) : product.default_variant
+  cart_item = current_cart.cart_items.find_by(product_variant_id: variant&.id) if variant
+  badge_side = local_assigns.fetch(:badge_side, :right)
+%>
 
 <div class="group bg-white rounded-lg border border-stone-200 overflow-hidden hover:shadow-lg hover:border-stone-300 transition-all duration-200 flex flex-col"
      id="product-card-<%= product.id %>">
@@ -39,7 +43,8 @@
               In Wishlist
             </span>
           <% end %>
-          <% if variant.out_of_stock? %>
+          <%# Only show 'Sold Out' if ALL variants are out of stock %>
+          <% if !product.in_stock? %>
             <span class="px-2 py-0.5 bg-stone-800/80 text-white text-[10px] font-medium rounded-full">Sold Out</span>
           <% elsif variant.low_stock? %>
             <span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-medium rounded-full">Few Left</span>
@@ -90,12 +95,17 @@
 
     <!-- Add to Cart -->
     <div class="mt-3">
-      <% if variant.nil? %>
+      <%# Show 'Sold Out' only if ALL variants are out of stock %>
+      <% if !product.in_stock? %>
         <button disabled class="w-full py-2 px-3 bg-stone-100 text-stone-400 text-xs sm:text-sm font-medium rounded-lg cursor-not-allowed">
           Sold Out
         </button>
-      <% else %>
+      <% elsif variant %>
         <%= render 'shared/cart_controls', variant: variant, cart_item: cart_item %>
+      <% else %>
+        <button disabled class="w-full py-2 px-3 bg-stone-100 text-stone-400 text-xs sm:text-sm font-medium rounded-lg cursor-not-allowed">
+          Unavailable
+        </button>
       <% end %>
     </div>
   </div>

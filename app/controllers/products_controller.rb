@@ -18,93 +18,45 @@ class ProductsController < ApplicationController
     @catalog_min_price = variants_scope.minimum(:price).to_f.floor
     @catalog_max_price = variants_scope.maximum(:price).to_f.ceil
 
-    # ── Base query ───────────────────────────────────────────────────
-    products = Product.active.includes(
-      :category,
-      { variants: { image_attachment: :blob } },
-      images_attachments: :blob
+    # ── Build base product IDs with all non-multiselect filters ───────
+    # This is used for facet calculation (standard e-commerce approach)
+    base_product_ids = build_filtered_product_ids(
+      category_ids: @category_ids,
+      rating: @rating,
+      in_stock: @in_stock,
+      min_price: @min_price,
+      max_price: @max_price,
+      discount: @discount
     )
 
-    # ── Apply category filter ────────────────────────────────────────
-    if @category_ids.any?
-      # Expand selected categories to include the full family tree:
-      # - Selecting a parent includes products on the parent + all its children
-      # - Selecting any child also includes products assigned directly to its parent
-      #   (since a product under "Jewellery" logically belongs to all subcategories)
-      selected_categories = Category.where(id: @category_ids).includes(:children, :parent)
-      expanded_ids = selected_categories.flat_map { |cat|
-        ids = cat.self_and_children_ids
-        ids << cat.parent_id if cat.parent_id.present?
-        ids
-      }.compact.uniq
-      products = products.where(category_id: expanded_ids)
-    end
+    # ── Build facets from base filtered products (BEFORE multiselect) ──
+    # This ensures all available options are shown, not just filtered subset
+    @facets = build_facets_from_ids(base_product_ids, @in_stock)
 
-    # ── Apply price filter ───────────────────────────────────────────
-    if @min_price.present? || @max_price.present?
-      price_filter = ProductVariant.where(active: true).group(:product_id)
-      price_filter = price_filter.having("MIN(price) >= ?", @min_price.to_f) if @min_price.present?
-      price_filter = price_filter.having("MIN(price) <= ?", @max_price.to_f) if @max_price.present?
-      products = products.where(id: price_filter.select(:product_id))
-    end
+    # ── Calculate category counts WITHOUT category filter ──────────────
+    # This ensures all categories remain visible when selecting any filters
+    category_count_product_ids = build_filtered_product_ids(
+      category_ids: [],  # Exclude category filter for category counts
+      rating: @rating,
+      in_stock: @in_stock,
+      min_price: @min_price,
+      max_price: @max_price,
+      discount: @discount
+    )
+    @category_counts = Product.where(id: category_count_product_ids).group(:category_id).count
 
-    # ── Apply remaining filters (before facets for accurate counts) ───
-    # These filters affect category/facet counts so apply them first
-    products = products.by_discount(@discount) if @discount.present?
-    products = products.by_rating(@rating) if @rating.present?
-    products = products.in_stock_only if @in_stock
+    # ── Apply multiselect filters to get final product IDs ───────────
+    final_product_ids = apply_multiselect_filters(
+      base_product_ids,
+      colors: @colors,
+      materials: @materials,
+      gemstones: @gemstones,
+      occasions: @occasions,
+      in_stock: @in_stock
+    )
 
-    # ── Calculate category counts from filtered products ─────────────
-    # PERFORMANCE: Use a single query with subquery instead of plucking all IDs
-    @category_counts = Product.active
-                               .where(id: products.reorder(nil).select(:id))
-                               .group(:category_id)
-                               .count
-
-    # ── Faceted counts (after category/price/stock/discount/rating, before multiselect) ──
-    # Build facets from products that match all filters except multiselect ones
-    # This allows users to see available options even when some are selected
-    @facets = build_facets(products)
-
-    # ── Apply multiselect filters (color, material, gemstone, occasion) ─────
-    products = products.by_color(@colors) if @colors.any?
-    products = products.by_attribute(:base_material, @materials) if @materials.any?
-    products = products.by_attribute(:gemstone, @gemstones) if @gemstones.any?
-    products = products.by_attribute(:occasion, @occasions) if @occasions.any?
-
-    # ── Sort ─────────────────────────────────────────────────────────
-    # When sorting by price/discount, we need to handle the case where filters may have added DISTINCT
-    # PostgreSQL requires ORDER BY expressions to appear in SELECT when using DISTINCT
-    # Solution: Get filtered IDs first, then re-query with ordering and eager loading
-    products = case @sort
-    when "price_low", "price_high"
-      direction = @sort == "price_low" ? "ASC" : "DESC"
-      # PERFORMANCE: Pluck IDs first (fast), then re-query with proper ordering
-      # This avoids DISTINCT + ORDER BY conflicts entirely
-      product_ids = products.reorder(nil).pluck(:id)
-      Product.active
-             .includes(:category, { variants: { image_attachment: :blob } }, images_attachments: :blob)
-             .where(id: product_ids)
-             .left_joins(:variants)
-             .where(product_variants: { active: true })
-             .group(:id)
-             .order(Arel.sql("MIN(product_variants.price) #{direction}"))
-    when "rating"
-      products.order(average_rating: :desc)
-    when "discount"
-      # PERFORMANCE: Same approach as price sorting - pluck IDs first
-      product_ids = products.reorder(nil).pluck(:id)
-      Product.active
-             .includes(:category, { variants: { image_attachment: :blob } }, images_attachments: :blob)
-             .where(id: product_ids)
-             .left_joins(:variants)
-             .where(product_variants: { active: true })
-             .where("product_variants.compare_at_price > product_variants.price")
-             .group(:id)
-             .order(Arel.sql("MAX((product_variants.compare_at_price - product_variants.price) / NULLIF(product_variants.compare_at_price, 0) * 100) DESC"))
-    else
-      products.order(created_at: :desc)
-    end
+    # ── Sort and paginate ───────────────────────────────────────────
+    products = build_sorted_products(final_product_ids, @sort, @in_stock)
 
     @pagy, @products = pagy(products, limit: 16)
     @category_tree = Category.grouped_for_filters(product_counts: @category_counts)
@@ -174,5 +126,138 @@ class ProductsController < ApplicationController
       filters << { label: "Max ₹#{@max_price}", param: "max_price", value: @max_price }
     end
     filters
+  end
+
+  # Build filtered product IDs with non-multiselect filters
+  # This is the base for facet calculation
+  def build_filtered_product_ids(category_ids:, rating:, in_stock:, min_price:, max_price:, discount:)
+    products = Product.active
+
+    # Category filter
+    if category_ids.any?
+      selected_categories = Category.where(id: category_ids).includes(:children, :parent)
+      expanded_ids = selected_categories.flat_map { |cat|
+        ids = cat.self_and_children_ids
+        ids << cat.parent_id if cat.parent_id.present?
+        ids
+      }.compact.uniq
+      products = products.where(category_id: expanded_ids)
+    end
+
+    # Rating filter (product-level)
+    products = products.where("average_rating >= ?", rating.to_f) if rating.present? && rating.to_f > 0
+
+    # Variant-level filters require joining variants
+    needs_variant_filter = in_stock || min_price.present? || max_price.present? || discount.present?
+
+    if needs_variant_filter
+      products = products.joins(:variants).where(product_variants: { active: true })
+
+      # In-stock filter
+      if in_stock
+        products = products.where("product_variants.stock_quantity > ?", 0)
+      end
+
+      # Price range filter
+      products = products.where("product_variants.price >= ?", min_price.to_f) if min_price.present?
+      products = products.where("product_variants.price <= ?", max_price.to_f) if max_price.present?
+
+      # Discount filter
+      if discount.present?
+        products = products.where("product_variants.compare_at_price > product_variants.price")
+                           .where("((product_variants.compare_at_price - product_variants.price) / product_variants.compare_at_price * 100) >= ?", discount.to_i)
+      end
+
+      products = products.distinct
+    end
+
+    products.pluck(:id)
+  end
+
+  # Build facets from product IDs (respects in-stock filter for variant colors)
+  def build_facets_from_ids(product_ids, in_stock)
+    return { colors: {}, materials: {}, gemstones: {}, occasions: {} } if product_ids.empty?
+
+    products = Product.where(id: product_ids)
+
+    # For colors, we need to respect in-stock filter at variant level
+    color_query = products.joins(:variants)
+                          .where(product_variants: { active: true })
+                          .where.not(product_variants: { color: [nil, ""] })
+    color_query = color_query.where("product_variants.stock_quantity > ?", 0) if in_stock
+    colors = color_query.group("product_variants.color").count
+
+    # Product-level attributes
+    materials = products.where.not(base_material: [nil, ""]).group(:base_material).count
+    gemstones = products.where.not(gemstone: [nil, ""]).group(:gemstone).count
+    occasions = products.where.not(occasion: [nil, ""]).group(:occasion).count
+
+    { colors: colors, materials: materials, gemstones: gemstones, occasions: occasions }
+  end
+
+  # Apply multiselect filters (color, material, gemstone, occasion)
+  def apply_multiselect_filters(product_ids, colors:, materials:, gemstones:, occasions:, in_stock:)
+    return product_ids if product_ids.empty?
+
+    products = Product.where(id: product_ids)
+
+    # Color filter (variant-level)
+    if colors.any?
+      color_query = products.joins(:variants)
+                            .where(product_variants: { active: true, color: colors })
+      color_query = color_query.where("product_variants.stock_quantity > ?", 0) if in_stock
+      products = color_query.distinct
+    end
+
+    # Product-level attribute filters
+    products = products.where(base_material: materials) if materials.any?
+    products = products.where(gemstone: gemstones) if gemstones.any?
+    products = products.where(occasion: occasions) if occasions.any?
+
+    products.pluck(:id)
+  end
+
+  # Build sorted products query with eager loading
+  def build_sorted_products(product_ids, sort, in_stock)
+    return Product.none if product_ids.empty?
+
+    products = case sort
+    when "price_low", "price_high"
+      direction = sort == "price_low" ? "ASC" : "DESC"
+      query = Product.where(id: product_ids)
+                     .joins(:variants)
+                     .where(product_variants: { active: true })
+      query = query.where("product_variants.stock_quantity > ?", 0) if in_stock
+      query.group("products.id")
+           .order(Arel.sql("MIN(product_variants.price) #{direction}"))
+    when "rating"
+      Product.where(id: product_ids)
+             .order(Arel.sql("COALESCE(average_rating, 0) DESC"))
+    when "discount"
+      query = Product.where(id: product_ids)
+                     .joins(:variants)
+                     .where(product_variants: { active: true })
+      query = query.where("product_variants.stock_quantity > ?", 0) if in_stock
+      query.group("products.id")
+           .order(Arel.sql(
+             "MAX(CASE " \
+             "WHEN product_variants.compare_at_price > product_variants.price " \
+             "THEN (product_variants.compare_at_price - product_variants.price) / NULLIF(product_variants.compare_at_price, 0) * 100 " \
+             "ELSE 0 END) DESC"
+           ))
+    when "newest"
+      Product.where(id: product_ids)
+             .order(created_at: :desc)
+    else
+      Product.where(id: product_ids)
+             .order(Arel.sql("COALESCE(average_rating, 0) DESC"))
+    end
+
+    # Eager load associations for display
+    products.includes(
+      :category,
+      { variants: { image_attachment: :blob } },
+      images_attachments: :blob
+    )
   end
 end
