@@ -114,10 +114,21 @@ class ProductsController < ApplicationController
 
   def build_active_filters
     filters = []
+    
+    # Only show categories that should be visible based on admin settings
+    show_subcategories = @filter_config["show_subcategories"]
     @category_ids.each do |cid|
       cat = Category.find_by(id: cid)
-      filters << { label: cat.name, param: "category_ids", value: cid } if cat
+      next unless cat
+      
+      # Skip subcategories if they're disabled in admin panel
+      if cat.parent_id.present? && !show_subcategories
+        next
+      end
+      
+      filters << { label: cat.name, param: "category_ids", value: cid }
     end
+    
     @colors.each { |v| filters << { label: "Color: #{v}", param: "colors", value: v } }
     @materials.each { |v| filters << { label: "Material: #{v}", param: "materials", value: v } }
     @gemstones.each { |v| filters << { label: "Stone: #{v}", param: "gemstones", value: v } }

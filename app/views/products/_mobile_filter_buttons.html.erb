@@ -1,0 +1,22 @@
+<div class="grid grid-cols-2 gap-2.5">
+  <!-- Filter Button -->
+  <button type="button" data-action="click->filter-drawer#open"
+          class="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white rounded-lg font-medium text-stone-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] active:shadow-[0_1px_3px_rgba(0,0,0,0.12)] active:translate-y-[1px] transition-all">
+    <svg class="w-4.5 h-4.5 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+    </svg>
+    <span class="text-sm">Filters</span>
+    <% if @active_filters.any? %>
+      <span class="px-1.5 py-0.5 bg-rose-800 text-white text-[10px] font-bold rounded-full min-w-[18px] text-center"><%= @active_filters.size %></span>
+    <% end %>
+  </button>
+  
+  <!-- Sort Button -->
+  <button type="button" data-action="click->filter-drawer#openSort"
+          class="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white rounded-lg font-medium text-stone-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] active:shadow-[0_1px_3px_rgba(0,0,0,0.12)] active:translate-y-[1px] transition-all">
+    <svg class="w-4.5 h-4.5 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"/>
+    </svg>
+    <span class="text-sm">Sort</span>
+  </button>
+</div>

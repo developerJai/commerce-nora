@@ -219,7 +219,11 @@ Rails.application.routes.draw do
   resources :invoices, only: [ :show ], param: :order_number, defaults: { format: "pdf" }
 
   # Addresses
-  resources :addresses, param: :token
+  resources :addresses, param: :token do
+    member do
+      patch :set_default
+    end
+  end
 
   # Wishlist
   resources :wishlists, only: [ :index, :create, :destroy ], param: :product_id do

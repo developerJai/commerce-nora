@@ -1,12 +1,13 @@
 <% content_for(:title) { "My Wishlist" } %>
 
-<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
-  <div class="flex flex-col lg:flex-row gap-6">
-    <div class="w-full lg:w-64 flex-shrink-0">
-      <%= render 'shared/account_sidebar', active_page: 'wishlist' %>
-    </div>
+<div class="min-h-screen bg-stone-50">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 lg:py-10">
+    <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      <div class="w-full lg:w-72 flex-shrink-0">
+        <%= render 'shared/account_sidebar', active_page: 'wishlist' %>
+      </div>
 
-    <div class="flex-1">
+      <div class="flex-1 min-h-[600px]">
       <div id="wishlist-header" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h1 class="text-2xl font-serif font-semibold text-stone-900">My Wishlist</h1>

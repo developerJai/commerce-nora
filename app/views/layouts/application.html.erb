@@ -177,42 +177,44 @@
     </div>
 
     <!-- Categories Nav with Subcategory Dropdowns -->
-    <nav class="hidden sm:block border-t border-stone-100">
-      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div class="flex items-center gap-1 sm:gap-4 h-10 overflow-x-auto scrollbar-hide">
-          <% active_class = 'px-3 py-1.5 text-sm text-rose-700 font-medium whitespace-nowrap' %>
-          <% inactive_class = 'px-3 py-1.5 text-sm text-stone-600 hover:text-rose-800 whitespace-nowrap transition' %>
-          <% selected_category_ids = Array(params[:category_ids]).reject(&:blank?).map(&:to_s) %>
-          <% collections_active = params[:featured].present? && ActiveModel::Type::Boolean.new.cast(params[:featured]) %>
-          <% all_active = selected_category_ids.empty? && !collections_active %>
+    <% unless controller_name == 'products' && action_name == 'index' %>
+      <nav class="hidden sm:block border-t border-stone-100">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div class="flex items-center gap-1 sm:gap-4 h-10 overflow-x-auto scrollbar-hide">
+            <% active_class = 'px-3 py-1.5 text-sm text-rose-700 font-medium whitespace-nowrap' %>
+            <% inactive_class = 'px-3 py-1.5 text-sm text-stone-600 hover:text-rose-800 whitespace-nowrap transition' %>
+            <% selected_category_ids = Array(params[:category_ids]).reject(&:blank?).map(&:to_s) %>
+            <% collections_active = params[:featured].present? && ActiveModel::Type::Boolean.new.cast(params[:featured]) %>
+            <% all_active = selected_category_ids.empty? && !collections_active %>
 
-          <%= link_to products_path, class: (all_active ? active_class : inactive_class) do %>
-            All
-          <% end %>
-          <%= link_to 'Collections', products_path(featured: true), class: (collections_active ? active_class : inactive_class) %>
-          <% Category.tree.each do |category| %>
-            <% category_active = selected_category_ids.include?(category.id.to_s) || category.children.any? { |c| selected_category_ids.include?(c.id.to_s) } %>
-            <% has_children = category.children.select(&:active?).any? %>
-            <% if has_children %>
-              <div class="relative group">
-                <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
-                <div class="absolute left-0 top-full pt-1 hidden group-hover:block z-50">
-                  <div class="bg-white border border-stone-200 rounded-lg shadow-lg py-2 min-w-[180px]">
-                    <% category.children.select(&:active?).sort_by { |c| [c.position, c.name] }.each do |child| %>
-                      <% child_active = selected_category_ids.include?(child.id.to_s) %>
-                      <%= link_to child.name, category_path(child.slug),
-                          class: "block px-4 py-2 text-sm transition #{child_active ? 'text-rose-700 font-medium bg-rose-50' : 'text-stone-600 hover:text-rose-800 hover:bg-rose-50'}" %>
-                    <% end %>
+            <%= link_to products_path, class: (all_active ? active_class : inactive_class) do %>
+              All
+            <% end %>
+            <%= link_to 'Collections', products_path(featured: true), class: (collections_active ? active_class : inactive_class) %>
+            <% Category.tree.each do |category| %>
+              <% category_active = selected_category_ids.include?(category.id.to_s) || category.children.any? { |c| selected_category_ids.include?(c.id.to_s) } %>
+              <% has_children = category.children.select(&:active?).any? %>
+              <% if has_children %>
+                <div class="relative group">
+                  <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
+                  <div class="absolute left-0 top-full pt-1 hidden group-hover:block z-50">
+                    <div class="bg-white border border-stone-200 rounded-lg shadow-lg py-2 min-w-[180px]">
+                      <% category.children.select(&:active?).sort_by { |c| [c.position, c.name] }.each do |child| %>
+                        <% child_active = selected_category_ids.include?(child.id.to_s) %>
+                        <%= link_to child.name, category_path(child.slug),
+                            class: "block px-4 py-2 text-sm transition #{child_active ? 'text-rose-700 font-medium bg-rose-50' : 'text-stone-600 hover:text-rose-800 hover:bg-rose-50'}" %>
+                      <% end %>
+                    </div>
                   </div>
                 </div>
-              </div>
-            <% else %>
-              <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
+              <% else %>
+                <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
+              <% end %>
             <% end %>
-          <% end %>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    <% end %>
   </header>
 
   <div id="toasts" class="fixed top-20 sm:top-24 right-3 sm:right-6 z-[60] flex flex-col gap-2 items-end">
@@ -230,8 +232,9 @@
   </main>
 
   <!-- Footer -->
-  <% hide_footer = (controller_name == 'carts' && action_name == 'show') || (controller_name == 'checkouts' && action_name == 'show') %>
-  <footer class="<%= hide_footer ? 'hidden lg:block' : 'hidden sm:block' %> bg-stone-900 mt-12 sm:mt-16">
+  <% hide_footer_mobile = (controller_name == 'carts' && action_name == 'show') || (controller_name == 'checkouts' && action_name == 'show') %>
+  <% hide_footer_completely = (controller_name == 'products' && action_name == 'index') %>
+  <footer class="<%= hide_footer_completely ? 'hidden' : (hide_footer_mobile ? 'hidden lg:block' : 'hidden sm:block') %> bg-stone-900 mt-12 sm:mt-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
       <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
         <div class="col-span-2 md:col-span-1">

@@ -1,5 +1,20 @@
-<%= turbo_stream.append 'products-grid' do %>
-  <%= render 'cards', products: @products %>
+<%# For infinite scroll (pagination) - append new products %>
+<% if params[:page].present? && params[:page].to_i > 1 %>
+  <%= turbo_stream.append 'products-grid' do %>
+    <%= render 'cards', products: @products %>
+  <% end %>
+<% else %>
+  <%# For filter/sort changes - replace entire products grid %>
+  <%= turbo_stream.replace 'products-grid' do %>
+    <div id="products-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+      <%= render 'cards', products: @products %>
+    </div>
+  <% end %>
+  
+  <%# Also update mobile filter buttons count when filters change %>
+  <%= turbo_stream.replace 'mobile-filter-buttons' do %>
+    <%= render 'mobile_filter_buttons' %>
+  <% end %>
 <% end %>
 
 <%= turbo_stream.replace 'results-counter' do %>

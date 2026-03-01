@@ -1,6 +1,6 @@
 class AddressesController < ApplicationController
   before_action :require_customer
-  before_action :set_address, only: [:show, :edit, :update, :destroy]
+  before_action :set_address, only: [:show, :edit, :update, :destroy, :set_default]
 
   def index
     @addresses = current_customer.addresses.default_first
@@ -53,6 +53,14 @@ class AddressesController < ApplicationController
   def destroy
     @address.destroy
     redirect_to addresses_path, notice: "Address deleted"
+  end
+
+  def set_default
+    # Remove default from all other addresses
+    current_customer.addresses.where(is_default: true).update_all(is_default: false)
+    # Set this address as default
+    @address.update(is_default: true)
+    redirect_to addresses_path, notice: "Default address updated"
   end
 
   private
