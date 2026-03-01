@@ -1,11 +1,12 @@
 <% content_for(:title) { "Checkout" } %>
+<%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css", "data-turbo-track": "reload" %>
 <% store_setting = StoreSetting.instance %>
 <% enable_razorpay = store_setting.razorpay_enabled? %>
 <% enable_cod = store_setting.cod_enabled? %>
 <% any_payment_enabled = store_setting.any_payment_method_enabled? %>
 
-<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
-  <h1 class="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-stone-900 mb-4 sm:mb-6 md:mb-8">Secure Checkout</h1>
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 md:py-8">
+  <h1 class="text-base sm:text-xl md:text-2xl font-serif font-semibold text-stone-900 mb-3 sm:mb-6 md:mb-8">Checkout</h1>
 
   <% if !@address %>
     <!-- No Address State - Show Address Selection First -->
@@ -16,51 +17,51 @@
         data: { turbo: false },
         class: "contents" do |f| %>
       
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
         <!-- Left Column: Address, Payment, Items -->
-        <div class="lg:col-span-2 space-y-4 sm:space-y-6">
+        <div class="md:col-span-2 space-y-3 sm:space-y-6 pb-[220px] md:pb-0">
           
           <!-- Delivery Address (Compact) -->
-          <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 p-4 sm:p-5 md:p-6" id="address-display">
-            <div class="flex items-start justify-between">
-              <div class="flex items-start gap-2 sm:gap-3">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 p-3 sm:p-5 md:p-6" id="address-display">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-start gap-2 flex-1 min-w-0">
+                <div class="w-7 h-7 sm:w-10 sm:h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
                 </div>
-                <div id="address-details">
-                  <h2 class="text-sm sm:text-base font-serif font-semibold text-stone-900">Deliver to</h2>
-                  <div class="mt-1.5 sm:mt-2">
-                    <p class="text-sm sm:text-base font-medium text-stone-900"><%= @address.full_name %></p>
-                    <p class="text-xs sm:text-sm text-stone-600 mt-0.5"><%= @address.full_address %></p>
-                    <% if @address.phone.present? %>
-                      <p class="text-xs sm:text-sm text-stone-500 mt-0.5">📞 <%= @address.phone %></p>
-                    <% end %>
-                  </div>
+                <div id="address-details" class="flex-1 min-w-0">
+                  <p class="text-xs sm:text-sm font-semibold text-stone-900"><%= @address.full_name %></p>
+                  <p class="text-xs sm:text-sm text-stone-600 mt-0.5 line-clamp-2"><%= @address.full_address %></p>
                 </div>
               </div>
               <button type="button" 
                       id="change-address-btn"
-                      class="text-xs sm:text-sm text-rose-700 hover:text-rose-900 font-medium whitespace-nowrap">
+                      class="text-xs sm:text-sm text-rose-700 hover:text-rose-900 font-semibold whitespace-nowrap flex-shrink-0">
                 Change
               </button>
             </div>
           </div>
 
           <!-- Address Selection Modal (Hidden by default) -->
-          <div id="address-modal" class="hidden bg-white rounded-lg sm:rounded-xl border-2 border-rose-200 p-4 sm:p-5 md:p-6 shadow-lg">
-            <div class="flex items-center justify-between mb-3 sm:mb-4">
-              <h2 class="text-base sm:text-lg font-serif font-semibold text-stone-900">Select Delivery Address</h2>
-              <button type="button" 
-                      id="close-address-modal"
-                      class="text-stone-400 hover:text-stone-600">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </button>
-            </div>
+          <div id="address-modal" class="hidden fixed inset-0 md:relative md:inset-auto bg-black/40 md:bg-transparent z-50 md:z-auto">
+            <div class="fixed bottom-0 left-0 right-0 md:relative bg-white rounded-t-3xl md:rounded-xl border-2 border-rose-200 md:border-rose-200 p-4 sm:p-5 md:p-6 shadow-lg max-h-[85vh] md:max-h-none overflow-y-auto transform translate-y-full md:translate-y-0 transition-transform duration-300 ease-out" id="address-modal-content">
+              <!-- Drag Handle (Mobile Only) -->
+              <div class="md:hidden flex justify-center py-2 -mt-2 mb-2">
+                <div class="w-12 h-1 bg-stone-300 rounded-full"></div>
+              </div>
+              
+              <div class="flex items-center justify-between mb-3 sm:mb-4">
+                <h2 class="text-base sm:text-lg font-serif font-semibold text-stone-900">Select Address</h2>
+                <button type="button" 
+                        id="close-address-modal"
+                        class="text-stone-400 hover:text-stone-600">
+                  <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
             
             <div id="address-list" class="space-y-2 sm:space-y-3 mb-4 sm:mb-6 max-h-96 overflow-y-auto">
               <% current_customer.addresses.default_first.each do |addr| %>
@@ -88,7 +89,7 @@
                         </div>
                         <p class="text-xs sm:text-sm text-stone-600 mt-0.5 sm:mt-1 break-words"><%= addr.full_address %></p>
                         <% if addr.phone.present? %>
-                          <p class="text-xs sm:text-sm text-stone-500 mt-0.5 sm:mt-1">📞 <%= addr.phone %></p>
+                          <p class="text-xs sm:text-sm text-stone-500 mt-0.5 sm:mt-1">📞 <%= addr.full_phone %></p>
                         <% end %>
                       </div>
                     </div>
@@ -97,48 +98,46 @@
               <% end %>
             </div>
             
-            <div class="border-t border-stone-200 pt-3 sm:pt-4">
-              <%= link_to address_checkout_path, class: "w-full py-3 px-4 bg-rose-800 text-white text-center font-medium rounded-lg hover:bg-rose-900 transition flex items-center justify-center gap-2" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                Add New Address
-              <% end %>
+              <div class="border-t border-stone-200 pt-3 sm:pt-4">
+                <%= link_to new_address_path(redirect_to: 'checkout'), class: "w-full py-3 px-4 bg-rose-800 text-white text-center font-medium rounded-lg hover:bg-rose-900 transition flex items-center justify-center gap-2" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  Add New Address
+                <% end %>
+              </div>
             </div>
           </div>
 
           <!-- Payment Method -->
-          <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6" id="payment-section">
-            <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Payment Method</h2>
+          <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 p-3 sm:p-6" id="payment-section">
+            <h2 class="text-sm sm:text-base font-serif font-semibold text-stone-900 mb-2 sm:mb-4">Payment</h2>
             
             <% if any_payment_enabled %>
-              <div class="space-y-3">
+              <div class="space-y-2 sm:space-y-3">
                 <%# Razorpay First (Default when both enabled) %>
                 <% if enable_razorpay %>
-                  <label class="payment-option relative flex items-center p-4 border-2 border-stone-200 rounded-xl cursor-pointer transition-all hover:border-stone-300 <%= 'border-rose-500 bg-rose-50 ring-2 ring-rose-200' if enable_razorpay %>" data-payment-method="razorpay">
+                  <label class="payment-option relative flex items-center p-2.5 sm:p-4 border-2 border-stone-200 rounded-lg sm:rounded-xl cursor-pointer transition-all hover:border-stone-300 <%= 'border-rose-500 bg-rose-50 ring-2 ring-rose-200' if enable_razorpay %>" data-payment-method="razorpay">
                     <%= f.radio_button :payment_method, 'razorpay', 
-                        checked: true, # Always check Razorpay by default when available
+                        checked: true,
                         class: 'sr-only', 
                         id: 'payment_razorpay' %>
-                    <div class="flex items-center gap-4 w-full">
-                      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg class="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-2 sm:gap-4 w-full">
+                      <div class="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 sm:w-6 sm:h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                         </svg>
                       </div>
-                      <div class="flex-1">
-                        <div class="flex items-center justify-between">
-                          <span class="font-semibold text-stone-900">Pay Online</span>
-                          <div class="flex items-center gap-2">
-                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-medium">Razorpay</span>
-                            <span class="check-icon text-rose-600 opacity-0 transition-opacity">
-                              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                              </svg>
-                            </span>
-                          </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2">
+                          <span class="text-sm sm:text-base font-semibold text-stone-900">Pay Online</span>
+                          <span class="check-icon text-rose-600 opacity-0 transition-opacity">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                          </span>
                         </div>
-                        <p class="text-sm text-stone-600">UPI, Credit/Debit Card, Netbanking, Wallets</p>
+                        <p class="hidden sm:block text-sm text-stone-600 mt-0.5">UPI, Cards, Netbanking</p>
                       </div>
                     </div>
                   </label>
@@ -146,27 +145,27 @@
 
                 <%# COD Second %>
                 <% if enable_cod %>
-                  <label class="payment-option relative flex items-center p-4 border-2 border-stone-200 rounded-xl cursor-pointer transition-all hover:border-stone-300 <%= 'border-rose-500 bg-rose-50 ring-2 ring-rose-200' if !enable_razorpay %>" data-payment-method="cod">
+                  <label class="payment-option relative flex items-center p-2.5 sm:p-4 border-2 border-stone-200 rounded-lg sm:rounded-xl cursor-pointer transition-all hover:border-stone-300 <%= 'border-rose-500 bg-rose-50 ring-2 ring-rose-200' if !enable_razorpay %>" data-payment-method="cod">
                     <%= f.radio_button :payment_method, 'cod', 
-                        checked: !enable_razorpay, # Only check COD if Razorpay is disabled
+                        checked: !enable_razorpay,
                         class: 'sr-only', 
                         id: 'payment_cod' %>
-                    <div class="flex items-center gap-4 w-full">
-                      <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg class="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-2 sm:gap-4 w-full">
+                      <div class="w-8 h-8 sm:w-12 sm:h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 sm:w-6 sm:h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z"/>
                         </svg>
                       </div>
-                      <div class="flex-1">
-                        <div class="flex items-center justify-between">
-                          <span class="font-semibold text-stone-900">Cash on Delivery</span>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2">
+                          <span class="text-sm sm:text-base font-semibold text-stone-900">Cash on Delivery</span>
                           <span class="check-icon text-rose-600 opacity-0 transition-opacity">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
                               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                           </span>
                         </div>
-                        <p class="text-sm text-stone-600">Pay with cash or UPI when your order is delivered</p>
+                        <p class="hidden sm:block text-sm text-stone-600 mt-0.5">Pay when delivered</p>
                       </div>
                     </div>
                   </label>
@@ -192,14 +191,13 @@
           </div>
 
           <!-- Per-Vendor Order Estimates -->
-          <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-base font-serif font-semibold text-stone-900">
-                <%= @vendor_estimates.size > 1 ? "#{@vendor_estimates.size} Vendor Orders" : "Order Items" %> 
-                (<%= current_cart.cart_items.count %> items)
+          <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 p-3 sm:p-6">
+            <div class="flex items-center justify-between mb-2 sm:mb-4">
+              <h2 class="text-sm sm:text-base font-semibold text-stone-900">
+                <%= "#{current_cart.cart_items.count} #{current_cart.cart_items.count == 1 ? 'Item' : 'Items'}" %>
               </h2>
-              <%= link_to cart_path, class: "text-sm text-rose-700 hover:text-rose-900 font-medium" do %>
-                Edit Cart
+              <%= link_to cart_path, class: "text-xs sm:text-sm text-rose-700 hover:text-rose-900 font-semibold" do %>
+                Edit
               <% end %>
             </div>
             
@@ -293,7 +291,7 @@
               </div>
             <% else %>
               <!-- Single Vendor - Simple Item List -->
-              <div class="space-y-4">
+              <div class="space-y-4 mb-4">
                 <% current_cart.cart_items.each do |item|
                   tax_rate = item.product_variant&.product&.hsn_code&.gst_rate || 3.0
                   # Calculate item tax amount
@@ -322,11 +320,39 @@
                   </div>
                 <% end %>
               </div>
+              
+              <!-- Single Vendor Estimate Summary -->
+              <div class="bg-stone-50 rounded-lg p-3 text-xs space-y-1">
+                <div class="flex justify-between">
+                  <span class="text-stone-600">Subtotal</span>
+                  <span class="text-stone-900"><%= format_price(@subtotal) %></span>
+                </div>
+                <% if @discount > 0 %>
+                  <div class="flex justify-between text-emerald-600">
+                    <span>Discount</span>
+                    <span>-<%= format_price(@discount) %></span>
+                  </div>
+                <% end %>
+                <div class="flex justify-between">
+                  <span class="text-stone-600">Shipping</span>
+                  <span class="<%= @shipping.to_f > 0 ? 'text-stone-900' : 'text-emerald-600 font-medium' %>">
+                    <%= @shipping.to_f > 0 ? format_price(@shipping) : 'FREE' %>
+                  </span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-stone-600">Tax</span>
+                  <span class="text-stone-900"><%= format_price(@tax) %></span>
+                </div>
+                <div class="flex justify-between pt-1 border-t border-stone-200">
+                  <span class="font-medium text-stone-900">Total</span>
+                  <span class="font-semibold text-stone-900"><%= format_price(@total) %></span>
+                </div>
+              </div>
             <% end %>
           </div>
 
-          <!-- Order Notes -->
-          <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
+          <!-- Order Notes (Hidden on Mobile) -->
+          <div class="hidden md:block bg-white rounded-xl border border-stone-200 p-5 sm:p-6">
             <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Notes <span class="text-stone-400 font-normal text-sm">(Optional)</span></h2>
             <%= f.text_area :notes, rows: 2, placeholder: 'Any special instructions for delivery...', 
                 class: 'w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm resize-none' %>
@@ -334,11 +360,12 @@
         </div>
 
         <!-- Right Column: Order Summary -->
-        <div class="lg:col-span-1">
-          <div class="bg-white rounded-xl border border-stone-200 p-5 sm:p-6 lg:sticky lg:top-24">
-            <h2 class="text-base font-serif font-semibold text-stone-900 mb-4">Order Summary</h2>
+        <div class="fixed bottom-0 left-0 right-0 md:relative md:col-span-1 z-30 pb-14 md:pb-0">
+          <div class="bg-white border-t-2 border-stone-200 md:border md:border-t md:rounded-xl shadow-[0_-2px_12px_rgba(0,0,0,0.08)] md:shadow-sm p-3.5 md:p-6 md:sticky md:top-24">
+            <h2 class="hidden md:block text-base font-serif font-semibold text-stone-900 mb-4">Order Summary</h2>
             
-            <div class="space-y-2 text-sm mb-4">
+            <!-- Desktop Summary -->
+            <div class="hidden md:block space-y-2 text-sm mb-4">
               <div class="flex justify-between py-1">
                 <span class="text-stone-600">Subtotal</span>
                 <span class="text-stone-900 font-medium"><%= format_price(@subtotal) %></span>
@@ -366,6 +393,20 @@
                   <span class="font-bold text-stone-900 text-xl" id="order-total"><%= format_price(@total) %></span>
                 </div>
                 <p class="text-xs text-stone-500 mt-1 text-right">Inclusive of all taxes</p>
+              </div>
+            </div>
+            
+            <!-- Mobile Summary (Compact) -->
+            <div class="md:hidden mb-3">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <p class="text-xs text-stone-500">Total Amount</p>
+                  <p class="text-xl font-bold text-stone-900"><%= format_price(@total) %></p>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs text-stone-500"><%= current_cart.cart_items.count %> <%= current_cart.cart_items.count == 1 ? 'item' : 'items' %></p>
+                  <p class="text-xs text-stone-400">Inc. taxes</p>
+                </div>
               </div>
             </div>
             
@@ -441,27 +482,15 @@
 
             <% if any_payment_enabled %>
               <!-- Payment Info Box -->
-              <div id="payment-info-box" class="mt-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg class="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="font-semibold text-amber-900" id="payment-info-title">Cash on Delivery</p>
-                    <p class="text-sm text-amber-700 mt-0.5" id="payment-info-desc">Pay when you receive your order</p>
-                  </div>
-                </div>
-              </div>
+              <p id="payment-info-box" class="text-[10px] text-stone-400 mb-2"><svg class="w-3 h-3 inline-block align-middle mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span id="payment-info-desc">Pay when you receive your order</span></p>
 
               <!-- Submit Button -->
               <%= f.submit 'Place Order', 
                   id: 'place-order-btn',
-                  class: 'mt-5 w-full py-4 px-4 bg-rose-800 text-white font-semibold text-lg rounded-xl hover:bg-rose-900 transition shadow-lg shadow-rose-200 cursor-pointer' %>
+                  class: 'w-full py-3 lg:py-4 px-4 bg-rose-800 text-white font-semibold text-base lg:text-lg rounded-xl hover:bg-rose-900 transition shadow-lg cursor-pointer' %>
               
-              <!-- Security Badges -->
-              <div class="mt-4 flex items-center justify-center gap-4 text-xs text-stone-500">
+              <!-- Security Badges (Desktop Only) -->
+              <div class="hidden lg:flex mt-4 items-center justify-center gap-4 text-xs text-stone-500">
                 <span class="flex items-center gap-1">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -492,7 +521,7 @@
               </button>
             <% end %>
 
-            <p class="mt-4 text-xs text-stone-400 text-center">
+            <p class="hidden md:block mt-4 text-xs text-stone-400 text-center">
               By placing this order, you agree to our Terms and Privacy Policy
             </p>
           </div>
@@ -512,7 +541,6 @@
       const paymentCod = document.getElementById('payment_cod');
       const paymentRazorpay = document.getElementById('payment_razorpay');
       const paymentInfoBox = document.getElementById('payment-info-box');
-      const paymentInfoTitle = document.getElementById('payment-info-title');
       const paymentInfoDesc = document.getElementById('payment-info-desc');
       
       // Address modal elements
@@ -523,25 +551,115 @@
       const addressOptions = document.querySelectorAll('.address-option');
       const addressDetails = document.getElementById('address-details');
       
-      // Address modal toggle
+      // Address modal toggle with bottom sheet animation
+      const addressModalContent = document.getElementById('address-modal-content');
+      
+      // Swipe gesture variables
+      let touchStartY = 0;
+      let touchCurrentY = 0;
+      let isDragging = false;
+      
       if (changeAddressBtn && addressModal) {
         changeAddressBtn.addEventListener('click', function() {
           addressModal.classList.remove('hidden');
           if (addressDisplay) addressDisplay.classList.add('hidden');
+          // Trigger animation after display
+          setTimeout(() => {
+            if (addressModalContent) {
+              addressModalContent.classList.remove('translate-y-full');
+            }
+          }, 10);
+          document.body.classList.add('overflow-hidden');
         });
       }
       
-      if (closeAddressModal && addressModal) {
-        closeAddressModal.addEventListener('click', function() {
-          addressModal.classList.add('hidden');
+      function closeModal() {
+        if (addressModalContent) {
+          addressModalContent.classList.add('translate-y-full');
+        }
+        setTimeout(() => {
+          if (addressModal) addressModal.classList.add('hidden');
           if (addressDisplay) addressDisplay.classList.remove('hidden');
+          document.body.classList.remove('overflow-hidden');
+        }, 300);
+      }
+      
+      if (closeAddressModal) {
+        closeAddressModal.addEventListener('click', closeModal);
+      }
+      
+      // Close on backdrop click (mobile only)
+      if (addressModal) {
+        addressModal.addEventListener('click', function(e) {
+          if (e.target === addressModal && window.innerWidth < 1024) {
+            closeModal();
+          }
         });
       }
-
-      // Address selection - Simple form submission approach
+      
+      // Swipe-down gesture to close modal
+      if (addressModalContent) {
+        addressModalContent.addEventListener('touchstart', function(e) {
+          touchStartY = e.touches[0].clientY;
+          isDragging = false;
+        }, { passive: true });
+        
+        addressModalContent.addEventListener('touchmove', function(e) {
+          if (!touchStartY) return;
+          
+          touchCurrentY = e.touches[0].clientY;
+          const deltaY = touchCurrentY - touchStartY;
+          
+          // Only allow dragging down
+          if (deltaY > 0) {
+            isDragging = true;
+            
+            // Check if content is scrolled to top
+            const scrollableContent = addressModalContent.querySelector('#address-list');
+            if (scrollableContent && scrollableContent.scrollTop > 0) {
+              return; // Let the content scroll naturally
+            }
+            
+            e.preventDefault();
+            
+            // Apply transform with resistance
+            const resistance = 0.5;
+            const translateY = deltaY * resistance;
+            addressModalContent.style.transform = `translateY(${translateY}px)`;
+            addressModalContent.style.transition = 'none';
+          }
+        }, { passive: false });
+        
+        addressModalContent.addEventListener('touchend', function(e) {
+          if (!isDragging) return;
+          
+          const deltaY = touchCurrentY - touchStartY;
+          const threshold = 100; // pixels to swipe down to close
+          
+          addressModalContent.style.transition = '';
+          
+          if (deltaY > threshold) {
+            // Close the modal
+            closeModal();
+          } else {
+            // Snap back to original position
+            addressModalContent.style.transform = '';
+          }
+          
+          touchStartY = 0;
+          touchCurrentY = 0;
+          isDragging = false;
+        }, { passive: true });
+      }
+      
+      // Address selection with loading state
       addressOptions.forEach(option => {
         option.addEventListener('click', function() {
           const token = this.dataset.addressToken;
+          
+          // Show loading state
+          this.style.opacity = '0.5';
+          this.style.pointerEvents = 'none';
           
           // Create a form and submit it to save the address
           const form = document.createElement('form');
@@ -589,16 +707,14 @@
             // Update payment info box
             if (radio.id === 'payment_cod') {
               if (paymentInfoBox) {
-                paymentInfoBox.className = 'mt-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl';
+                paymentInfoBox.className = 'text-[10px] text-stone-400 mb-2';
               }
-              if (paymentInfoTitle) paymentInfoTitle.textContent = 'Cash on Delivery';
               if (paymentInfoDesc) paymentInfoDesc.textContent = 'Pay when you receive your order';
               submitBtn.value = 'Place Order';
             } else if (radio.id === 'payment_razorpay') {
               if (paymentInfoBox) {
-                paymentInfoBox.className = 'mt-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl';
+                paymentInfoBox.className = 'text-[10px] text-stone-400 mb-2';
               }
-              if (paymentInfoTitle) paymentInfoTitle.textContent = 'Pay Online';
               if (paymentInfoDesc) paymentInfoDesc.textContent = 'You will be redirected to secure payment page';
               submitBtn.value = 'Proceed to Payment';
             }
@@ -727,9 +843,8 @@
           if (checkIcon) checkIcon.classList.remove('opacity-0');
         }
         if (paymentInfoBox) {
-          paymentInfoBox.className = 'mt-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl';
+          paymentInfoBox.className = 'text-[10px] text-stone-400 mb-2';
         }
-        if (paymentInfoTitle) paymentInfoTitle.textContent = 'Pay Online';
         if (paymentInfoDesc) paymentInfoDesc.textContent = 'You will be redirected to secure payment page';
         submitBtn.value = 'Proceed to Payment';
       }

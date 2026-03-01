@@ -340,7 +340,7 @@
               <p><%= @order.shipping_address.city %>, <%= @order.shipping_address.state %> <%= @order.shipping_address.postal_code %></p>
               <p><%= @order.shipping_address.country %></p>
               <% if @order.shipping_address.phone.present? %>
-                <p class="mt-2"><%= @order.shipping_address.phone %></p>
+                <p class="mt-2"><%= @order.shipping_address.full_phone %></p>
               <% end %>
             </div>
           <% else %>

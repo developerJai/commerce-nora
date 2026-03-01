@@ -201,8 +201,7 @@ Rails.application.routes.draw do
 
   # Checkout
   resource :checkout, only: [ :show, :create ] do
-    get "address", action: :address
-    post "address", action: :save_address, as: :save_address
+    post "address", action: :save_address, as: :address
     get "confirm", action: :confirm
   end
 

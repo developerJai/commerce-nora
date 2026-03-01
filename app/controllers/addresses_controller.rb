@@ -3,46 +3,56 @@ class AddressesController < ApplicationController
   before_action :set_address, only: [:show, :edit, :update, :destroy]
 
   def index
-    @address_type = params[:address_type].to_s
-    @address_type = 'shipping' unless Address::ADDRESS_TYPES.include?(@address_type)
-
-    @addresses = current_customer.addresses.where(address_type: @address_type).default_first
+    @addresses = current_customer.addresses.default_first
   end
 
   def show
   end
 
   def new
-    @address = current_customer.addresses.build
-    requested_type = params[:address_type].to_s
-    @address.address_type = requested_type if Address::ADDRESS_TYPES.include?(requested_type)
+    @address = current_customer.addresses.build(country: 'India')
+    @redirect_to = params[:redirect_to]
   end
 
   def create
     @address = current_customer.addresses.build(address_params)
+    @redirect_to = params[:address][:redirect_to]
 
     if @address.save
-      redirect_to addresses_path(address_type: @address.address_type), notice: "Address added successfully"
+      # Set as selected address for checkout if coming from checkout
+      if @redirect_to == 'checkout'
+        session[:checkout_address_id] = @address.id
+        redirect_to checkout_path, notice: "Address added successfully"
+      else
+        redirect_to addresses_path, notice: "Address added successfully"
+      end
     else
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
+    @redirect_to = params[:redirect_to]
   end
 
   def update
+    @redirect_to = params[:address][:redirect_to]
+    
     if @address.update(address_params)
-      redirect_to addresses_path(address_type: @address.address_type), notice: "Address updated successfully"
+      if @redirect_to == 'checkout'
+        session[:checkout_address_id] = @address.id
+        redirect_to checkout_path, notice: "Address updated successfully"
+      else
+        redirect_to addresses_path, notice: "Address updated successfully"
+      end
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    address_type = @address.address_type
     @address.destroy
-    redirect_to addresses_path(address_type: address_type), notice: "Address deleted"
+    redirect_to addresses_path, notice: "Address deleted"
   end
 
   private
@@ -53,7 +63,7 @@ class AddressesController < ApplicationController
 
   def address_params
     params.require(:address).permit(
-      :address_type, :first_name, :last_name, :phone,
+      :first_name, :last_name, :country_code, :phone,
       :street_address, :apartment, :city, :state,
       :postal_code, :country, :is_default
     )

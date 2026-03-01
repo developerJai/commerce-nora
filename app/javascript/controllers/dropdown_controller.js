@@ -18,6 +18,14 @@ export default class extends Controller {
     }
   }
 
+  hide(event) {
+    if (event && this.element.contains(event.target)) {
+      return
+    }
+    this.menuTarget.classList.add("hidden")
+    document.removeEventListener("click", this.closeOnClickOutside)
+  }
+
   closeOnClickOutside(event) {
     if (!this.element.contains(event.target)) {
       this.menuTarget.classList.add("hidden")

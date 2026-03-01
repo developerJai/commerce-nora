@@ -5,7 +5,6 @@ class Address < ApplicationRecord
 
   ADDRESS_TYPES = %w[shipping billing].freeze
 
-  validates :address_type, presence: true, inclusion: { in: ADDRESS_TYPES }
   validates :first_name, :last_name, :street_address, :city, :state, :postal_code, :country, presence: true
   validates :token, presence: true, uniqueness: true
 
@@ -14,6 +13,7 @@ class Address < ApplicationRecord
   scope :default_first, -> { order(is_default: :desc, created_at: :desc) }
 
   before_validation :generate_token, if: -> { token.blank? }
+  before_validation :set_default_address_type
   before_save :ensure_single_default
 
   # Use token in storefront URLs instead of numeric ID
@@ -23,6 +23,11 @@ class Address < ApplicationRecord
 
   def full_name
     "#{first_name} #{last_name}"
+  end
+
+  def full_phone
+    return phone if country_code.blank?
+    "#{country_code} #{phone}"
   end
 
   def full_address
@@ -42,9 +47,13 @@ class Address < ApplicationRecord
     end
   end
 
+  def set_default_address_type
+    self.address_type ||= 'shipping'
+  end
+
   def ensure_single_default
     if is_default?
-      customer.addresses.where(address_type: address_type).where.not(id: id).update_all(is_default: false)
+      customer.addresses.where.not(id: id).update_all(is_default: false)
     end
   end
 end

@@ -26,6 +26,10 @@ class Order < ApplicationRecord
       [ street_address, apartment, city, state, postal_code, country ].compact_blank.join(", ")
     end
 
+    def full_phone
+      phone.present? ? "+91 #{phone}" : nil
+    end
+
     def one_line
       "#{full_name}, #{full_address}"
     end

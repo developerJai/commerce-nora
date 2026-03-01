@@ -1,152 +1,152 @@
 <% content_for(:title) { "My Account" } %>
 
-<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
-  <div class="flex flex-col lg:flex-row gap-6">
-    <!-- Sidebar -->
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+  <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
+    <!-- Sidebar - Visible on all devices -->
     <div class="w-full lg:w-64 flex-shrink-0">
       <%= render 'shared/account_sidebar', active_page: 'profile' %>
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 space-y-6">
-      <!-- Welcome Header -->
-      <div class="bg-gradient-to-br from-rose-50 to-amber-50 rounded-lg border border-stone-200 p-6">
-        <h1 class="text-2xl font-serif font-semibold text-stone-900 mb-1">
+    <div class="flex-1 space-y-4 sm:space-y-6">
+      <!-- Welcome Header - Mobile Optimized -->
+      <div class="bg-gradient-to-br from-rose-50 to-amber-50 rounded-xl sm:rounded-2xl border border-stone-200 p-4 sm:p-5 lg:p-6">
+        <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 mb-1">
           Welcome back, <%= @customer.first_name %>!
         </h1>
-        <p class="text-sm text-stone-600">Manage your account and view your orders</p>
+        <p class="text-xs sm:text-sm text-stone-600">Manage your account and view your orders</p>
       </div>
 
-      <!-- Quick Stats -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg border border-stone-200 p-4">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <!-- Quick Stats - Mobile Optimized -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-3 sm:p-4 hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-rose-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
               </svg>
             </div>
             <div>
-              <p class="text-2xl font-bold text-stone-900"><%= @customer.orders.count %></p>
-              <p class="text-xs text-stone-500">Orders</p>
+              <p class="text-xl sm:text-2xl font-bold text-stone-900"><%= @customer.orders.count %></p>
+              <p class="text-[10px] sm:text-xs text-stone-500">Orders</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg border border-stone-200 p-4">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-3 sm:p-4 hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
               </svg>
             </div>
             <div>
-              <p class="text-2xl font-bold text-stone-900"><%= @customer.wishlist_count %></p>
-              <p class="text-xs text-stone-500">Wishlist</p>
+              <p class="text-xl sm:text-2xl font-bold text-stone-900"><%= @customer.wishlist_count %></p>
+              <p class="text-[10px] sm:text-xs text-stone-500">Wishlist</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg border border-stone-200 p-4">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-3 sm:p-4 hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
               </svg>
             </div>
             <div>
-              <p class="text-2xl font-bold text-stone-900"><%= @customer.addresses.count %></p>
-              <p class="text-xs text-stone-500">Addresses</p>
+              <p class="text-xl sm:text-2xl font-bold text-stone-900"><%= @customer.addresses.count %></p>
+              <p class="text-[10px] sm:text-xs text-stone-500">Addresses</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg border border-stone-200 p-4">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-3 sm:p-4 hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
             <div>
-              <p class="text-2xl font-bold text-stone-900"><%= @customer.orders.placed.count %></p>
-              <p class="text-xs text-stone-500">Active</p>
+              <p class="text-xl sm:text-2xl font-bold text-stone-900"><%= @customer.orders.placed.count %></p>
+              <p class="text-[10px] sm:text-xs text-stone-500">Active</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Profile Information Card -->
-      <div class="bg-white rounded-lg border border-stone-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-stone-200 flex items-center justify-between">
-          <h2 class="font-semibold text-stone-900">Profile Information</h2>
-          <%= link_to edit_account_path, class: 'inline-flex items-center gap-1 text-sm text-rose-700 hover:text-rose-900 font-medium transition' do %>
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <!-- Profile Information Card - Mobile Optimized -->
+      <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 overflow-hidden">
+        <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-stone-200 flex items-center justify-between">
+          <h2 class="text-sm sm:text-base font-semibold text-stone-900">Profile Information</h2>
+          <%= link_to edit_account_path, class: 'inline-flex items-center gap-1 text-xs sm:text-sm text-rose-700 hover:text-rose-900 active:text-rose-950 font-medium transition' do %>
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
             </svg>
             Edit
           <% end %>
         </div>
-        <div class="p-6">
-          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="p-4 sm:p-6">
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <dt class="text-xs font-medium text-stone-500 uppercase tracking-wide mb-1">Full Name</dt>
-              <dd class="text-base font-medium text-stone-900"><%= @customer.full_name %></dd>
+              <dt class="text-[10px] sm:text-xs font-medium text-stone-500 uppercase tracking-wide mb-1">Full Name</dt>
+              <dd class="text-sm sm:text-base font-medium text-stone-900"><%= @customer.full_name %></dd>
             </div>
             <div>
-              <dt class="text-xs font-medium text-stone-500 uppercase tracking-wide mb-1">Email Address</dt>
-              <dd class="text-base font-medium text-stone-900"><%= @customer.email %></dd>
+              <dt class="text-[10px] sm:text-xs font-medium text-stone-500 uppercase tracking-wide mb-1">Email Address</dt>
+              <dd class="text-sm sm:text-base font-medium text-stone-900 break-all"><%= @customer.email %></dd>
             </div>
             <div>
-              <dt class="text-xs font-medium text-stone-500 uppercase tracking-wide mb-1">Phone Number</dt>
-              <dd class="text-base font-medium text-stone-900"><%= @customer.phone.presence || '—' %></dd>
+              <dt class="text-[10px] sm:text-xs font-medium text-stone-500 uppercase tracking-wide mb-1">Phone Number</dt>
+              <dd class="text-sm sm:text-base font-medium text-stone-900"><%= @customer.phone.presence || '—' %></dd>
             </div>
             <div>
-              <dt class="text-xs font-medium text-stone-500 uppercase tracking-wide mb-1">Member Since</dt>
-              <dd class="text-base font-medium text-stone-900"><%= @customer.created_at.strftime('%B %d, %Y') %></dd>
+              <dt class="text-[10px] sm:text-xs font-medium text-stone-500 uppercase tracking-wide mb-1">Member Since</dt>
+              <dd class="text-sm sm:text-base font-medium text-stone-900"><%= @customer.created_at.strftime('%B %d, %Y') %></dd>
             </div>
           </dl>
         </div>
       </div>
 
-      <!-- Recent Orders -->
-      <div class="bg-white rounded-lg border border-stone-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-stone-200 flex items-center justify-between">
-          <h2 class="font-semibold text-stone-900">Recent Orders</h2>
-          <%= link_to 'View All Orders', orders_path, class: 'text-sm text-rose-700 hover:text-rose-900 font-medium transition' %>
+      <!-- Recent Orders - Mobile Optimized -->
+      <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 overflow-hidden">
+        <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-stone-200 flex items-center justify-between">
+          <h2 class="text-sm sm:text-base font-semibold text-stone-900">Recent Orders</h2>
+          <%= link_to 'View All', orders_path, class: 'text-xs sm:text-sm text-rose-700 hover:text-rose-900 active:text-rose-950 font-medium transition' %>
         </div>
         <div class="divide-y divide-stone-100">
           <% if @recent_orders.any? %>
             <% @recent_orders.each do |order| %>
-              <%= link_to order_path(order), class: 'block px-6 py-4 hover:bg-stone-50 transition' do %>
-                <div class="flex items-center justify-between">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-1">
-                      <p class="font-semibold text-stone-900"><%= order.order_number %></p>
-                      <span class="px-2 py-0.5 bg-stone-100 text-stone-700 text-xs font-medium rounded-full">
+              <%= link_to order_path(order), class: 'block px-4 sm:px-6 py-3 sm:py-4 hover:bg-stone-50 active:bg-stone-100 transition' do %>
+                <div class="flex items-start sm:items-center justify-between gap-3">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <p class="font-semibold text-xs sm:text-sm text-stone-900 truncate"><%= order.order_number %></p>
+                      <span class="px-2 py-0.5 bg-stone-100 text-stone-700 text-[10px] sm:text-xs font-medium rounded-full flex-shrink-0">
                         <%= order.status.titleize %>
                       </span>
                     </div>
-                    <p class="text-sm text-stone-500">
-                      <%= order.placed_at&.strftime('%B %d, %Y') %> • <%= pluralize(order.items_count, 'item') %>
+                    <p class="text-[10px] sm:text-xs text-stone-500">
+                      <%= order.placed_at&.strftime('%b %d, %Y') %> • <%= pluralize(order.items_count, 'item') %>
                     </p>
                   </div>
-                  <div class="text-right">
-                    <p class="text-lg font-bold text-stone-900"><%= format_price(order.total_amount) %></p>
+                  <div class="text-right flex-shrink-0">
+                    <p class="text-sm sm:text-base lg:text-lg font-bold text-stone-900"><%= format_price(order.total_amount) %></p>
                   </div>
                 </div>
               <% end %>
             <% end %>
           <% else %>
-            <div class="px-6 py-12 text-center">
-              <div class="w-16 h-16 mx-auto bg-stone-100 rounded-full flex items-center justify-center mb-3">
-                <svg class="w-8 h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="px-4 sm:px-6 py-12 sm:py-16 text-center">
+              <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto bg-stone-100 rounded-full flex items-center justify-center mb-3">
+                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
               </div>
-              <p class="text-stone-600 font-medium mb-1">No orders yet</p>
-              <p class="text-sm text-stone-500 mb-4">Start shopping to see your orders here</p>
-              <%= link_to 'Browse Products', products_path, class: 'inline-block px-4 py-2 bg-rose-800 text-white text-sm font-medium rounded-lg hover:bg-rose-900 transition' %>
+              <p class="text-sm sm:text-base text-stone-600 font-medium mb-1">No orders yet</p>
+              <p class="text-xs sm:text-sm text-stone-500 mb-4">Start shopping to see your orders here</p>
+              <%= link_to 'Browse Products', products_path, class: 'inline-block px-4 sm:px-6 py-2 sm:py-2.5 bg-rose-800 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-rose-900 active:bg-rose-950 transition' %>
             </div>
           <% end %>
         </div>

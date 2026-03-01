@@ -4,6 +4,12 @@ class CheckoutsController < ApplicationController
 
   def show
     @addresses = current_customer.addresses.default_first
+    
+    # If no addresses exist, redirect to address page to add one
+    if @addresses.empty?
+      redirect_to new_address_path(redirect_to: 'checkout') and return
+    end
+    
     @address = current_customer.addresses.find_by(id: session[:checkout_address_id]) ||
                current_customer.default_shipping_address
 
@@ -32,11 +38,6 @@ class CheckoutsController < ApplicationController
     @razorpay_key_id = creds&.dig(:key_id)
   end
 
-  def address
-    @addresses = current_customer.addresses.default_first
-    @address = Address.new
-  end
-
   def save_address
     if params[:address_token].present?
       @address = current_customer.addresses.find_by!(token: params[:address_token])
@@ -60,7 +61,13 @@ class CheckoutsController < ApplicationController
     else
       @address = current_customer.addresses.build(address_params)
       if @address.save
-        session[:checkout_address_id] = @address.id
+        # Set as default if it's the first address or if explicitly requested
+        if current_customer.addresses.count == 1 || @address.is_default?
+          session[:checkout_address_id] = @address.id
+        else
+          # If not default, still select it for this checkout
+          session[:checkout_address_id] = @address.id
+        end
 
         respond_to do |format|
           format.html { redirect_to checkout_path }

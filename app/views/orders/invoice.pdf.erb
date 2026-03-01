@@ -31,7 +31,7 @@
       <div><%= [@order.shipping_address.city, @order.shipping_address.state, @order.shipping_address.postal_code].compact.join(', ') %></div>
       <div><%= @order.shipping_address.country %></div>
       <% if @order.shipping_address.phone.present? %>
-        <div>Phone: <%= @order.shipping_address.phone %></div>
+        <div>Phone: <%= @order.shipping_address.full_phone %></div>
       <% end %>
     <% end %>
   </div>

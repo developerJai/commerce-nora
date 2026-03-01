@@ -1,21 +1,24 @@
 <% content_for(:title) { "My Orders" } %>
 
-<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
-  <div class="flex flex-col lg:flex-row gap-6">
-    <div class="w-full lg:w-64 flex-shrink-0">
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+  <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
+    <!-- Sidebar - Hidden on mobile, shown on desktop -->
+    <div class="hidden lg:block w-64 flex-shrink-0">
       <%= render 'shared/account_sidebar', active_page: 'orders' %>
     </div>
 
     <div class="flex-1">
-      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-8">
-        <div>
-          <h1 class="text-2xl font-serif font-semibold text-stone-900">My Orders</h1>
-          <p class="text-sm text-stone-600 mt-1">Track your purchases and view order details</p>
-        </div>
+      <!-- Mobile-optimized header -->
+      <div class="mb-4 sm:mb-6">
+        <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">My Orders</h1>
+        <p class="text-xs sm:text-sm text-stone-600 mt-1">Track your purchases and view order details</p>
+      </div>
 
-        <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-          <% active_class = 'px-4 py-2 rounded-lg text-sm font-medium border transition bg-rose-800 text-white border-rose-800 whitespace-nowrap' %>
-          <% inactive_class = 'px-4 py-2 rounded-lg text-sm font-medium border transition bg-white text-stone-700 border-stone-200 hover:border-stone-300 whitespace-nowrap' %>
+      <!-- Mobile-optimized filter tabs with horizontal scroll -->
+      <div class="mb-4 sm:mb-6 -mx-3 sm:mx-0">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide px-3 sm:px-0 pb-2 sm:pb-0">
+          <% active_class = 'px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium border transition bg-rose-800 text-white border-rose-800 whitespace-nowrap flex-shrink-0 shadow-sm' %>
+          <% inactive_class = 'px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium border transition bg-white text-stone-700 border-stone-200 hover:border-stone-300 active:bg-stone-50 whitespace-nowrap flex-shrink-0' %>
           <%= link_to 'All', orders_path, class: (@status.blank? ? active_class : inactive_class) %>
           <%= link_to 'Not Shipped', orders_path(status: 'not_shipped'), class: (@status == 'not_shipped' ? active_class : inactive_class) %>
           <%= link_to 'Shipped', orders_path(status: 'shipped'), class: (@status == 'shipped' ? active_class : inactive_class) %>
@@ -25,58 +28,68 @@
       </div>
 
       <% if @orders.any? %>
-        <div class="space-y-4">
+        <div class="space-y-3 sm:space-y-4">
           <% @orders.each do |order| %>
-            <div class="bg-white rounded-xl border border-stone-200 overflow-hidden">
-              <div class="p-4 sm:p-6 border-b border-stone-100">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p class="font-semibold text-stone-900"><%= order.order_number %></p>
-                    <p class="text-sm text-stone-500">Placed on <%= order.placed_at&.strftime('%B %d, %Y') %></p>
+            <!-- Mobile-optimized order card with better touch targets -->
+            <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow active:scale-[0.99] sm:active:scale-100">
+              <!-- Header section with improved mobile layout -->
+              <div class="p-4 sm:p-5 border-b border-stone-100">
+                <div class="flex items-start justify-between gap-3 mb-2">
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-sm sm:text-base text-stone-900 truncate"><%= order.order_number %></p>
+                    <p class="text-xs sm:text-sm text-stone-500 mt-0.5">Placed <%= order.placed_at&.strftime('%b %d, %Y') %></p>
                   </div>
-                  <div class="flex items-center gap-3">
-                    <span class="px-3 py-1 rounded-full text-xs font-medium <%= order_status_badge(order.status) %>">
-                      <%= order.status.titleize %>
-                    </span>
-                    <%= link_to 'View Details', order_path(order), class: 'text-rose-700 hover:text-rose-900 text-sm font-medium' %>
-                  </div>
+                  <span class="px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium <%= order_status_badge(order.status) %> flex-shrink-0">
+                    <%= order.status.titleize %>
+                  </span>
                 </div>
               </div>
-              <div class="p-3 sm:p-4">
-                <!-- Order Items Summary -->
+              
+              <!-- Content section -->
+              <div class="p-4 sm:p-5">
+                <!-- Order Items Summary with better mobile typography -->
                 <div class="mb-3">
-                  <p class="text-sm text-stone-600 line-clamp-2">
+                  <p class="text-xs sm:text-sm text-stone-600 line-clamp-2 leading-relaxed">
                     <% items_list = order.order_items.map { |item| "#{item.product_name} (#{item.quantity})" } %>
                     <%= items_list.join(", ") %>
                   </p>
                 </div>
                 
-                <div class="flex items-center justify-between pt-2 border-t border-stone-100">
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded">
+                <!-- Footer with price and CTA -->
+                <div class="flex items-center justify-between pt-3 border-t border-stone-100">
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                    <span class="text-[10px] sm:text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded inline-block w-fit">
                       <%= order.order_items.sum(:quantity) %> item<%= order.order_items.sum(:quantity) > 1 ? 's' : '' %>
                     </span>
+                    <p class="font-bold text-base sm:text-lg text-stone-900"><%= format_price(order.total_amount) %></p>
                   </div>
-                  <p class="font-semibold text-stone-900"><%= format_price(order.total_amount) %></p>
+                  <%= link_to order_path(order), class: 'inline-flex items-center gap-1.5 px-4 py-2 bg-rose-800 hover:bg-rose-900 active:bg-rose-950 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors flex-shrink-0' do %>
+                    <span>View</span>
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  <% end %>
                 </div>
               </div>
             </div>
           <% end %>
         </div>
 
-        <div class="mt-8">
+        <!-- Mobile-optimized pagination -->
+        <div class="mt-6 sm:mt-8">
           <%== @pagy.series_nav if @pagy.last > 1 %>
         </div>
       <% else %>
-        <div class="text-center py-12 sm:py-16 bg-white rounded-xl border border-stone-200">
-          <div class="w-20 h-20 mx-auto mb-4 bg-rose-50 rounded-full flex items-center justify-center">
-            <svg class="w-10 h-10 text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- Mobile-optimized empty state -->
+        <div class="text-center py-16 sm:py-20 bg-white rounded-xl sm:rounded-2xl border border-stone-200">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 bg-rose-50 rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
           </div>
-          <h2 class="text-lg font-serif font-medium text-stone-900 mb-2">No orders yet</h2>
-          <p class="text-stone-500 text-sm mb-6">Start shopping to see your orders here</p>
-          <%= link_to 'Browse Jewellery', products_path, class: 'inline-block px-6 py-2.5 bg-rose-800 text-white font-medium rounded-full hover:bg-rose-900 transition' %>
+          <h2 class="text-base sm:text-lg font-serif font-medium text-stone-900 mb-2 px-4">No orders yet</h2>
+          <p class="text-stone-500 text-xs sm:text-sm mb-6 px-4">Start shopping to see your orders here</p>
+          <%= link_to 'Browse Jewellery', products_path, class: 'inline-block px-6 sm:px-8 py-2.5 sm:py-3 bg-rose-800 text-white text-sm sm:text-base font-medium rounded-full hover:bg-rose-900 active:bg-rose-950 transition-colors' %>
         </div>
       <% end %>
     </div>
