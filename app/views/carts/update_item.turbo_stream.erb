@@ -21,3 +21,7 @@
 <%= turbo_stream.update "cart-summary" do %>
   <%= render 'carts/summary', cart: @cart %>
 <% end %>
+
+<%= turbo_stream.update "cart-summary-mobile" do %>
+  <%= render 'carts/summary_mobile', cart: @cart %>
+<% end %>

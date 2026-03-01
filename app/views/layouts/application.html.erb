@@ -230,7 +230,8 @@
   </main>
 
   <!-- Footer -->
-  <footer class="hidden sm:block bg-stone-900 mt-12 sm:mt-16">
+  <% hide_footer = (controller_name == 'carts' && action_name == 'show') || (controller_name == 'checkouts' && action_name == 'show') %>
+  <footer class="<%= hide_footer ? 'hidden lg:block' : 'hidden sm:block' %> bg-stone-900 mt-12 sm:mt-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
       <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
         <div class="col-span-2 md:col-span-1">

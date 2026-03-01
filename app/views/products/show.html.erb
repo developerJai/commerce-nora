@@ -1,10 +1,10 @@
 <% content_for(:title) { @product.name } %>
 <% default_variant = @selected_variant %>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-controller="product-gallery product-variant">
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6" data-controller="product-gallery product-variant">
   <!-- Breadcrumb -->
-  <nav class="mb-4 sm:mb-6 overflow-x-auto" aria-label="Breadcrumb">
-    <ol class="flex items-center gap-2 text-xs sm:text-sm whitespace-nowrap">
+  <nav class="mb-2 sm:mb-4 md:mb-6 overflow-x-auto hide-scrollbar" aria-label="Breadcrumb">
+    <ol class="flex items-center gap-2 text-[10px] sm:text-xs md:text-sm whitespace-nowrap">
       <li><%= link_to 'Home', root_path, class: 'text-stone-500 hover:text-rose-700' %></li>
       <li><span class="text-stone-300">/</span></li>
       <li><%= link_to 'Jewellery', products_path, class: 'text-stone-500 hover:text-rose-700' %></li>
@@ -13,11 +13,11 @@
         <li><%= link_to @product.category.name, category_path(@product.category.slug), class: 'text-stone-500 hover:text-rose-700' %></li>
       <% end %>
       <li><span class="text-stone-300">/</span></li>
-      <li class="text-stone-900 font-medium truncate max-w-[150px] sm:max-w-[250px]"><%= @product.name %></li>
+      <li class="text-stone-900 font-medium truncate max-w-[120px] sm:max-w-[200px] md:max-w-[250px]"><%= @product.name %></li>
     </ol>
   </nav>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8 lg:gap-10 items-start">
     <!-- Product Images - Vertical Thumbnails on Left -->
     <div class="lg:col-span-7">
       <div class="lg:sticky lg:top-24">
@@ -29,13 +29,13 @@
 
           <!-- Vertical Thumbnails (Left Side) -->
           <% if gallery_images.count > 1 %>
-            <div class="hidden sm:block w-20 flex-shrink-0">
-              <div class="flex flex-col gap-2">
+            <div class="hidden sm:block w-16 md:w-20 flex-shrink-0">
+              <div class="flex flex-col gap-1.5 md:gap-2">
                 <% gallery_images.each_with_index do |image, index| %>
                   <button type="button"
                           data-action="click->product-gallery#selectImage"
                           data-product-gallery-index-param="<%= index %>"
-                          class="w-20 h-20 bg-stone-100 rounded-lg overflow-hidden border-2 transition <%= index == 0 ? 'border-rose-500' : 'border-stone-200 hover:border-rose-300' %>"
+                          class="w-16 h-16 md:w-20 md:h-20 bg-stone-100 rounded-md md:rounded-lg overflow-hidden border-2 transition <%= index == 0 ? 'border-rose-500' : 'border-stone-200 hover:border-rose-300' %>"
                           data-product-gallery-target="thumbnail">
                     <%= image_tag image, class: 'w-full h-full object-cover' %>
                   </button>
@@ -46,7 +46,7 @@
 
           <!-- Main Image -->
           <div class="flex-1 min-w-0">
-            <div class="aspect-square bg-stone-100 rounded-xl overflow-hidden relative">
+            <div class="aspect-square bg-stone-100 rounded-lg md:rounded-xl overflow-hidden relative">
               <% if gallery_images.any? %>
                 <% gallery_images.each_with_index do |image, index| %>
                   <div class="absolute inset-0 transition-opacity duration-300 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>" data-product-gallery-target="slide">
@@ -74,12 +74,12 @@
 
             <!-- Mobile Thumbnails (Horizontal - Below Image) -->
             <% if gallery_images.count > 1 %>
-              <div class="sm:hidden flex gap-2 mt-3 overflow-x-auto pb-1">
+              <div class="sm:hidden flex gap-1.5 mt-2 overflow-x-auto hide-scrollbar pb-1">
                 <% gallery_images.each_with_index do |image, index| %>
                   <button type="button"
                           data-action="click->product-gallery#selectImage"
                           data-product-gallery-index-param="<%= index %>"
-                          class="w-16 h-16 flex-shrink-0 bg-stone-100 rounded-lg overflow-hidden border-2 transition <%= index == 0 ? 'border-rose-500' : 'border-stone-200' %>"
+                          class="w-14 h-14 flex-shrink-0 bg-stone-100 rounded-md overflow-hidden border-2 transition <%= index == 0 ? 'border-rose-500' : 'border-stone-200' %>"
                           data-product-gallery-target="thumbnail">
                     <%= image_tag image, class: 'w-full h-full object-cover' %>
                   </button>
@@ -93,50 +93,50 @@
 
     <!-- Product Info -->
     <div class="lg:col-span-5">
-      <div class="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 lg:sticky lg:top-24">
+      <div class="bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6 lg:sticky lg:top-24">
       <!-- Title -->
-      <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 leading-tight"><%= @product.name %></h1>
+      <h1 class="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-stone-900 leading-tight"><%= @product.name %></h1>
       
       <!-- Rating Summary -->
       <% if @product.average_rating > 0 %>
-        <div class="flex items-center gap-3 mt-3">
-          <div class="flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white rounded">
-            <span class="font-semibold text-sm"><%= @product.average_rating.round(1) %></span>
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+        <div class="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-3">
+          <div class="flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 bg-emerald-600 text-white rounded">
+            <span class="font-semibold text-xs sm:text-sm"><%= @product.average_rating.round(1) %></span>
+            <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
             </svg>
           </div>
-          <a href="#reviews" class="text-sm text-stone-500 hover:text-rose-700">
+          <a href="#reviews" class="text-xs sm:text-sm text-stone-500 hover:text-rose-700">
             <%= @product.ratings_count %> <%= 'Review'.pluralize(@product.ratings_count) %>
           </a>
         </div>
       <% end %>
 
       <!-- Price Section -->
-      <div class="mt-4 pb-4 border-b border-stone-200">
-        <div class="flex items-baseline gap-3 flex-wrap" data-product-variant-target="priceSection">
-          <span class="text-2xl sm:text-3xl font-semibold text-stone-900" data-product-variant-target="price">
+      <div class="mt-3 sm:mt-4 pb-3 sm:pb-4 border-b border-stone-200">
+        <div class="flex items-baseline gap-2 sm:gap-3 flex-wrap" data-product-variant-target="priceSection">
+          <span class="text-xl sm:text-2xl md:text-3xl font-semibold text-stone-900" data-product-variant-target="price">
             <%= format_price(default_variant&.price) %>
           </span>
           <% if default_variant&.on_sale? %>
-            <span class="text-lg text-stone-400 line-through" data-product-variant-target="comparePrice">
+            <span class="text-base sm:text-lg text-stone-400 line-through" data-product-variant-target="comparePrice">
               <%= format_price(default_variant.compare_at_price) %>
             </span>
-            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-sm font-medium rounded" data-product-variant-target="discount">
+            <span class="px-1.5 sm:px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-medium rounded" data-product-variant-target="discount">
               Save <%= default_variant.discount_percentage %>%
             </span>
           <% else %>
-            <span class="hidden text-lg text-stone-400 line-through" data-product-variant-target="comparePrice"></span>
-            <span class="hidden px-2 py-0.5 bg-emerald-100 text-emerald-800 text-sm font-medium rounded" data-product-variant-target="discount"></span>
+            <span class="hidden text-base sm:text-lg text-stone-400 line-through" data-product-variant-target="comparePrice"></span>
+            <span class="hidden px-1.5 sm:px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-medium rounded" data-product-variant-target="discount"></span>
           <% end %>
         </div>
-        <p class="text-xs text-stone-500 mt-1">Inclusive of all taxes</p>
+        <p class="text-[10px] sm:text-xs text-stone-500 mt-0.5 sm:mt-1">Inclusive of all taxes</p>
       </div>
 
       <!-- Variant Selection (Inline Tabs) -->
       <% if @variants.count > 1 %>
-        <div class="mt-4">
-          <p class="text-sm font-medium text-stone-700 mb-3">
+        <div class="mt-3 sm:mt-4">
+          <p class="text-xs sm:text-sm font-medium text-stone-700 mb-2 sm:mb-3">
             Select: <span class="text-stone-900" data-product-variant-target="selectedName"><%= default_variant&.name %></span>
           </p>
           <div class="flex flex-wrap gap-2">
@@ -145,7 +145,7 @@
                       data-action="click->product-variant#selectVariant"
                       data-product-variant-target="option"
                       data-variant-slug="<%= variant.name.parameterize %>"
-                      class="px-4 py-2 text-sm font-medium rounded-lg border-2 transition <%= variant.id == @selected_variant.id ? 'border-rose-500 bg-rose-50 text-rose-800' : 'border-stone-200 text-stone-700 hover:border-rose-300' %> <%= variant.in_stock? ? '' : 'opacity-50' %>">
+                      class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md sm:rounded-lg border-2 transition <%= variant.id == @selected_variant.id ? 'border-rose-500 bg-rose-50 text-rose-800' : 'border-stone-200 text-stone-700 hover:border-rose-300' %> <%= variant.in_stock? ? '' : 'opacity-50' %>">
                 <%= variant.name %>
                 <% unless variant.in_stock? %>
                   <span class="block text-[10px] text-stone-500 font-normal">Out of Stock</span>
@@ -157,37 +157,37 @@
       <% end %>
 
       <!-- Stock Status -->
-      <div class="mt-4" data-product-variant-target="stockStatus">
+      <div class="mt-3 sm:mt-4" data-product-variant-target="stockStatus">
         <% if default_variant&.in_stock? %>
           <% if default_variant.low_stock? %>
-            <p class="text-sm text-amber-600 flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <p class="text-xs sm:text-sm text-amber-600 flex items-center gap-1 sm:gap-1.5">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
               </svg>
               Only <%= default_variant.stock_quantity %> left in stock
             </p>
           <% else %>
-            <p class="text-sm text-emerald-600 flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <p class="text-xs sm:text-sm text-emerald-600 flex items-center gap-1 sm:gap-1.5">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
               </svg>
               In Stock
             </p>
           <% end %>
         <% else %>
-          <p class="text-sm text-stone-500">Currently unavailable</p>
+          <p class="text-xs sm:text-sm text-stone-500">Currently unavailable</p>
         <% end %>
       </div>
 
       <!-- Action Buttons -->
-      <div class="mt-6">
-        <div class="flex items-center gap-3">
+      <div class="mt-4 sm:mt-6">
+        <div class="flex items-center gap-2 sm:gap-3">
           <% if @selected_variant&.in_stock? %>
             <div id="product-cart-controls-<%= @selected_variant.id %>" class="flex-1">
               <%= render 'products/cart_controls', variant: @selected_variant, cart_item: @cart_item %>
             </div>
           <% else %>
-            <button disabled class="flex-1 h-12 px-6 bg-stone-200 text-stone-500 font-medium rounded-lg cursor-not-allowed">
+            <button disabled class="flex-1 h-11 sm:h-12 px-4 sm:px-6 bg-stone-200 text-stone-500 text-sm sm:text-base font-medium rounded-lg cursor-not-allowed">
               Out of Stock
             </button>
           <% end %>
@@ -200,33 +200,33 @@
       </div>
 
       <!-- Trust Badges -->
-      <div class="mt-6 grid grid-cols-2 gap-3">
-        <div class="flex items-center gap-2 p-3 bg-stone-50 rounded-lg">
-          <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      <div class="mt-4 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-3">
+        <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
           <div>
-            <p class="text-xs font-medium text-stone-900">100% Certified</p>
-            <p class="text-[10px] text-stone-500">BIS Hallmarked</p>
+            <p class="text-[10px] sm:text-xs font-medium text-stone-900">100% Certified</p>
+            <p class="text-[9px] sm:text-[10px] text-stone-500">BIS Hallmarked</p>
           </div>
         </div>
-        <div class="flex items-center gap-2 p-3 bg-stone-50 rounded-lg">
-          <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <div>
-            <p class="text-xs font-medium text-stone-900">Lifetime Exchange</p>
-            <p class="text-[10px] text-stone-500">On all products</p>
+            <p class="text-[10px] sm:text-xs font-medium text-stone-900">Lifetime Exchange</p>
+            <p class="text-[9px] sm:text-[10px] text-stone-500">On all products</p>
           </div>
         </div>
-        <div class="flex items-center gap-2 p-3 bg-stone-50 rounded-lg">
-          <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+        <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
           <div>
-            <p class="text-xs font-medium text-stone-900">Free Shipping</p>
-            <p class="text-[10px] text-stone-500">Orders above ₹999</p>
+            <p class="text-[10px] sm:text-xs font-medium text-stone-900">Free Shipping</p>
+            <p class="text-[9px] sm:text-[10px] text-stone-500">Orders above ₹999</p>
           </div>
         </div>
-        <div class="flex items-center gap-2 p-3 bg-stone-50 rounded-lg">
-          <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <div>
-            <p class="text-xs font-medium text-stone-900">30-Day Returns</p>
-            <p class="text-[10px] text-stone-500">Easy refund</p>
+            <p class="text-[10px] sm:text-xs font-medium text-stone-900">30-Day Returns</p>
+            <p class="text-[9px] sm:text-[10px] text-stone-500">Easy refund</p>
           </div>
         </div>
       </div>
@@ -236,40 +236,40 @@
   </div>
 
   <!-- Product Details Tabs -->
-  <div class="mt-10 sm:mt-12 bg-white rounded-2xl border border-stone-200 p-5 sm:p-6" data-controller="tabs">
+  <div class="mt-6 sm:mt-8 md:mt-10 lg:mt-12 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6" data-controller="tabs">
     <div class="border-b border-stone-200">
-      <nav class="flex gap-6 sm:gap-8 overflow-x-auto">
+      <nav class="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto hide-scrollbar">
         <button type="button" data-action="click->tabs#select" data-tabs-target="tab" data-tab="description"
-                class="pb-3 text-sm font-medium border-b-2 border-rose-700 text-rose-800 whitespace-nowrap">
+                class="pb-2 sm:pb-3 text-xs sm:text-sm font-medium border-b-2 border-rose-700 text-rose-800 whitespace-nowrap">
           Description
         </button>
         <button type="button" data-action="click->tabs#select" data-tabs-target="tab" data-tab="details"
-                class="pb-3 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 whitespace-nowrap">
+                class="pb-2 sm:pb-3 text-xs sm:text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 whitespace-nowrap">
           Product Details
         </button>
         <button type="button" data-action="click->tabs#select" data-tabs-target="tab" data-tab="shipping"
-                class="pb-3 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 whitespace-nowrap">
+                class="pb-2 sm:pb-3 text-xs sm:text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 whitespace-nowrap">
           Shipping & Returns
         </button>
       </nav>
     </div>
 
-    <div class="pt-6">
+    <div class="pt-4 sm:pt-6">
       <div data-tabs-target="panel" data-tab="description">
         <% if @product.description.present? %>
-          <div class="prose prose-sm prose-stone max-w-none text-stone-600">
+          <div class="prose prose-sm prose-stone max-w-none text-stone-600 text-sm">
             <%= simple_format(@product.description) %>
           </div>
         <% else %>
-          <p class="text-stone-500 text-sm">No description available.</p>
+          <p class="text-stone-500 text-xs sm:text-sm">No description available.</p>
         <% end %>
       </div>
 
       <div data-tabs-target="panel" data-tab="details" class="hidden">
-        <div class="grid grid-cols-2 gap-4 text-sm">
-          <div class="p-3 bg-stone-50 rounded-lg">
-            <p class="text-stone-500">SKU</p>
-            <p class="font-medium text-stone-900"><%= default_variant&.sku.presence || @product.sku.presence || 'N/A' %></p>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm">
+          <div class="p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+            <p class="text-stone-500 text-[10px] sm:text-xs">SKU</p>
+            <p class="font-medium text-stone-900 text-xs sm:text-sm"><%= default_variant&.sku.presence || @product.sku.presence || 'N/A' %></p>
           </div>
           <% if @product.category %>
             <div class="p-3 bg-stone-50 rounded-lg">
@@ -310,7 +310,7 @@
       </div>
 
       <div data-tabs-target="panel" data-tab="shipping" class="hidden">
-        <div class="space-y-4 text-sm text-stone-600">
+        <div class="space-y-3 sm:space-y-4 text-xs sm:text-sm text-stone-600">
           <div>
             <h4 class="font-medium text-stone-900 mb-1">Shipping</h4>
             <p>Free shipping on orders above ₹999. Standard delivery takes 3-5 business days.</p>
@@ -329,10 +329,10 @@
   </div>
 
   <!-- Reviews Section -->
-  <section id="reviews" class="mt-8 sm:mt-10 bg-white rounded-2xl border border-stone-200 p-5 sm:p-6">
-    <div class="sm:flex sm:items-start sm:justify-between mb-6">
+  <section id="reviews" class="mt-6 sm:mt-8 md:mt-10 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6">
+    <div class="sm:flex sm:items-start sm:justify-between mb-4 sm:mb-6">
       <div>
-        <h2 class="text-lg sm:text-xl font-serif font-semibold text-stone-900">Customer Reviews</h2>
+        <h2 class="text-base sm:text-lg md:text-xl font-serif font-semibold text-stone-900">Customer Reviews</h2>
         <% if @product.average_rating > 0 %>
           <div class="flex items-center gap-3 mt-2">
             <div class="flex items-center gap-1">
@@ -351,9 +351,9 @@
     </div>
     
     <% if @reviews.any? %>
-      <div class="space-y-4">
+      <div class="space-y-3 sm:space-y-4">
         <% @reviews.each do |review| %>
-          <div class="bg-white rounded-xl border border-stone-200 p-4 sm:p-5">
+          <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 p-3 sm:p-4 md:p-5">
             <div class="flex items-start justify-between gap-4">
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-1">
@@ -398,9 +398,9 @@
 
   <!-- Related Products -->
   <% if @related_products.any? %>
-    <section class="mt-10 sm:mt-12 bg-white rounded-2xl border border-stone-200 p-5 sm:p-6">
-      <h2 class="text-lg sm:text-xl font-serif font-semibold text-stone-900 mb-6">You May Also Like</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+    <section class="mt-6 sm:mt-8 md:mt-10 lg:mt-12 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6">
+      <h2 class="text-base sm:text-lg md:text-xl font-serif font-semibold text-stone-900 mb-4 sm:mb-6">You May Also Like</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
         <% @related_products.each do |product| %>
           <%= render 'shared/product_card', product: product %>
         <% end %>

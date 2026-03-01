@@ -93,6 +93,9 @@ class CartsController < ApplicationController
             locals: { cart_items: @cart_items }),
           turbo_stream.update("cart-summary",
             partial: "carts/summary",
+            locals: { cart: @cart }),
+          turbo_stream.update("cart-summary-mobile",
+            partial: "carts/summary_mobile",
             locals: { cart: @cart })
         ]
 
