@@ -2,7 +2,7 @@
 <%# Locals: remove_filter_url (lambda) %>
 <% fc = @filter_config %>
 
-<%= form_with url: products_path, method: :get, class: 'space-y-1', data: { controller: 'filters', action: 'change->filters#scheduleSubmit' } do |f| %>
+<%= form_with url: products_path, method: :get, class: 'space-y-1', data: { controller: 'filters', action: 'change->filters#scheduleSubmit', turbo_frame: 'products-content' } do |f| %>
   <%= hidden_field_tag :sort, @sort %>
 
   <!-- ── Availability Toggle ── -->

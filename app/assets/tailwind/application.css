@@ -68,6 +68,14 @@ input:focus, select:focus, textarea:focus {
   display: none;
 }
 
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Safe area padding for mobile bottom nav */
 .safe-area-pb {
   padding-bottom: env(safe-area-inset-bottom);

@@ -12,34 +12,77 @@
   url_for(new_params)
 } %>
 
-<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8" data-controller="filter-drawer">
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8" data-controller="filter-drawer scroll-header">
   <div class="flex flex-col lg:flex-row gap-4 sm:gap-8">
 
-    <!-- ═══════════════ Mobile Filter Button ═══════════════ -->
-    <div class="lg:hidden flex items-center gap-3">
-      <button type="button" data-action="click->filter-drawer#open"
-              class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-xl border border-stone-200 font-medium text-stone-900 shadow-sm active:bg-stone-50">
-        <svg class="w-5 h-5 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-        </svg>
-        Filters
-        <% if @active_filters.any? %>
-          <span class="px-1.5 py-0.5 bg-rose-800 text-white text-xs font-bold rounded-full"><%= @active_filters.size %></span>
-        <% end %>
-      </button>
-    </div>
-
-    <!-- ═══════════════ Mobile Filter Drawer (Overlay) ═══════════════ -->
-    <div data-filter-drawer-target="overlay" class="hidden fixed inset-0 bg-black/40 z-40 lg:hidden" data-action="click->filter-drawer#close"></div>
-    <div data-filter-drawer-target="drawer" class="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out lg:hidden overflow-y-auto">
-      <div class="sticky top-0 bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between z-10">
-        <h2 class="font-serif font-semibold text-stone-900 text-lg">Filters</h2>
-        <button type="button" data-action="click->filter-drawer#close" class="p-2 text-stone-400 hover:text-stone-600">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    <!-- ═══════════════ Mobile Filter & Sort Buttons (Two Column) ═══════════════ -->
+    <div class="lg:hidden sticky top-[60px] z-20 bg-gradient-to-b from-white via-white to-white/80 pb-2 transition-transform duration-300" data-scroll-header-target="header">
+      <div class="grid grid-cols-2 gap-2.5">
+        <!-- Filter Button -->
+        <button type="button" data-action="click->filter-drawer#open"
+                class="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white rounded-lg font-medium text-stone-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] active:shadow-[0_1px_3px_rgba(0,0,0,0.12)] active:translate-y-[1px] transition-all">
+          <svg class="w-4.5 h-4.5 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+          </svg>
+          <span class="text-sm">Filters</span>
+          <% if @active_filters.any? %>
+            <span class="px-1.5 py-0.5 bg-rose-800 text-white text-[10px] font-bold rounded-full min-w-[18px] text-center"><%= @active_filters.size %></span>
+          <% end %>
+        </button>
+        
+        <!-- Sort Button -->
+        <button type="button" data-action="click->filter-drawer#openSort"
+                class="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white rounded-lg font-medium text-stone-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] active:shadow-[0_1px_3px_rgba(0,0,0,0.12)] active:translate-y-[1px] transition-all">
+          <svg class="w-4.5 h-4.5 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"/>
+          </svg>
+          <span class="text-sm">Sort</span>
         </button>
       </div>
-      <div class="p-4">
+    </div>
+
+    <!-- ═══════════════ Mobile Filter Drawer (Bottom Sheet) ═══════════════ -->
+    <div data-filter-drawer-target="overlay" class="hidden fixed inset-0 bg-black/40 z-40 lg:hidden" data-action="click->filter-drawer#closeAny"></div>
+    <div data-filter-drawer-target="drawer" class="fixed left-0 right-0 bottom-0 max-h-[85vh] bg-white z-50 shadow-2xl transform translate-y-full transition-transform duration-300 ease-out lg:hidden overflow-hidden rounded-t-3xl">
+      <div class="sticky top-0 bg-white border-b border-stone-200 px-4 py-3 z-10">
+        <div class="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-3"></div>
+        <div class="flex items-center justify-between">
+          <h2 class="font-serif font-semibold text-stone-900 text-lg">Filters</h2>
+          <button type="button" data-action="click->filter-drawer#close" class="p-2 text-stone-400 hover:text-stone-600">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="p-4 overflow-y-auto" style="max-height: calc(85vh - 80px);">
         <%= render 'filter_form', remove_filter_url: remove_filter_url %>
+      </div>
+    </div>
+    
+    <!-- ═══════════════ Mobile Sort Drawer (Bottom Sheet) ═══════════════ -->
+    <div data-filter-drawer-target="sortDrawer" class="fixed left-0 right-0 bottom-0 bg-white z-50 shadow-2xl transform translate-y-full transition-transform duration-300 ease-out lg:hidden rounded-t-3xl">
+      <div class="px-4 py-3">
+        <div class="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-3"></div>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-serif font-semibold text-stone-900 text-lg">Sort By</h2>
+          <button type="button" data-action="click->filter-drawer#closeSort" class="p-2 text-stone-400 hover:text-stone-600">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="space-y-2 pb-4">
+          <% tabs = [
+            ['Popularity', 'rating'],
+            ['Price: Low to High', 'price_low'],
+            ['Price: High to Low', 'price_high'],
+            ['Discount', 'discount'],
+            ['Newest First', 'newest']
+          ] %>
+          <% tabs.each do |label, value| %>
+            <% active = (@sort == value) || (@sort.blank? && value == 'rating') %>
+            <%= link_to label,
+                url_for(params.permit!.to_h.merge(sort: value, page: nil)),
+                class: "block px-4 py-3 rounded-xl border transition #{active ? 'bg-rose-50 border-rose-800 text-rose-900 font-semibold' : 'bg-white border-stone-200 text-stone-700 hover:bg-stone-50'}" %>
+          <% end %>
+        </div>
       </div>
     </div>
 
@@ -58,24 +101,35 @@
 
     <!-- ═══════════════ Products Grid ═══════════════ -->
     <div class="flex-1 min-w-0">
-      <!-- Active Filter Chips -->
+      <%= turbo_frame_tag "products-content" do %>
+      <!-- Active Filter Chips (Horizontally Scrollable on Mobile) -->
       <% if @active_filters.any? %>
-        <div class="flex flex-wrap items-center gap-2 mb-4">
-          <span class="text-xs font-medium text-stone-500 uppercase tracking-wider">Active:</span>
-          <% @active_filters.each do |f| %>
-            <a href="<%= remove_filter_url.call(f[:param], f[:value]) %>"
-               class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium rounded-full hover:bg-rose-100 transition group">
-              <%= f[:label] %>
-              <svg class="w-3 h-3 text-rose-400 group-hover:text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </a>
-          <% end %>
+        <div class="mb-3">
+          <div class="flex items-center justify-between gap-2 mb-1.5 px-0.5">
+            <%= link_to 'Clear All', products_path, data: { turbo_frame: 'products-content' }, class: 'text-[11px] text-rose-700 hover:text-rose-900 font-semibold underline flex-shrink-0' %>
+            <div class="text-[11px] text-stone-600 font-medium">
+              <span class="font-semibold text-stone-900"><%= number_with_delimiter(@pagy.count) %></span> results
+            </div>
+          </div>
+          <div class="overflow-x-auto hide-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0">
+            <div class="flex items-center gap-1.5 pb-1.5" style="min-width: min-content;">
+              <% @active_filters.each do |f| %>
+                <a href="<%= remove_filter_url.call(f[:param], f[:value]) %>"
+                   data-turbo-frame="products-content"
+                   class="inline-flex items-center gap-1 px-2 py-1 bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-medium rounded-full hover:bg-rose-100 transition group whitespace-nowrap flex-shrink-0">
+                  <%= f[:label] %>
+                  <svg class="w-2.5 h-2.5 text-rose-400 group-hover:text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                </a>
+              <% end %>
+            </div>
+          </div>
         </div>
       <% end %>
 
-      <!-- Header: Results Counter and Sort -->
-      <div class="sticky top-[104px] sm:top-[112px] z-10 bg-white shadow-sm mb-4 sm:mb-6 rounded-xl border border-stone-200">
+      <!-- Header: Results Counter (Desktop Sort Only) -->
+      <div class="hidden sm:block sticky top-[112px] z-10 bg-white shadow-sm mb-4 sm:mb-6 rounded-xl border border-stone-200">
         <div class="px-4 sm:px-5">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 py-3">
+          <div class="flex items-center justify-between gap-2.5 py-3">
             <div id="results-counter" class="flex items-center">
               <%= render 'results_counter' %>
             </div>
@@ -88,27 +142,25 @@
                 ['Discount', 'discount'],
                 ['Newest', 'newest']
               ] %>
-              <!-- Mobile: Dropdown -->
-              <div class="sm:hidden flex-1">
-                <select onchange="window.location.href=this.value"
-                        class="w-full px-3 py-2 text-sm border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white">
-                  <% tabs.each do |label, value| %>
-                    <% active = (@sort == value) || (@sort.blank? && value == 'rating') %>
-                    <option value="<%= url_for(params.permit!.to_h.merge(sort: value, page: nil)) %>" <%= 'selected' if active %>><%= label %></option>
-                  <% end %>
-                </select>
-              </div>
               <!-- Desktop: Tabs -->
-              <div class="hidden sm:flex items-center gap-0.5 bg-stone-50 rounded-lg p-0.5">
+              <div class="flex items-center gap-0.5 bg-stone-50 rounded-lg p-0.5">
                 <% tabs.each do |label, value| %>
                   <% active = (@sort == value) || (@sort.blank? && value == 'rating') %>
                   <%= link_to label,
                       url_for(params.permit!.to_h.merge(sort: value, page: nil)),
+                      data: { turbo_frame: 'products-content' },
                       class: "px-3 py-1.5 text-xs font-medium rounded-md transition whitespace-nowrap #{active ? 'bg-white text-rose-800 shadow-sm' : 'text-stone-500 hover:text-stone-800 hover:bg-white/50'}" %>
                 <% end %>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      
+      <!-- Mobile Results Counter -->
+      <div class="sm:hidden mb-4">
+        <div id="results-counter-mobile" class="flex items-center text-sm text-stone-600">
+          <%= render 'results_counter' %>
         </div>
       </div>
 
@@ -136,6 +188,7 @@
           <p class="text-stone-500 text-sm mb-4">Try adjusting your filters to find what you're looking for</p>
           <%= link_to 'Clear All Filters', products_path, class: 'inline-block px-5 py-2 bg-rose-800 text-white text-sm font-medium rounded-full hover:bg-rose-900 transition' %>
         </div>
+      <% end %>
       <% end %>
     </div>
   </div>
