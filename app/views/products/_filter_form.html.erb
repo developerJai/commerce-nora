@@ -1,8 +1,9 @@
 <%# Shared filter form used in desktop sidebar and mobile drawer %>
-<%# Locals: remove_filter_url (lambda) %>
+<%# Locals: remove_filter_url (lambda), mobile (optional) %>
 <% fc = @filter_config %>
+<% mobile = local_assigns.fetch(:mobile, false) %>
 
-<%= form_with url: products_path, method: :get, class: 'space-y-1', data: { controller: 'filters', action: 'change->filters#scheduleSubmit', turbo_frame: 'products-content' } do |f| %>
+<%= form_with url: products_path, method: :get, class: 'space-y-1', data: mobile ? { turbo_frame: '_top' } : { controller: 'filters', action: 'change->filters#scheduleSubmit', turbo_frame: 'products-content' } do |f| %>
   <%= hidden_field_tag :sort, @sort %>
 
   <!-- ── Availability Toggle ── -->
@@ -146,7 +147,7 @@
           }
         %>
         <% @facets[:colors].sort_by { |_, count| -count }.each do |color, count| %>
-          <label class="group cursor-pointer" title="<%= color %> (<%= count %>)">
+          <label class="group cursor-pointer" title="<%= color %>">
             <%= check_box_tag 'colors[]', color, @colors.include?(color), class: 'sr-only peer' %>
             <div class="flex items-center gap-1.5 px-2.5 py-1.5 border-2 rounded-full text-xs font-medium transition
                         peer-checked:border-rose-800 peer-checked:bg-rose-50 peer-checked:text-rose-800
@@ -154,7 +155,6 @@
               <span class="w-3.5 h-3.5 rounded-full border border-stone-300 flex-shrink-0"
                     style="background: <%= color_map[color] || '#ccc' %>"></span>
               <%= color %>
-              <span class="text-stone-400 text-[10px]"><%= count %></span>
             </div>
           </label>
         <% end %>
@@ -175,7 +175,6 @@
             <%= check_box_tag 'materials[]', material, @materials.include?(material),
                 class: 'h-3.5 w-3.5 rounded border-2 border-stone-300 text-rose-800 focus:ring-rose-500' %>
             <span class="flex-1"><%= material %></span>
-            <span class="text-[10px] text-stone-400"><%= count %></span>
           </label>
         <% end %>
       </div>
@@ -195,7 +194,6 @@
             <%= check_box_tag 'gemstones[]', stone, @gemstones.include?(stone),
                 class: 'h-3.5 w-3.5 rounded border-2 border-stone-300 text-rose-800 focus:ring-rose-500' %>
             <span class="flex-1"><%= stone %></span>
-            <span class="text-[10px] text-stone-400"><%= count %></span>
           </label>
         <% end %>
       </div>
@@ -215,7 +213,6 @@
             <%= check_box_tag 'occasions[]', occasion, @occasions.include?(occasion),
                 class: 'h-3.5 w-3.5 rounded border-2 border-stone-300 text-rose-800 focus:ring-rose-500' %>
             <span class="flex-1"><%= occasion %></span>
-            <span class="text-[10px] text-stone-400"><%= count %></span>
           </label>
         <% end %>
       </div>
@@ -287,5 +284,14 @@
     </div>
   <% end %>
 
-  <%= f.submit 'Apply Filters', class: 'hidden' %>
+  <% if mobile %>
+    <div class="sticky bottom-0 bg-white border-t border-stone-200 pt-3 pb-2 mt-3 -mx-4 px-4">
+      <div class="flex gap-3">
+        <%= link_to 'Clear All', products_path, class: 'flex-1 py-2.5 text-center text-sm font-medium text-stone-600 bg-stone-100 rounded-lg hover:bg-stone-200 transition' %>
+        <%= f.submit 'Apply Filters', class: 'flex-1 py-2.5 text-center text-sm font-semibold text-white bg-rose-800 rounded-lg hover:bg-rose-900 transition cursor-pointer' %>
+      </div>
+    </div>
+  <% else %>
+    <%= f.submit 'Apply Filters', class: 'hidden' %>
+  <% end %>
 <% end %>

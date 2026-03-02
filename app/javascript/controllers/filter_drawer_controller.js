@@ -10,6 +10,10 @@ export default class extends Controller {
     this.touchStartY = 0
     this.touchCurrentY = 0
     this.isDragging = false
+    this.scrollLocked = false
+    this._boundStart = this.handleTouchStart.bind(this)
+    this._boundMove = this.handleTouchMove.bind(this)
+    this._boundEnd = this.handleTouchEnd.bind(this)
   }
 
   open() {
@@ -17,20 +21,19 @@ export default class extends Controller {
     this.drawerTarget.classList.remove("translate-y-full")
     this.overlayTarget.classList.remove("hidden")
     document.body.classList.add("overflow-hidden")
-    this.setupSwipeHandlers(this.drawerTarget)
+    this.attachSwipe(this.drawerTarget)
   }
 
   close(event) {
-    // Prevent closing if clicking inside the drawer content
     if (event && this.drawerTarget.contains(event.target) && !event.target.closest('[data-action*="close"]')) {
       return
     }
-    
     this.isFilterOpen = false
     this.drawerTarget.classList.add("translate-y-full")
     this.overlayTarget.classList.add("hidden")
     document.body.classList.remove("overflow-hidden")
     this.resetDrawerPosition(this.drawerTarget)
+    this.detachSwipe(this.drawerTarget)
   }
 
   openSort() {
@@ -38,24 +41,22 @@ export default class extends Controller {
     this.sortDrawerTarget.classList.remove("translate-y-full")
     this.overlayTarget.classList.remove("hidden")
     document.body.classList.add("overflow-hidden")
-    this.setupSwipeHandlers(this.sortDrawerTarget)
+    this.attachSwipe(this.sortDrawerTarget)
   }
 
   closeSort(event) {
-    // Prevent closing if clicking inside the drawer content
     if (event && this.sortDrawerTarget.contains(event.target) && !event.target.closest('[data-action*="close"]')) {
       return
     }
-    
     this.isSortOpen = false
     this.sortDrawerTarget.classList.add("translate-y-full")
     this.overlayTarget.classList.add("hidden")
     document.body.classList.remove("overflow-hidden")
     this.resetDrawerPosition(this.sortDrawerTarget)
+    this.detachSwipe(this.sortDrawerTarget)
   }
 
   closeAny() {
-    // Close whichever drawer is currently open
     if (this.isFilterOpen) {
       this.close()
     } else if (this.isSortOpen) {
@@ -63,15 +64,49 @@ export default class extends Controller {
     }
   }
 
-  setupSwipeHandlers(drawer) {
-    drawer.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true })
-    drawer.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false })
-    drawer.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true })
+  // ── Swipe handling ──
+
+  attachSwipe(drawer) {
+    drawer.removeEventListener('touchstart', this._boundStart)
+    drawer.removeEventListener('touchmove', this._boundMove)
+    drawer.removeEventListener('touchend', this._boundEnd)
+    drawer.addEventListener('touchstart', this._boundStart, { passive: true })
+    drawer.addEventListener('touchmove', this._boundMove, { passive: false })
+    drawer.addEventListener('touchend', this._boundEnd, { passive: true })
+  }
+
+  detachSwipe(drawer) {
+    drawer.removeEventListener('touchstart', this._boundStart)
+    drawer.removeEventListener('touchmove', this._boundMove)
+    drawer.removeEventListener('touchend', this._boundEnd)
+  }
+
+  findScrollableParent(el, drawer) {
+    while (el && el !== drawer) {
+      const style = window.getComputedStyle(el)
+      const overflow = style.overflowY
+      if ((overflow === 'auto' || overflow === 'scroll') && el.scrollHeight > el.clientHeight) {
+        return el
+      }
+      el = el.parentElement
+    }
+    return null
   }
 
   handleTouchStart(e) {
     this.touchStartY = e.touches[0].clientY
+    this.touchCurrentY = this.touchStartY
     this.isDragging = false
+    this.scrollLocked = false
+
+    const drawer = e.currentTarget
+    const scrollable = this.findScrollableParent(e.target, drawer)
+
+    if (scrollable && scrollable.scrollTop > 0) {
+      this.scrollLocked = true
+    }
+
+    this.touchStartedInHeader = !scrollable
   }
 
   handleTouchMove(e) {
@@ -79,21 +114,29 @@ export default class extends Controller {
 
     this.touchCurrentY = e.touches[0].clientY
     const deltaY = this.touchCurrentY - this.touchStartY
+    const drawer = e.currentTarget
 
-    // Only allow dragging down
-    if (deltaY > 0) {
-      this.isDragging = true
-      const drawer = e.currentTarget
-      
-      // Check if content is scrolled to top
-      const scrollableContent = drawer.querySelector('[style*="overflow-y"]')
-      if (scrollableContent && scrollableContent.scrollTop > 0) {
-        return // Let the content scroll naturally
+    if (this.scrollLocked) {
+      const scrollable = this.findScrollableParent(e.target, drawer)
+      if (scrollable && scrollable.scrollTop <= 0 && deltaY > 0) {
+        this.scrollLocked = false
+      } else {
+        return
+      }
+    }
+
+    if (deltaY > 10) {
+      const scrollable = this.findScrollableParent(e.target, drawer)
+      if (scrollable && scrollable.scrollTop > 0) {
+        return
+      }
+
+      if (!this.isDragging) {
+        this.isDragging = true
       }
 
       e.preventDefault()
-      
-      // Apply transform with resistance
+
       const resistance = 0.5
       const translateY = deltaY * resistance
       drawer.style.transform = `translateY(${translateY}px)`
@@ -102,29 +145,34 @@ export default class extends Controller {
   }
 
   handleTouchEnd(e) {
-    if (!this.isDragging) return
+    const drawer = e.currentTarget
+
+    if (!this.isDragging) {
+      this.touchStartY = 0
+      this.touchCurrentY = 0
+      this.scrollLocked = false
+      return
+    }
 
     const deltaY = this.touchCurrentY - this.touchStartY
-    const drawer = e.currentTarget
-    const threshold = 100 // pixels to swipe down to close
+    const threshold = 100
 
     drawer.style.transition = ''
 
     if (deltaY > threshold) {
-      // Close the drawer
       if (this.isFilterOpen) {
         this.close()
       } else if (this.isSortOpen) {
         this.closeSort()
       }
     } else {
-      // Snap back to original position
       this.resetDrawerPosition(drawer)
     }
 
     this.touchStartY = 0
     this.touchCurrentY = 0
     this.isDragging = false
+    this.scrollLocked = false
   }
 
   resetDrawerPosition(drawer) {
