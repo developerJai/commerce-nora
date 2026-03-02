@@ -10,6 +10,11 @@ class CartsController < ApplicationController
     @vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
     @multi_vendor = @vendor_ids.size > 1
 
+    # Group items by vendor if multi-vendor
+    if @multi_vendor
+      @items_by_vendor = @cart_items.group_by { |item| item.product_variant.product.vendor }
+    end
+
     # Check if coupons are enabled in settings
     @coupons_enabled = StoreSetting.instance.coupons_enabled?
   end
@@ -87,6 +92,7 @@ class CartsController < ApplicationController
             partial: "products/cart_controls",
             locals: { variant: @variant, cart_item: nil }),
           turbo_stream.update("cart-count", partial: "shared/cart_count_badge"),
+          turbo_stream.update("mobile-cart-count", partial: "shared/mobile_cart_count_badge"),
           turbo_stream.update("cart-item-count", current_cart.item_count.to_s),
           turbo_stream.update("cart-items",
             partial: "carts/items",

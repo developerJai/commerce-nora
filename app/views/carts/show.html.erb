@@ -37,26 +37,15 @@
         </div>
       </div>
     <% else %>
-      <!-- Multi-Vendor Indicator -->
-      <% if @multi_vendor %>
-        <div class="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-lg">
-          <div class="flex items-start gap-1.5 sm:gap-2">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <div>
-              <p class="text-xs sm:text-sm font-medium text-amber-800">Multiple Vendors</p>
-              <p class="text-[10px] sm:text-xs text-amber-700">Your bag contains items from <%= @vendor_ids.size %> different sellers. Orders will be processed separately.</p>
-            </div>
-          </div>
-        </div>
-      <% end %>
-
       <div class="lg:flex lg:gap-6 xl:gap-8">
         <!-- Cart Items -->
         <div class="lg:flex-1 pb-[280px] lg:pb-0">
           <div id="cart-items">
-            <%= render 'items', cart_items: @cart_items %>
+            <% if @multi_vendor %>
+              <%= render 'items_by_vendor', items_by_vendor: @items_by_vendor %>
+            <% else %>
+              <%= render 'items', cart_items: @cart_items %>
+            <% end %>
           </div>
         </div>
 

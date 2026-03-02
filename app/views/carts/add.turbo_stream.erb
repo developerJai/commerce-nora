@@ -14,6 +14,10 @@
   <%= render 'shared/cart_count_badge' %>
 <% end %>
 
+<%= turbo_stream.update "mobile-cart-count" do %>
+  <%= render 'shared/mobile_cart_count_badge' %>
+<% end %>
+
 <%= turbo_stream.update "cart-item-count", current_cart.item_count.to_s %>
 
 <% if @show_toast %>

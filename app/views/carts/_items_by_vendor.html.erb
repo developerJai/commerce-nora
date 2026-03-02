@@ -1,0 +1,121 @@
+<% if items_by_vendor.any? %>
+  <div class="space-y-4">
+    <% items_by_vendor.each do |vendor, cart_items| %>
+      <div class="bg-white rounded-xl border border-stone-200 overflow-hidden">
+        <!-- Vendor Header -->
+        <div class="bg-stone-50 border-b border-stone-200 px-4 py-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="font-semibold text-stone-900 text-sm">Seller: <%= vendor&.business_name || "Seller ##{vendor&.id}" %></p>
+                <p class="text-xs text-stone-500"><%= cart_items.size %> <%= cart_items.size == 1 ? 'item' : 'items' %></p>
+              </div>
+            </div>
+            <span class="text-sm font-semibold text-stone-900">
+              <%= format_price(cart_items.sum(&:total_price)) %>
+            </span>
+          </div>
+        </div>
+
+        <!-- Vendor Items -->
+        <ul class="divide-y divide-stone-100">
+          <% cart_items.each do |item| %>
+            <li class="p-4" id="cart-item-<%= item.id %>">
+              <div class="flex gap-4">
+                <!-- Image -->
+                <div class="w-20 h-20 flex-shrink-0 bg-stone-50 rounded-lg overflow-hidden">
+                  <% if item.product_variant.image.attached? %>
+                    <%= image_tag item.product_variant.image, class: 'w-full h-full object-cover' %>
+                  <% elsif item.product_variant.product.images.attached? %>
+                    <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
+                  <% else %>
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-50 to-amber-50">
+                      <svg class="w-8 h-8 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                      </svg>
+                    </div>
+                  <% end %>
+                </div>
+
+                <!-- Details -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex justify-between">
+                    <div>
+                      <h3 class="text-sm font-medium text-stone-800">
+                        <%= link_to item.product_variant.product.name, product_path(item.product_variant.product.slug), class: 'hover:text-rose-700' %>
+                      </h3>
+                      <p class="text-xs text-stone-500 mt-0.5"><%= item.product_variant.name %></p>
+                      <p class="text-sm font-medium text-stone-900 mt-1"><%= format_price(item.unit_price) %></p>
+                    </div>
+                    <%= button_to remove_from_cart_path(item.product_variant_id), 
+                                  method: :delete,
+                                  class: "text-stone-400 hover:text-rose-600 p-1",
+                                  title: "Remove",
+                                  form: { data: { turbo_confirm: "Remove this item from your bag?" } } do %>
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    <% end %>
+                  </div>
+
+                  <!-- Quantity & Total -->
+                  <div class="flex items-center justify-between mt-3">
+                    <div class="inline-flex items-center border border-stone-200 rounded-lg"
+                         data-controller="cart-controls"
+                         data-cart-controls-update-url-value="<%= update_item_cart_path(item.product_variant_id) %>"
+                         data-cart-controls-current-quantity-value="<%= item.quantity %>"
+                         data-cart-controls-max-stock-value="<%= item.available_quantity %>">
+                      <button type="button" 
+                              data-action="click->cart-controls#decrement"
+                              class="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-50 rounded-l-lg transition">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+                        </svg>
+                      </button>
+                      <span class="w-10 text-center text-sm font-medium text-stone-800"><%= item.quantity %></span>
+                      <button type="button" 
+                              data-action="click->cart-controls#increment"
+                              <% if item.quantity >= item.available_quantity %>disabled<% end %>
+                              class="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-50 rounded-r-lg transition disabled:opacity-40">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <span class="font-semibold text-stone-900"><%= format_price(item.total_price) %></span>
+                  </div>
+
+                  <% if item.product_variant.low_stock? && !item.product_variant.out_of_stock? %>
+                    <p class="text-xs text-amber-600 mt-2">Only <%= item.product_variant.stock_quantity %> left</p>
+                  <% end %>
+                </div>
+              </div>
+              
+              <% if item.exceeds_stock? %>
+                <div class="mt-3 p-2 bg-amber-50 rounded-lg text-xs text-amber-700">
+                  Only <%= item.available_quantity %> available. Please reduce quantity.
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="text-center py-16 bg-white rounded-xl border border-stone-200">
+    <div class="w-20 h-20 mx-auto mb-4 bg-rose-50 rounded-full flex items-center justify-center">
+      <svg class="w-10 h-10 text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+      </svg>
+    </div>
+    <h3 class="text-lg font-serif font-medium text-stone-900">Your bag is empty</h3>
+    <p class="mt-2 text-sm text-stone-500">Discover our exquisite collection</p>
+    <%= link_to 'Browse Jewellery', products_path, class: 'mt-6 inline-block px-6 py-2.5 bg-rose-800 hover:bg-rose-900 text-white font-medium rounded-full transition' %>
+  </div>
+<% end %>
