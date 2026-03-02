@@ -228,6 +228,71 @@ RAILS_ENV=production bin/rails db:migrate
 RAILS_ENV=production bin/rails db:seed
 ```
 
+## Staging Environment Setup
+
+The staging environment mirrors production settings but uses local storage and test Razorpay credentials for safe testing.
+
+### 1. Configure Credentials
+
+Add staging Razorpay credentials to your encrypted credentials file:
+
+```bash
+EDITOR=nano bin/rails credentials:edit
+```
+
+Add the following section:
+
+```yaml
+staging:
+  razorpay:
+    key_id: rzp_test_SJBinYUmS48dNI
+    key_secret: rDakuyLgm2X04u457QDtM5eV
+    webhook_secret: BzZ8rK3QgY9tJMx
+```
+
+### 2. Create Staging Databases
+
+```bash
+# Create all staging databases (primary, cache, queue, cable)
+RAILS_ENV=staging bin/rails db:create
+
+# Run migrations
+RAILS_ENV=staging bin/rails db:migrate
+
+# Seed with sample data (optional)
+RAILS_ENV=staging bin/rails db:seed
+```
+
+### 3. Run Staging Server
+
+```bash
+# Start staging server on port 3001
+RAILS_ENV=staging bin/rails server -p 3001
+
+# In another terminal, watch Tailwind CSS
+RAILS_ENV=staging bin/rails tailwindcss:watch
+```
+
+The staging application will be available at:
+- **Storefront**: http://localhost:3001
+- **Admin Panel**: http://localhost:3001/admin
+
+### Staging vs Production Differences
+
+| Feature | Production | Staging |
+|---------|-----------|---------|
+| **File Storage** | Amazon S3 + CloudFront CDN | Local filesystem |
+| **Razorpay** | Live credentials | Test credentials |
+| **Database** | `noralooks_production*` | `noralooks_staging*` |
+| **CDN** | Enabled | Disabled |
+| **Error Reporting** | Disabled | Disabled |
+| **Caching** | Solid Cache | Solid Cache |
+| **Background Jobs** | Solid Queue | Solid Queue |
+
+### Staging Deployment
+
+For deploying staging to a server, update your deployment configuration to use `RAILS_ENV=staging` and ensure the staging server has access to local storage directories.
+
 ## Project Structure
 
 ```

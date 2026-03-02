@@ -537,7 +537,7 @@ namespace :seed do
         business_name: "Laxmi Gold House",
         contact_name: "Rajesh Kumar",
         email: "vendor1@noralooks.com",
-        phone: "9876543210",
+        phone: "+91 9876543210",
         gst_number: "07AABCT1332L1ZH",
         city: "Jaipur", state: "Rajasthan", pincode: "302001",
         password: "password123"
@@ -546,7 +546,7 @@ namespace :seed do
         business_name: "Shree Diamonds",
         contact_name: "Priya Sharma",
         email: "vendor2@noralooks.com",
-        phone: "9876543211",
+        phone: "+91 9876543211",
         gst_number: "27AADCS0472N1ZG",
         city: "Mumbai", state: "Maharashtra", pincode: "400001",
         password: "password123"
@@ -555,7 +555,7 @@ namespace :seed do
         business_name: "Royal Gems & Jewels",
         contact_name: "Amit Patel",
         email: "vendor3@noralooks.com",
-        phone: "9876543212",
+        phone: "+91 9876543212",
         gst_number: "24AAECR5055K1ZB",
         city: "Surat", state: "Gujarat", pincode: "395001",
         password: "password123"
@@ -902,7 +902,7 @@ namespace :seed do
       c.first_name = "Demo"
       c.last_name = "User"
       c.password = "password123"
-      c.phone = "555-123-4567"
+      c.phone = "+91 9999123456"
       c.active = true
     end
     puts "  ✓ Demo customer: demo@example.com / password123"
@@ -924,7 +924,7 @@ namespace :seed do
         c.first_name = data[:first_name]
         c.last_name = data[:last_name]
         c.password = "password123"
-        c.phone = "555-#{rand(100..999)}-#{rand(1000..9999)}"
+        c.phone = "+91 #{rand(7000000000..9999999999)}"
         c.active = true
       end
     end
