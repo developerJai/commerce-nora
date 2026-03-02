@@ -28,14 +28,16 @@ class Category < ApplicationRecord
   end
 
   # Returns category tree for storefront filters.
-  # When product_counts hash is given, hides categories with 0 products.
+  # When product_counts hash is given, hides parent categories with 0 products.
+  # Subcategories are always shown if active (not filtered by product count).
   def self.grouped_for_filters(product_counts: nil)
     root.active.ordered.includes(:children).filter_map do |parent|
       active_children = parent.children.select(&:active?)
                               .sort_by { |c| [c.position, c.name] }
 
       if product_counts
-        active_children = active_children.select { |c| (product_counts[c.id] || 0) > 0 }
+        # Show all active subcategories, don't filter by product count
+        # Only hide the parent if it and all children have 0 products
         parent_total = (product_counts[parent.id] || 0) + active_children.sum { |c| product_counts[c.id] || 0 }
         next if parent_total == 0
       end
