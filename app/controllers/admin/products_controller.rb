@@ -70,7 +70,15 @@ module Admin
     end
 
     def update
-      if @product.update(product_params)
+      handle_image_removals if params[:product][:remove_image_ids].present?
+      
+      # Extract images from params to handle them separately
+      product_update_params = product_params
+      new_images = product_update_params.delete(:images)
+      
+      if @product.update(product_update_params)
+        # Append new images instead of replacing existing ones
+        @product.images.attach(new_images) if new_images.present?
         redirect_to admin_product_path(@product), notice: "Product updated successfully"
       else
         render :edit, status: :unprocessable_entity
@@ -99,6 +107,16 @@ module Admin
 
     def set_product
       @product = vendor_scoped(Product).find(params[:id])
+    end
+
+    def handle_image_removals
+      image_ids = params[:product][:remove_image_ids].reject(&:blank?)
+      return if image_ids.empty?
+
+      image_ids.each do |image_id|
+        image = @product.images.find_by(id: image_id)
+        image&.purge
+      end
     end
 
     def product_params
