@@ -1,1 +1,31 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+# Robots.txt for Noralooks - Artificial Jewellery & Traditional Wear E-commerce
+# Allow all search engines to crawl public pages
+
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /signup
+Allow: /products
+Allow: /categories
+Allow: /search
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /vendor_portal/
+Disallow: /account
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders
+Disallow: /wishlists
+Disallow: /addresses
+Disallow: /support_tickets
+
+# Disallow API endpoints
+Disallow: /api/
+Disallow: /rails/
+
+# Crawl delay (optional - adjust based on server capacity)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://noralooks.com/sitemap.xml

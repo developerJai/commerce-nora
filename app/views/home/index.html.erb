@@ -1,5 +1,83 @@
-<% content_for(:title) { "Artificial Jewellery, Gifts & Ethnic Wear" } %>
+<% content_for(:title) { "Home" } %>
+<% content_for(:meta_description) { "Discover exquisite artificial jewellery, traditional ethnic wear, and thoughtful gifts at Noralooks. Shop premium quality fashion jewellery online with free shipping on orders above ₹999. Easy 7-day returns & lifetime exchange policy." } %>
+<% content_for(:meta_keywords) { ["buy artificial jewellery online", "fashion jewellery India", "ethnic wear online", "traditional wear shopping", "imitation jewellery", "costume jewellery", "online gift shopping", "jewellery store India", "affordable jewellery", "women's jewellery"] } %>
 <% content_for(:hide_header_search) { true } %>
+
+<% content_for(:head) do %>
+  <!-- Structured Data - Organization Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Noralooks",
+    "url": "<%= root_url %>",
+    "logo": "<%= og_image_url %>",
+    "description": "Premium artificial jewellery, ethnic wear, and gifts online store",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "IN"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Customer Service",
+      "availableLanguage": ["English", "Hindi"]
+    },
+    "sameAs": []
+  }
+  </script>
+
+  <!-- Structured Data - WebSite Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Noralooks",
+    "url": "<%= root_url %>",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "<%= search_url %>?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Structured Data - Online Store Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "Noralooks",
+    "image": "<%= og_image_url %>",
+    "description": "Shop exquisite artificial jewellery, ethnic wear, and thoughtful gifts",
+    "priceRange": "₹₹",
+    "url": "<%= root_url %>",
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Jewellery & Fashion",
+      "itemListElement": [
+        {
+          "@type": "OfferCatalog",
+          "name": "Artificial Jewellery",
+          "itemListElement": []
+        },
+        {
+          "@type": "OfferCatalog",
+          "name": "Traditional Wear",
+          "itemListElement": []
+        },
+        {
+          "@type": "OfferCatalog",
+          "name": "Gifts",
+          "itemListElement": []
+        }
+      ]
+    }
+  }
+  </script>
+<% end %>
 
 <!-- CSS Animations - Cross Browser Support -->
 <style>

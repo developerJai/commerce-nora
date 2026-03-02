@@ -4,6 +4,40 @@ module ApplicationHelper
     number_to_currency(amount || 0, unit: "₹", format: "%u%n")
   end
 
+  # SEO Meta Tags
+  def meta_title(title = nil)
+    base_title = "Noralooks - Artificial Jewellery, Gifts & Traditional Wear"
+    title.present? ? "#{title} | #{base_title}" : base_title
+  end
+
+  def meta_description(description = nil)
+    description || "Shop exquisite artificial jewellery, ethnic wear, and thoughtful gifts at Noralooks. Premium quality, affordable prices, free shipping on orders above ₹999. 7-day easy returns."
+  end
+
+  def meta_keywords(keywords = [])
+    base_keywords = [
+      "artificial jewellery",
+      "fashion jewellery",
+      "ethnic wear",
+      "traditional wear",
+      "gifts",
+      "online jewellery shopping",
+      "Noralooks",
+      "imitation jewellery",
+      "costume jewellery",
+      "Indian jewellery"
+    ]
+    (base_keywords + keywords).uniq.join(", ")
+  end
+
+  def canonical_url
+    request.original_url.split('?').first
+  end
+
+  def og_image_url
+    asset_url('storefront/home/discount-banner.png')
+  end
+
   def order_status_badge(status)
     case status
     when 'pending' then 'bg-amber-100 text-amber-800'

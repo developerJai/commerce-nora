@@ -1,4 +1,31 @@
 <% content_for(:title) { "Create Account" } %>
+<% content_for(:meta_description) { "Create your free Noralooks account to shop artificial jewellery, ethnic wear, and gifts. Get exclusive access to deals, track orders, save wishlist items, and enjoy personalized shopping experience." } %>
+<% content_for(:meta_keywords) { ["create account", "sign up", "register", "new account", "customer registration", "Noralooks signup", "join Noralooks", "free account", "jewellery shopping account"] } %>
+
+<% content_for(:head) do %>
+  <!-- Structured Data - WebPage Schema for Registration -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Create Account - Noralooks",
+    "description": "Create your free Noralooks account",
+    "url": "<%= signup_url %>",
+    "mainEntity": {
+      "@type": "WebApplication",
+      "name": "Noralooks Customer Registration",
+      "applicationCategory": "E-commerce",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR",
+        "description": "Free account registration"
+      }
+    }
+  }
+  </script>
+<% end %>
 
 <!-- Add intl-tel-input CSS -->
 <%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css", "data-turbo-track": "reload" %>
@@ -7,18 +34,19 @@
   <div class="w-full max-w-md">
     <div class="bg-white rounded-none sm:rounded-xl border-0 sm:border border-stone-200 p-5 sm:p-6 md:p-8">
       <!-- Header -->
-      <div class="text-center mb-6 sm:mb-8">
-        <div class="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 sm:mb-4 bg-rose-50 rounded-full flex items-center justify-center">
+      <header class="text-center mb-6 sm:mb-8">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 sm:mb-4 bg-rose-50 rounded-full flex items-center justify-center" aria-hidden="true">
           <svg class="w-6 h-6 sm:w-7 sm:h-7 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
           </svg>
         </div>
-        <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Create Account</h1>
-        <p class="text-stone-500 mt-1.5 sm:mt-2 text-xs sm:text-sm">Join Noralooks for exclusive jewellery</p>
-      </div>
+        <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Create Your Noralooks Account</h1>
+        <p class="text-stone-500 mt-1.5 sm:mt-2 text-xs sm:text-sm">Join Noralooks for exclusive jewellery deals and personalized shopping</p>
+      </header>
 
       <%= form_with model: @customer, url: signup_path, method: :post, class: 'space-y-4 sm:space-y-5',
-          data: { controller: 'signup-form', action: 'submit->signup-form#submit' } do |f| %>
+          data: { controller: 'signup-form', action: 'submit->signup-form#submit' },
+          aria: { label: 'Create account registration form' } do |f| %>
         <% if @customer.errors.any? %>
           <div class="rounded-lg bg-red-50 border border-red-200 p-3 sm:p-4">
             <div class="flex items-start gap-2 sm:gap-3">
