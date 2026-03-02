@@ -241,6 +241,9 @@ Rails.application.routes.draw do
   get "search", to: "search#index"
   get "search/suggestions", to: "search#suggestions"
 
+  # Sitemap
+  get "sitemap.xml", to: "sitemaps#show", defaults: { format: :xml }
+
   # Static Pages
   get "shipping", to: "pages#shipping"
   get "returns", to: "pages#returns"

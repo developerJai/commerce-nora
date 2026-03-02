@@ -28,4 +28,4 @@ Disallow: /rails/
 Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://noralooks.com/sitemap.xml
+Sitemap: https://www.noralooks.com/sitemap.xml
