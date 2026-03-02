@@ -93,5 +93,6 @@ Rails.application.configure do
     secure: false
 
   # Add your staging server IP or hostname here
-  # config.hosts << "your-staging-ip-or-hostname"
+  config.hosts << "staging.noralooks.com"
+  config.hosts << "103.47.224.92"
 end

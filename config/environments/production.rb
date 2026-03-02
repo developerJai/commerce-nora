@@ -97,5 +97,5 @@ Rails.application.configure do
     same_site: :lax,
     secure: false
 
-  config.hosts << "103.47.224.92"
+  config.hosts << "www.noralooks.com"
 end
