@@ -20,6 +20,7 @@ import QuantityController from "controllers/quantity_controller"
 import ImagePreviewController from "controllers/image_preview_controller"
 import MultiImagePreviewController from "controllers/multi_image_preview_controller"
 import CollectionItemPreviewController from "controllers/collection_item_preview_controller"
+import CaptchaController from "controllers/captcha_controller"
 
 application.register("sidebar", SidebarController)
 application.register("dropdown", DropdownController)
@@ -37,3 +38,4 @@ application.register("quantity", QuantityController)
 application.register("image-preview", ImagePreviewController)
 application.register("multi-image-preview", MultiImagePreviewController)
 application.register("collection-item-preview", CollectionItemPreviewController)
+application.register("captcha", CaptchaController)

@@ -9,6 +9,13 @@ module VendorPortal
     end
 
     def create
+      unless valid_captcha?
+        flash.now[:alert] = "Please complete the verification challenge"
+        @portal = 'vendor'
+        render :new, status: :unprocessable_entity
+        return
+      end
+
       admin_user = AdminUser.authenticate(params[:email], params[:password], role: 'vendor')
 
       if admin_user && admin_user.active?
@@ -34,6 +41,20 @@ module VendorPortal
       if session[:admin_id] && AdminUser.where(role: 'vendor').exists?(session[:admin_id])
         redirect_to admin_root_path
       end
+    end
+
+    def valid_captcha?
+      token = params[:captcha_token]
+      return false if token.blank?
+      
+      parts = token.split('-')
+      return false if parts.length != 2
+      
+      timestamp = parts[0].to_i
+      current_time = (Time.current.to_f * 1000).to_i
+      
+      time_diff = current_time - timestamp
+      time_diff >= 0 && time_diff < 300000
     end
   end
 end
