@@ -12,6 +12,7 @@ class ProductsController < ApplicationController
     @discount     = params[:discount]
     @rating       = params[:rating]
     @in_stock     = params[:in_stock] == "1"
+    @q            = params[:q].to_s.strip
 
     # ── Catalog price bounds ─────────────────────────────────────────
     variants_scope = ProductVariant.where(active: true)
@@ -26,7 +27,8 @@ class ProductsController < ApplicationController
       in_stock: @in_stock,
       min_price: @min_price,
       max_price: @max_price,
-      discount: @discount
+      discount: @discount,
+      q: @q
     )
 
     # ── Build facets from base filtered products (BEFORE multiselect) ──
@@ -41,7 +43,8 @@ class ProductsController < ApplicationController
       in_stock: @in_stock,
       min_price: @min_price,
       max_price: @max_price,
-      discount: @discount
+      discount: @discount,
+      q: @q
     )
     @category_counts = Product.where(id: category_count_product_ids).group(:category_id).count
 
@@ -119,6 +122,11 @@ class ProductsController < ApplicationController
   def build_active_filters
     filters = []
 
+    # Search query filter
+    if @q.present?
+      filters << { label: "Search: #{@q}", param: "q", value: @q }
+    end
+
     # Only show categories that should be visible based on admin settings
     show_subcategories = @filter_config["show_subcategories"]
     @category_ids.each do |cid|
@@ -151,8 +159,11 @@ class ProductsController < ApplicationController
 
   # Build filtered product IDs with non-multiselect filters
   # This is the base for facet calculation
-  def build_filtered_product_ids(category_ids:, rating:, in_stock:, min_price:, max_price:, discount:)
+  def build_filtered_product_ids(category_ids:, rating:, in_stock:, min_price:, max_price:, discount:, q: nil)
     products = Product.active
+
+    # Search query filter
+    products = products.search(q) if q.present?
 
     # Category filter
     if category_ids.any?

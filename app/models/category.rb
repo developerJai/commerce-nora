@@ -65,6 +65,7 @@ class Category < ApplicationRecord
   end
 
   def self_and_children_ids
+    return [] unless active? && deleted_at.nil?
     [id] + children.active.pluck(:id)
   end
 

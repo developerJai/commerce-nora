@@ -32,16 +32,19 @@ class Product < ApplicationRecord
 
   scope :active, -> {
     left_joins(:vendor, :category)
+      .left_outer_joins(category: :parent)
       .where(products: { active: true })
       .where("vendors.active IS NULL OR vendors.active = ?", true)
       .where("categories.active IS NULL OR categories.active = ?", true)
       .where("categories.deleted_at IS NULL OR products.category_id IS NULL")
+      .where("parents_categories.active IS NULL OR parents_categories.active = ?", true)
+      .where("parents_categories.deleted_at IS NULL OR categories.parent_id IS NULL")
   }
   scope :featured, -> { where(featured: true) }
   scope :hot_selling, -> { where(hot_selling: true) }
   scope :with_category, ->(category_id) { where(category_id: category_id) if category_id.present? }
   scope :search, ->(query) {
-    where("name ILIKE :q OR description ILIKE :q OR short_description ILIKE :q", q: "%#{query}%") if query.present?
+    where("products.name ILIKE :q OR products.description ILIKE :q OR products.short_description ILIKE :q", q: "%#{query}%") if query.present?
   }
   scope :by_price_range, ->(min, max) {
     joins(:variants).where(product_variants: { active: true })
@@ -157,6 +160,38 @@ class Product < ApplicationRecord
   # Returns the attribute definitions for this product's category
   def product_attribute_definitions
     category&.product_attribute_definitions || []
+  end
+
+  # ── Storefront visibility helpers ───────────────────────────────
+
+  # Checks if this product would appear on the storefront
+  def visible_on_storefront?
+    return false unless active?
+    return true if category.nil?
+    return false unless category.active?
+    return true if category.root?
+    category.parent&.active? && category.parent&.deleted_at.nil?
+  end
+
+  # Returns the reason why product is not visible, or nil if visible
+  def storefront_visibility_issue
+    return "Product is inactive" unless active?
+    return nil if category.nil?
+    return "Category is inactive" unless category.active?
+    return "Category is deleted" if category.deleted_at.present?
+    return nil if category.root?
+    return "Parent category is inactive" unless category.parent&.active?
+    return "Parent category is deleted" if category.parent&.deleted_at.present?
+    nil
+  end
+
+  # Returns the problematic category (if any)
+  def visibility_issue_category
+    return nil if visible_on_storefront?
+    return nil if category.nil?
+    return category unless category.active? && category.deleted_at.nil?
+    return category.parent if category.parent.present? && (!category.parent.active? || category.parent.deleted_at.present?)
+    nil
   end
 
   # Get value for a category-driven attribute (checks column first, then properties)

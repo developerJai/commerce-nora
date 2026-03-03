@@ -191,7 +191,13 @@ export default class extends Controller {
       this.hideResults()
     }
   }
-  
+
+  submitForm(event) {
+    // Let the form submit naturally when Enter is pressed
+    // The keydown.enter action will trigger form submission
+    this.hideResults()
+  }
+
   escapeHtml(text) {
     const div = document.createElement('div')
     div.textContent = text

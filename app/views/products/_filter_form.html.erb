@@ -5,6 +5,7 @@
 
 <%= form_with url: products_path, method: :get, class: 'space-y-1', data: mobile ? { turbo_frame: '_top' } : { controller: 'filters', action: 'change->filters#scheduleSubmit', turbo_frame: 'products-content' } do |f| %>
   <%= hidden_field_tag :sort, @sort %>
+  <%= hidden_field_tag :q, @q if @q.present? %>
 
   <!-- ── Availability Toggle ── -->
   <% if fc["show_availability"] %>

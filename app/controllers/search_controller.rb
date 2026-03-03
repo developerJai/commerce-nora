@@ -36,7 +36,7 @@ class SearchController < ApplicationController
 
     # Search products
     products = Product.active
-                     .where("name ILIKE ? OR description ILIKE ?", "%#{query}%", "%#{query}%")
+                     .where("products.name ILIKE ? OR products.description ILIKE ?", "%#{query}%", "%#{query}%")
                      .includes(:variants, images_attachments: :blob)
                      .limit(5)
                      .map do |product|
