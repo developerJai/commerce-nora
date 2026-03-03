@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["firstName", "lastName", "email", "emailError", "phone", "phoneError", "password", "passwordConfirmation", "form"]
+  static targets = ["firstName", "lastName", "email", "emailError", "phone", "phoneError", "password", "passwordConfirmation", "form", "submitButton"]
   
   connect() {
     this.phoneInputInstance = null
@@ -254,15 +254,40 @@ export default class extends Controller {
       return
     }
 
+    // Show loading state
+    this.showLoading()
+
     // Format phone number with country code
     if (this.hasPhoneTarget && this.phoneTarget.value.trim() && this.phoneInputInstance) {
       const fullNumber = this.phoneInputInstance.getNumber()
       this.phoneTarget.value = fullNumber
     }
+
+    // Form will submit normally - don't prevent default
   }
 
-  // Password Toggle
+  showLoading() {
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.disabled = true
+      this.submitButtonTarget.dataset.originalText = this.submitButtonTarget.value
+      this.submitButtonTarget.value = 'Loading...'
+      this.submitButtonTarget.classList.add('opacity-75', 'cursor-not-allowed')
+    }
+  }
+
+  hideLoading() {
+    if (this.hasSubmitButtonTarget && this.submitButtonTarget.dataset.originalText) {
+      this.submitButtonTarget.disabled = false
+      this.submitButtonTarget.value = this.submitButtonTarget.dataset.originalText
+      this.submitButtonTarget.classList.remove('opacity-75', 'cursor-not-allowed')
+    }
+  }
+
+  // Password Toggle - Fixed for mobile touch
   togglePassword(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    
     const button = event.currentTarget
     const fieldId = button.dataset.fieldId
     const field = document.getElementById(fieldId)

@@ -18,6 +18,8 @@ class ApplicationController < ActionController::Base
 
   def require_customer
     unless customer_logged_in?
+      # Store the full URL to redirect back after login
+      session[:return_to] = request.fullpath
       flash[:alert] = "Please login to continue"
       redirect_to login_path
     end
@@ -59,7 +61,7 @@ class ApplicationController < ActionController::Base
     search_parts = []
 
     # Add "jewellery" if any jewellery categories are active
-    jewellery_categories = ["Necklaces", "Rings", "Earrings", "Bangles", "Bracelets", "Pendants"]
+    jewellery_categories = [ "Necklaces", "Rings", "Earrings", "Bangles", "Bracelets", "Pendants" ]
     if (active_categories & jewellery_categories).any?
       search_parts << "jewellery"
     end

@@ -76,7 +76,11 @@
         overflow-y: auto !important;
         height: auto !important;
       }
-  <% end %>
+      /* Add padding for native mobile bottom tab bar (Hotwire Native) */
+      main {
+        padding-bottom: 70px !important;
+      }
+    <% end %>
   </style>
 </head>
 <body class="flex flex-col bg-stone-50 font-sans">
@@ -350,7 +354,8 @@
     </div>
   </footer>
 
-  <!-- Mobile Bottom Navigation -->
+  <!-- Mobile Bottom Navigation (hidden in Hotwire Native app since it has native tabs) -->
+  <% unless request.user_agent&.include?("Hotwire") %>
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-40 safe-area-pb">
     <div class="flex items-center justify-around h-14">
       <%= link_to root_path, class: "flex flex-col items-center justify-center flex-1 py-2 #{current_page?(root_path) ? 'text-rose-800' : 'text-stone-400'}" do %>
@@ -387,5 +392,6 @@
   </nav>
   
   <div class="sm:hidden h-14"></div>
+  <% end %>
 </body>
 </html>

@@ -19,45 +19,68 @@
     }
   }
   </script>
+  
+  <% if request.user_agent&.include?("Hotwire") %>
+  <!-- Mobile app specific styles -->
+  <style>
+    /* Prevent zoom on iOS - minimum 16px font size */
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+    /* Larger touch targets for mobile app */
+    .mobile-input {
+      min-height: 48px;
+    }
+    /* Hide decorative elements in mobile app */
+    .mobile-app .decorative-icon {
+      display: none;
+    }
+  </style>
+  <% end %>
 <% end %>
 
-<div class="sm:min-h-[60vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12">
-  <div class="w-full max-w-md">
-    <div class="bg-white rounded-none sm:rounded-xl border-0 sm:border border-stone-200 p-5 sm:p-6 md:p-8">
+<div class="<%= request.user_agent&.include?('Hotwire') ? 'mobile-app min-h-screen' : 'sm:min-h-[60vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12' %>">
+  <div class="w-full max-w-md <%= request.user_agent&.include?('Hotwire') ? 'px-4 py-4' : '' %>">
+    <div class="bg-white <%= request.user_agent&.include?('Hotwire') ? '' : 'rounded-none sm:rounded-xl border-0 sm:border border-stone-200 p-5 sm:p-6 md:p-8' %>">
       <!-- Header -->
-      <header class="text-center mb-6 sm:mb-8">
-        <div class="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 sm:mb-4 bg-rose-50 rounded-full flex items-center justify-center" aria-hidden="true">
-          <svg class="w-6 h-6 sm:w-7 sm:h-7 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <header class="text-center mb-6">
+        <% unless request.user_agent&.include?("Hotwire") %>
+        <div class="decorative-icon w-12 h-12 mx-auto mb-3 bg-rose-50 rounded-full flex items-center justify-center" aria-hidden="true">
+          <svg class="w-6 h-6 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 007-7z"/>
           </svg>
         </div>
-        <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Welcome Back to Noralooks</h1>
-        <p class="text-stone-500 mt-1.5 sm:mt-2 text-xs sm:text-sm">Sign in to your account to shop jewellery and track orders</p>
+        <% end %>
+        <h1 class="text-xl font-semibold text-stone-900 <%= request.user_agent&.include?('Hotwire') ? 'font-sans' : 'font-serif' %>">Welcome Back</h1>
+        <p class="text-stone-500 mt-1.5 text-sm">Sign in to continue shopping</p>
       </header>
 
-      <%= form_with url: login_path, method: :post, class: 'space-y-4 sm:space-y-5',
+      <%= form_with url: login_path, method: :post, class: 'space-y-4',
           data: { controller: 'signup-form', action: 'submit->signup-form#submit' },
           aria: { label: 'Sign in form' } do |f| %>
         <div>
-          <%= f.label :email, class: 'block text-xs sm:text-sm font-medium text-stone-700 mb-1 sm:mb-1.5' %>
+          <%= f.label :email, class: 'block text-sm font-medium text-stone-700 mb-1' %>
           <%= f.email_field :email, autofocus: true, autocomplete: 'email', required: true,
+              value: @email, # Preserve email on failed login
               placeholder: 'Enter your email',
-              class: 'w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+              class: 'mobile-input w-full px-3 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
               data: { signup_form_target: 'email' } %>
         </div>
 
         <div>
-          <%= f.label :password, class: 'block text-xs sm:text-sm font-medium text-stone-700 mb-1 sm:mb-1.5' %>
+          <%= f.label :password, class: 'block text-sm font-medium text-stone-700 mb-1' %>
           <div class="relative">
             <%= f.password_field :password, autocomplete: 'current-password', required: true,
                 placeholder: 'Enter your password',
-                class: 'w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-sm',
+                class: 'mobile-input w-full px-3 py-3 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
                 id: 'password',
                 data: { signup_form_target: 'password' } %>
-            <button type="button" class="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600" 
-                    data-action="click->signup-form#togglePassword" 
-                    data-field-id="password">
-              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button type="button" 
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600 p-2 touch-manipulation" 
+                    data-action="click->signup-form#togglePassword touchstart->signup-form#togglePassword" 
+                    data-field-id="password"
+                    aria-label="Toggle password visibility">
+              <svg class="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
               </svg>
@@ -65,11 +88,12 @@
           </div>
         </div>
 
-        <%= f.submit 'Sign In', class: 'w-full py-2.5 sm:py-3 px-4 bg-rose-800 text-white text-sm sm:text-base font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer',
-            data: { signup_form_target: 'form' } %>
+        <%= f.submit 'Sign In', 
+            class: 'mobile-input w-full py-4 px-4 bg-rose-800 text-white text-base font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer shadow-md',
+            data: { signup_form_target: 'submitButton' } %>
       <% end %>
 
-      <p class="mt-5 sm:mt-6 text-center text-xs sm:text-sm text-stone-600">
+      <p class="mt-5 text-center text-sm text-stone-600">
         Don't have an account?
         <%= link_to 'Create one', signup_path, class: 'text-rose-700 hover:text-rose-900 font-medium' %>
       </p>
