@@ -34,6 +34,7 @@ class Product < ApplicationRecord
     left_joins(:vendor, :category)
       .where(products: { active: true })
       .where("vendors.active IS NULL OR vendors.active = ?", true)
+      .where("categories.active IS NULL OR categories.active = ?", true)
       .where("categories.deleted_at IS NULL OR products.category_id IS NULL")
   }
   scope :featured, -> { where(featured: true) }

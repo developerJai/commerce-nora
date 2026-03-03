@@ -1,7 +1,7 @@
 class SearchController < ApplicationController
   def index
     @q = params[:q]
-    
+
     if @q.present?
       @pagy, @products = pagy(
         Product.active.search(@q).includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).ordered,
@@ -14,15 +14,16 @@ class SearchController < ApplicationController
 
   def suggestions
     query = params[:q].to_s.strip
-    
+
     if query.length < 2
       render json: { categories: [], products: [], variants: [] }
       return
     end
 
-    # Search categories
-    categories = Category.active
-                        .where('name ILIKE ?', "%#{query}%")
+    # Search categories - only show root categories (parent_id: nil) that are active
+    # This ensures we don't show subcategories with disabled parents
+    categories = Category.active.root
+                        .where("name ILIKE ?", "%#{query}%")
                         .limit(3)
                         .map do |cat|
       {
@@ -35,7 +36,7 @@ class SearchController < ApplicationController
 
     # Search products
     products = Product.active
-                     .where('name ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%")
+                     .where("name ILIKE ? OR description ILIKE ?", "%#{query}%", "%#{query}%")
                      .includes(:variants, images_attachments: :blob)
                      .limit(5)
                      .map do |product|
@@ -46,7 +47,7 @@ class SearchController < ApplicationController
         slug: product.slug,
         price: helpers.format_price(product.min_price),
         in_stock: product.in_stock?,
-        image: product.images.attached? ? url_for(product.images.first.variant(resize_to_fill: [80, 80])) : nil
+        image: product.images.attached? ? url_for(product.images.first.variant(resize_to_fill: [ 80, 80 ])) : nil
       }
     end
 
@@ -54,7 +55,7 @@ class SearchController < ApplicationController
     variants = ProductVariant.active
                             .joins(:product)
                             .where(products: { active: true, deleted_at: nil })
-                            .where('product_variants.name ILIKE ? OR product_variants.sku ILIKE ?', "%#{query}%", "%#{query}%")
+                            .where("product_variants.name ILIKE ? OR product_variants.sku ILIKE ?", "%#{query}%", "%#{query}%")
                             .includes(:product, image_attachment: :blob)
                             .limit(5)
                             .map do |variant|
@@ -66,7 +67,7 @@ class SearchController < ApplicationController
         product_slug: variant.product.slug,
         price: helpers.format_price(variant.price),
         stock_quantity: variant.stock_quantity,
-        image: variant.image.attached? ? url_for(variant.image.variant(resize_to_fill: [80, 80])) : nil
+        image: variant.image.attached? ? url_for(variant.image.variant(resize_to_fill: [ 80, 80 ])) : nil
       }
     end
 
