@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["firstName", "lastName", "email", "phone", "phoneError", "password", "passwordConfirmation", "form"]
+  static targets = ["firstName", "lastName", "email", "emailError", "phone", "phoneError", "password", "passwordConfirmation", "form"]
   
   connect() {
     this.phoneInputInstance = null
@@ -129,6 +129,40 @@ export default class extends Controller {
     }
   }
 
+  // Email Validation Helper
+  isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  validateEmail() {
+    if (!this.hasEmailTarget) return true
+
+    const email = this.emailTarget.value.trim()
+    
+    if (email === '') {
+      if (this.hasEmailErrorTarget) {
+        this.emailErrorTarget.textContent = 'Email is required'
+        this.emailErrorTarget.classList.remove('hidden')
+      }
+      this.emailTarget.classList.add('border-red-500')
+      return false
+    } else if (!this.isValidEmail(email)) {
+      if (this.hasEmailErrorTarget) {
+        this.emailErrorTarget.textContent = 'Please enter a valid email address'
+        this.emailErrorTarget.classList.remove('hidden')
+      }
+      this.emailTarget.classList.add('border-red-500')
+      return false
+    } else {
+      if (this.hasEmailErrorTarget) {
+        this.emailErrorTarget.classList.add('hidden')
+      }
+      this.emailTarget.classList.remove('border-red-500')
+      return true
+    }
+  }
+
   // Space Prevention Methods
 
   setupSpacePrevention() {
@@ -162,19 +196,26 @@ export default class extends Controller {
 
   // Form Validation
   validateForm() {
-    const errors = []
+    let isValid = true
 
     // Validate required fields (only if targets exist)
     if (this.hasFirstNameTarget && this.firstNameTarget.value.trim() === '') {
-      errors.push('First name is required')
+      this.firstNameTarget.classList.add('border-red-500')
+      isValid = false
+    } else if (this.hasFirstNameTarget) {
+      this.firstNameTarget.classList.remove('border-red-500')
     }
 
     if (this.hasLastNameTarget && this.lastNameTarget.value.trim() === '') {
-      errors.push('Last name is required')
+      this.lastNameTarget.classList.add('border-red-500')
+      isValid = false
+    } else if (this.hasLastNameTarget) {
+      this.lastNameTarget.classList.remove('border-red-500')
     }
 
-    if (this.hasEmailTarget && this.emailTarget.value.trim() === '') {
-      errors.push('Email is required')
+    // Validate email
+    if (!this.validateEmail()) {
+      isValid = false
     }
 
     // Password validation: different for signup vs signin
@@ -182,35 +223,28 @@ export default class extends Controller {
       if (this.hasPasswordConfirmationTarget) {
         // Signup form - require minimum 8 characters
         if (this.passwordTarget.value.length < 8) {
-          errors.push('Password must be at least 8 characters')
-        }
-      } else {
-        // Signin form - just require non-empty
-        if (this.passwordTarget.value.trim() === '') {
-          errors.push('Password is required')
+          this.passwordTarget.classList.add('border-red-500')
+          isValid = false
+        } else {
+          this.passwordTarget.classList.remove('border-red-500')
         }
       }
     }
 
     if (this.hasPasswordConfirmationTarget && this.hasPasswordTarget && 
         this.passwordConfirmationTarget.value !== this.passwordTarget.value) {
-      errors.push('Password confirmation does not match')
+      this.passwordConfirmationTarget.classList.add('border-red-500')
+      isValid = false
+    } else if (this.hasPasswordConfirmationTarget) {
+      this.passwordConfirmationTarget.classList.remove('border-red-500')
     }
 
     // Validate phone number
     if (!this.validatePhone()) {
-      if (this.hasPhoneTarget) {
-        this.phoneTarget.focus()
-      }
-      return false
+      isValid = false
     }
 
-    if (errors.length > 0) {
-      alert(errors.join('\n'))
-      return false
-    }
-
-    return true
+    return isValid
   }
 
   // Form Submission

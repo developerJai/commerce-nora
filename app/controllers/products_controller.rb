@@ -87,10 +87,14 @@ class ProductsController < ApplicationController
 
     @variants = @product.variants.active.ordered
     @reviews = @product.approved_reviews.includes(:customer).recent.limit(10)
-    @related_products = Product.active.where(category_id: @product.category_id)
-                               .where.not(id: @product.id)
-                               .includes({ variants: { image_attachment: :blob } }, images_attachments: :blob)
-                               .limit(4)
+    @related_products = if @product.category_id.present?
+                          Product.active.where(category_id: @product.category_id)
+                                 .where.not(id: @product.id)
+                                 .includes({ variants: { image_attachment: :blob } }, images_attachments: :blob)
+                                 .limit(4)
+    else
+                          Product.none
+    end
 
     @selected_variant = if params[:variant].present?
       @variants.find { |v| v.name.parameterize == params[:variant] } || @variants.first
@@ -114,21 +118,21 @@ class ProductsController < ApplicationController
 
   def build_active_filters
     filters = []
-    
+
     # Only show categories that should be visible based on admin settings
     show_subcategories = @filter_config["show_subcategories"]
     @category_ids.each do |cid|
       cat = Category.find_by(id: cid)
       next unless cat
-      
+
       # Skip subcategories if they're disabled in admin panel
       if cat.parent_id.present? && !show_subcategories
         next
       end
-      
+
       filters << { label: cat.name, param: "category_ids", value: cid }
     end
-    
+
     @colors.each { |v| filters << { label: "Color: #{v}", param: "colors", value: v } }
     @materials.each { |v| filters << { label: "Material: #{v}", param: "materials", value: v } }
     @gemstones.each { |v| filters << { label: "Stone: #{v}", param: "gemstones", value: v } }
@@ -200,14 +204,14 @@ class ProductsController < ApplicationController
     # For colors, we need to respect in-stock filter at variant level
     color_query = products.joins(:variants)
                           .where(product_variants: { active: true })
-                          .where.not(product_variants: { color: [nil, ""] })
+                          .where.not(product_variants: { color: [ nil, "" ] })
     color_query = color_query.where("product_variants.stock_quantity > ?", 0) if in_stock
     colors = color_query.group("product_variants.color").count
 
     # Product-level attributes
-    materials = products.where.not(base_material: [nil, ""]).group(:base_material).count
-    gemstones = products.where.not(gemstone: [nil, ""]).group(:gemstone).count
-    occasions = products.where.not(occasion: [nil, ""]).group(:occasion).count
+    materials = products.where.not(base_material: [ nil, "" ]).group(:base_material).count
+    gemstones = products.where.not(gemstone: [ nil, "" ]).group(:gemstone).count
+    occasions = products.where.not(occasion: [ nil, "" ]).group(:occasion).count
 
     { colors: colors, materials: materials, gemstones: gemstones, occasions: occasions }
   end

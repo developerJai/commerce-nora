@@ -24,7 +24,7 @@
 
     <!-- ═══════════════ Mobile Filter Drawer (Bottom Sheet) ═══════════════ -->
     <div data-filter-drawer-target="overlay" class="hidden fixed inset-0 bg-black/40 z-40 lg:hidden" data-action="click->filter-drawer#closeAny"></div>
-    <div data-filter-drawer-target="drawer" class="fixed left-0 right-0 bottom-0 max-h-[85vh] bg-white z-50 shadow-2xl transform translate-y-full transition-transform duration-300 ease-out lg:hidden overflow-hidden rounded-t-3xl">
+    <div data-filter-drawer-target="drawer" class="fixed left-0 right-0 bottom-0 max-h-[85vh] bg-white z-50 shadow-2xl transform translate-y-full transition-transform duration-300 ease-out lg:hidden overflow-hidden rounded-t-3xl pb-[max(env(safe-area-inset-bottom),16px)]">
       <div class="sticky top-0 bg-white border-b border-stone-200 px-4 py-3 z-10">
         <div class="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-3"></div>
         <div class="flex items-center justify-between">
@@ -34,13 +34,13 @@
           </button>
         </div>
       </div>
-      <div class="p-4 overflow-y-auto" style="max-height: calc(85vh - 130px);">
+      <div class="p-4 overflow-y-auto overscroll-contain" style="max-height: calc(85vh - 130px); touch-action: pan-y;">
         <%= render 'filter_form', remove_filter_url: remove_filter_url, mobile: true %>
       </div>
     </div>
     
     <!-- ═══════════════ Mobile Sort Drawer (Bottom Sheet) ═══════════════ -->
-    <div data-filter-drawer-target="sortDrawer" class="fixed left-0 right-0 bottom-0 bg-white z-50 shadow-2xl transform translate-y-full transition-transform duration-300 ease-out lg:hidden rounded-t-3xl">
+    <div data-filter-drawer-target="sortDrawer" class="fixed left-0 right-0 bottom-0 max-h-[80vh] bg-white z-50 shadow-2xl transform translate-y-full transition-transform duration-300 ease-out lg:hidden rounded-t-3xl pb-[max(env(safe-area-inset-bottom),16px)]">
       <div class="px-4 py-3">
         <div class="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-3"></div>
         <div class="flex items-center justify-between mb-4">
@@ -49,7 +49,7 @@
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
-        <div class="space-y-2 pb-4">
+        <div class="space-y-2 pb-4 overflow-y-auto overscroll-contain" style="max-height: calc(80vh - 150px); touch-action: pan-y;">
           <% tabs = [
             ['Popularity', 'rating'],
             ['Price: Low to High', 'price_low'],
@@ -137,7 +137,7 @@
           </div>
           <h3 class="text-lg font-serif font-medium text-stone-900 mb-2">No products found</h3>
           <p class="text-stone-500 text-sm mb-4">Try adjusting your filters to find what you're looking for</p>
-          <%= link_to 'Clear All Filters', products_path, class: 'inline-block px-5 py-2 bg-rose-800 text-white text-sm font-medium rounded-full hover:bg-rose-900 transition' %>
+          <%= link_to 'Clear All Filters', products_path, data: { turbo_frame: "_top" }, class: 'inline-block px-5 py-2 bg-rose-800 text-white text-sm font-medium rounded-full hover:bg-rose-900 transition' %>
         </div>
       <% end %>
       <% end %>

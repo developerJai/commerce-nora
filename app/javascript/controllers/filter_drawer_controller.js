@@ -14,6 +14,7 @@ export default class extends Controller {
     this._boundStart = this.handleTouchStart.bind(this)
     this._boundMove = this.handleTouchMove.bind(this)
     this._boundEnd = this.handleTouchEnd.bind(this)
+    this._boundWheel = this.handleWheel.bind(this)
   }
 
   open() {
@@ -70,15 +71,18 @@ export default class extends Controller {
     drawer.removeEventListener('touchstart', this._boundStart)
     drawer.removeEventListener('touchmove', this._boundMove)
     drawer.removeEventListener('touchend', this._boundEnd)
+    drawer.removeEventListener('wheel', this._boundWheel)
     drawer.addEventListener('touchstart', this._boundStart, { passive: true })
     drawer.addEventListener('touchmove', this._boundMove, { passive: false })
     drawer.addEventListener('touchend', this._boundEnd, { passive: true })
+    drawer.addEventListener('wheel', this._boundWheel, { passive: false })
   }
 
   detachSwipe(drawer) {
     drawer.removeEventListener('touchstart', this._boundStart)
     drawer.removeEventListener('touchmove', this._boundMove)
     drawer.removeEventListener('touchend', this._boundEnd)
+    drawer.removeEventListener('wheel', this._boundWheel)
   }
 
   findScrollableParent(el, drawer) {
@@ -91,6 +95,22 @@ export default class extends Controller {
       el = el.parentElement
     }
     return null
+  }
+
+  _boundWheel = this.handleWheel.bind(this)
+
+  handleWheel(e) {
+    const drawer = e.currentTarget
+    const scrollable = this.findScrollableParent(e.target, drawer)
+    
+    if (scrollable) {
+      const isAtTop = scrollable.scrollTop <= 0
+      const isAtBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight
+      
+      if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+        e.preventDefault()
+      }
+    }
   }
 
   handleTouchStart(e) {

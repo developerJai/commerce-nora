@@ -31,8 +31,10 @@ class Product < ApplicationRecord
   validate :validate_attribute_options
 
   scope :active, -> {
-    left_joins(:vendor).where(products: { active: true })
-                       .where("vendors.active IS NULL OR vendors.active = ?", true)
+    left_joins(:vendor, :category)
+      .where(products: { active: true })
+      .where("vendors.active IS NULL OR vendors.active = ?", true)
+      .where("categories.deleted_at IS NULL OR products.category_id IS NULL")
   }
   scope :featured, -> { where(featured: true) }
   scope :hot_selling, -> { where(hot_selling: true) }
