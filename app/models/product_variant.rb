@@ -24,6 +24,7 @@ class ProductVariant < ApplicationRecord
   before_validation :auto_generate_name, if: -> { name.blank? && (color.present? || size.present?) }
 
   validate :validate_image
+  validate :mrp_not_less_than_selling_price
 
   # ── Scopes ────────────────────────────────────────────────────────
   scope :active, -> { where(active: true) }
@@ -73,12 +74,12 @@ class ProductVariant < ApplicationRecord
     with_lock do
       old_quantity = stock_quantity
       new_quantity = old_quantity + quantity_change
-      
+
       raise "Cannot have negative stock" if new_quantity < 0
-      
+
       transaction do
         update!(stock_quantity: new_quantity)
-        
+
         stock_adjustments.create!(
           quantity_change: quantity_change,
           quantity_before: old_quantity,
@@ -88,31 +89,31 @@ class ProductVariant < ApplicationRecord
           adjusted_by: adjusted_by
         )
       end
-      
+
       new_quantity
     end
   end
 
   # Convenience methods for common adjustments
   def restock!(quantity, notes: nil, adjusted_by: nil)
-    adjust_stock!(quantity, reason: 'restock', notes: notes, adjusted_by: adjusted_by)
+    adjust_stock!(quantity, reason: "restock", notes: notes, adjusted_by: adjusted_by)
   end
 
   def record_sale!(quantity, notes: nil, adjusted_by: nil)
-    adjust_stock!(-quantity, reason: 'sale', notes: notes, adjusted_by: adjusted_by)
+    adjust_stock!(-quantity, reason: "sale", notes: notes, adjusted_by: adjusted_by)
   end
 
   def record_return!(quantity, notes: nil, adjusted_by: nil)
-    adjust_stock!(quantity, reason: 'return', notes: notes, adjusted_by: adjusted_by)
+    adjust_stock!(quantity, reason: "return", notes: notes, adjusted_by: adjusted_by)
   end
 
   def record_damage!(quantity, notes: nil, adjusted_by: nil)
-    adjust_stock!(-quantity, reason: 'damage', notes: notes, adjusted_by: adjusted_by)
+    adjust_stock!(-quantity, reason: "damage", notes: notes, adjusted_by: adjusted_by)
   end
 
   def correct_stock!(new_quantity, notes: nil, adjusted_by: nil)
     change = new_quantity - stock_quantity
-    adjust_stock!(change, reason: 'correction', notes: notes, adjusted_by: adjusted_by)
+    adjust_stock!(change, reason: "correction", notes: notes, adjusted_by: adjusted_by)
   end
 
   # ── Category-aware attribute helpers ──────────────────────────────
@@ -141,11 +142,11 @@ class ProductVariant < ApplicationRecord
 
   # Legacy methods (deprecated - use adjust_stock! instead)
   def decrement_stock!(quantity)
-    adjust_stock!(-quantity, reason: 'sale')
+    adjust_stock!(-quantity, reason: "sale")
   end
 
   def increment_stock!(quantity)
-    adjust_stock!(quantity, reason: 'restock')
+    adjust_stock!(quantity, reason: "restock")
   end
 
   private
@@ -181,6 +182,12 @@ class ProductVariant < ApplicationRecord
 
     if image.blob.byte_size.to_i > 2.megabytes
       errors.add(:image, "must be smaller than 2 MB")
+    end
+  end
+
+  def mrp_not_less_than_selling_price
+    if compare_at_price.present? && price.present? && compare_at_price < price
+      errors.add(:compare_at_price, "cannot be less than selling price")
     end
   end
 end
