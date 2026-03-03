@@ -107,7 +107,7 @@
             </div>
             <div>
               <span class="text-gray-500">Total:</span>
-              <span class="ml-2 text-gray-900"><%= format_price(@support_ticket.order.total) %></span>
+              <span class="ml-2 text-gray-900"><%= format_price(@support_ticket.order.total_amount) %></span>
             </div>
             <%= link_to 'View Order', admin_order_path(@support_ticket.order), class: 'text-indigo-600 hover:underline text-sm' %>
           </div>
