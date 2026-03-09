@@ -152,7 +152,7 @@
         </div>
 
         <div class="mt-4 aspect-square bg-stone-50 rounded-xl overflow-hidden border border-stone-200">
-          <% preview_src = @variant.image.attached? ? url_for(@variant.image) : '' %>
+          <% preview_src = (@variant.persisted? && @variant.image.attached?) ? url_for(@variant.image) : '' %>
           <img src="<%= preview_src %>" class="w-full h-full object-cover <%= preview_src.present? ? '' : 'hidden' %>" data-image-preview-target="preview" alt="">
           <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-50 to-amber-50 <%= preview_src.present? ? 'hidden' : '' %>" data-image-preview-target="placeholder">
             <svg class="w-16 h-16 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
