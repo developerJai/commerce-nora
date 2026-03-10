@@ -1,0 +1,53 @@
+<tr id="<%= dom_id(homepage_collection) %>">
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+    <%= homepage_collection.position %>
+  </td>
+
+  <td class="px-6 py-4">
+    <div class="text-sm font-medium text-gray-900"><%= homepage_collection.name %></div>
+
+    <% if homepage_collection.subtitle.present? %>
+      <div class="text-sm text-gray-500">
+        <%= truncate(homepage_collection.subtitle, length: 60) %>
+      </div>
+    <% end %>
+  </td>
+
+  <td class="px-6 py-4 whitespace-nowrap">
+    <span class="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
+      <%= homepage_collection.layout_label %>
+    </span>
+  </td>
+
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+    <%= homepage_collection.items.size %> items
+  </td>
+
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+    <%= homepage_collection.starts_at&.strftime('%b %d, %Y') || 'Always' %> -
+    <%= homepage_collection.ends_at&.strftime('%b %d, %Y') || 'Forever' %>
+  </td>
+
+  <td class="px-6 py-4 whitespace-nowrap">
+    <span class="px-2 py-1 text-xs font-medium rounded-full <%= homepage_collection.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+      <%= homepage_collection.active? ? 'Active' : 'Inactive' %>
+    </span>
+  </td>
+
+  <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+    <%= link_to 'Manage', admin_homepage_collection_path(homepage_collection), class: 'text-indigo-600 hover:text-indigo-900 mr-3' %>
+
+    <%= link_to 'Edit', edit_admin_homepage_collection_path(homepage_collection), class: 'text-indigo-600 hover:text-indigo-900 mr-3' %>
+
+    <%= button_to homepage_collection.active? ? 'Disable' : 'Enable',
+        toggle_status_admin_homepage_collection_path(homepage_collection),
+        method: :patch,
+        class: homepage_collection.active? ? 'text-red-600 hover:text-red-900 mr-3' : 'text-green-600 hover:text-green-900 mr-3' %>
+
+    <%= button_to 'Delete',
+        admin_homepage_collection_path(homepage_collection),
+        method: :delete,
+        class: 'text-red-600 hover:text-red-900',
+        form: { data: { turbo_confirm: 'Are you sure you want to delete this collection?' } } %>
+  </td>
+</tr>

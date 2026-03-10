@@ -147,10 +147,11 @@ module Admin
       require 'csv'
       
       CSV.generate(headers: true) do |csv|
-        csv << ['SKU', 'Product', 'Variant', 'Current Stock', 'Reorder Point', 'Suggested Reorder Qty']
+        csv << ['SKU', 'Product', 'Variant', 'Current Stock', 'Reorder Point', 'Suggested Reorder Qty', 'Estimated Cost']
         
         @variants.each do |v|
-          csv << [v.sku, v.product.name, v.name, v.stock_quantity, v.reorder_point, v.reorder_quantity]
+          estimated_cost = v.price * v.reorder_quantity * 0.6
+          csv << [v.sku, v.product.name, v.name, v.stock_quantity, v.reorder_point, v.reorder_quantity, estimated_cost]
         end
       end
     end
