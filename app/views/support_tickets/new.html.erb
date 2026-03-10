@@ -55,7 +55,7 @@
 
       <div>
         <%= label_tag :message, 'Message', class: 'block text-sm font-semibold text-stone-900 mb-2' %>
-        <%= text_area_tag :message, '', rows: 8, required: true, placeholder: 'Describe your issue in detail...',
+        <%= text_area_tag :message, '', rows: 8, required: true, placeholder: 'Describe your issue in detail...',onkeydown: "if(event.key === ' ' && this.value.length === 0){ event.preventDefault(); }",
             class: 'w-full px-4 py-3 border border-stone-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm transition-shadow resize-none' %>
         <p class="mt-2 text-xs text-stone-500">Provide as much detail as possible to help us assist you better</p>
       </div>

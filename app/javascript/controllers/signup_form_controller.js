@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["firstName", "lastName", "email", "emailError", "phone", "phoneError", "password", "passwordConfirmation", "form", "submitButton"]
+  static targets = ["firstName", "lastName", "email", "emailError", "phone", "phoneError", "password", "passwordConfirmation","passwordMatchError", "form", "submitButton"]
   
   connect() {
     this.phoneInputInstance = null
@@ -231,12 +231,18 @@ export default class extends Controller {
       }
     }
 
-    if (this.hasPasswordConfirmationTarget && this.hasPasswordTarget && 
+    if (this.hasPasswordConfirmationTarget && this.hasPasswordTarget &&
         this.passwordConfirmationTarget.value !== this.passwordTarget.value) {
+
       this.passwordConfirmationTarget.classList.add('border-red-500')
+      this.passwordMatchErrorTarget.classList.remove('hidden')
       isValid = false
+
     } else if (this.hasPasswordConfirmationTarget) {
+
       this.passwordConfirmationTarget.classList.remove('border-red-500')
+      this.passwordMatchErrorTarget.classList.add('hidden')
+
     }
 
     // Validate phone number
@@ -245,6 +251,18 @@ export default class extends Controller {
     }
 
     return isValid
+  }
+
+  checkPasswordMatch() {
+    if (!this.hasPasswordTarget || !this.hasPasswordConfirmationTarget) return
+
+    if (this.passwordTarget.value !== this.passwordConfirmationTarget.value) {
+      this.passwordConfirmationTarget.classList.add('border-red-700')
+      this.passwordMatchErrorTarget.classList.remove('hidden')
+    } else {
+      this.passwordConfirmationTarget.classList.remove('border-red-700')
+      this.passwordMatchErrorTarget.classList.add('hidden')
+    }
   }
 
   // Form Submission

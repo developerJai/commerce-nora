@@ -167,6 +167,12 @@
           </div>
         </div>
 
+        <div id="password-match-error"
+             class="mt-1 text-xs text-red-600 hidden"
+             data-signup-form-target="passwordMatchError">
+          Password does not match
+        </div>
+
         <%= f.submit 'Create Account', 
             class: 'mobile-input w-full py-4 px-4 bg-rose-800 text-white text-base font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer shadow-md',
             data: { signup_form_target: 'submitButton' } %>

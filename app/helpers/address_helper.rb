@@ -57,6 +57,43 @@ module AddressHelper
       'New South Wales', 'Queensland', 'South Australia', 'Tasmania',
       'Victoria', 'Western Australia', 'Australian Capital Territory',
       'Northern Territory'
+    ],
+
+    'Germany' => [
+      'Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg',
+      'Bremen', 'Hamburg', 'Hesse', 'Lower Saxony',
+      'Mecklenburg-Vorpommern', 'North Rhine-Westphalia',
+      'Rhineland-Palatinate', 'Saarland', 'Saxony',
+      'Saxony-Anhalt', 'Schleswig-Holstein', 'Thuringia'
+    ],
+
+    'France' => [
+      'Auvergne-Rhône-Alpes', 'Bourgogne-Franche-Comté', 'Brittany',
+      'Centre-Val de Loire', 'Corsica', 'Grand Est', 'Hauts-de-France',
+      'Île-de-France', 'Normandy', 'Nouvelle-Aquitaine',
+      'Occitanie', 'Pays de la Loire', 'Provence-Alpes-Côte d’Azur'
+    ],
+
+    'Japan' => [
+      'Hokkaido', 'Aomori', 'Iwate', 'Miyagi', 'Akita', 'Yamagata', 'Fukushima',
+      'Ibaraki', 'Tochigi', 'Gunma', 'Saitama', 'Chiba', 'Tokyo', 'Kanagawa',
+      'Niigata', 'Toyama', 'Ishikawa', 'Fukui', 'Yamanashi', 'Nagano',
+      'Gifu', 'Shizuoka', 'Aichi', 'Mie',
+      'Shiga', 'Kyoto', 'Osaka', 'Hyogo', 'Nara', 'Wakayama',
+      'Tottori', 'Shimane', 'Okayama', 'Hiroshima', 'Yamaguchi',
+      'Tokushima', 'Kagawa', 'Ehime', 'Kochi',
+      'Fukuoka', 'Saga', 'Nagasaki', 'Kumamoto', 'Oita', 'Miyazaki',
+      'Kagoshima', 'Okinawa'
+    ],
+
+    'Singapore' => [
+      'Central Region', 'North Region', 'North-East Region',
+      'East Region', 'West Region'
+    ],
+
+    'United Arab Emirates' => [
+      'Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman',
+      'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'
     ]
   }.freeze
 

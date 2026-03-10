@@ -855,7 +855,7 @@
       <% end %>
 
       <!-- Actions (Available for both admin and vendor on their own orders) -->
-      <% if (admin_role? && !vendor_context?) || (vendor_context? && @order.vendor == current_vendor) %>
+      <% if ((admin_role? && !vendor_context?) || (vendor_context? && @order.vendor == current_vendor)) && !['delivered','cancelled'].include?(@order.status) %>
         <div class="bg-white rounded-lg shadow-sm p-4">
           <h3 class="text-sm font-medium text-gray-900 mb-4">Actions</h3>
           <div class="space-y-2">
