@@ -55,16 +55,21 @@
         <p class="text-stone-500 mt-1.5 text-sm">Sign in to continue shopping</p>
       </header>
 
-      <%= form_with url: login_path, method: :post, class: 'space-y-4',
+      <%= form_with url: login_path, method: :post, novalidate: true, class: 'space-y-4',
           data: { controller: 'signup-form', action: 'submit->signup-form#submit' },
           aria: { label: 'Sign in form' } do |f| %>
         <div>
           <%= f.label :email, class: 'block text-sm font-medium text-stone-700 mb-1' %>
-          <%= f.email_field :email, autofocus: true, autocomplete: 'email', required: true,
-              value: @email, # Preserve email on failed login
-              placeholder: 'Enter your email',
-              class: 'mobile-input w-full px-3 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
-              data: { signup_form_target: 'email' } %>
+          <%= f.email_field :email,required: true, value: @email, placeholder: "Enter your email",
+          class: "mobile-input w-full px-3 py-3 border border-stone-300 rounded-lg",
+          data: { 
+            signup_form_target: "email",
+            action: "input->signup-form#validateEmail blur->signup-form#validateEmail"
+          } %>
+
+          <p class="text-red-500 text-sm hidden"
+             data-signup-form-target="emailError">
+          </p>
         </div>
 
         <div>

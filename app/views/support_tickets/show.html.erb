@@ -70,7 +70,8 @@
             <h2 class="text-lg font-semibold text-stone-900 mb-4">Send Reply</h2>
             <%= form_with url: support_ticket_messages_path(@ticket), method: :post, class: 'space-y-4' do |f| %>
               <%= f.text_area :body, rows: 5, required: true, placeholder: 'Type your reply...',
-                  class: 'w-full px-4 py-3 border border-stone-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm transition-shadow resize-none' %>
+              onkeydown: "if(event.key === ' ' && this.value.length === 0){ event.preventDefault(); }",
+              class: 'w-full px-4 py-3 border border-stone-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm transition-shadow resize-none' %>
               <div class="flex justify-end">
                 <%= f.submit 'Send Reply', class: 'px-6 py-3 bg-rose-700 hover:bg-rose-800 text-white font-semibold rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer' %>
               </div>
