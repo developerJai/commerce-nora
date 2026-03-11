@@ -142,7 +142,7 @@ export default class extends Controller {
         }
         
         html += `
-          <a href="/products/${variant.product_slug}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition">
+          <a href="/products/${variant.product_slug}?variant=${variant.slug}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition" data-turbo="false">
             <div class="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
               ${variant.image 
                 ? `<img src="${variant.image}" class="w-full h-full object-cover" alt="">`

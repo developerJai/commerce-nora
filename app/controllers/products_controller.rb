@@ -100,7 +100,9 @@ class ProductsController < ApplicationController
     end
 
     @selected_variant = if params[:variant].present?
-      @variants.find { |v| v.name.parameterize == params[:variant] } || @variants.first
+      # Search by parameterizing the name since slug is not a database column
+      found_variant = @variants.find { |v| v.name.parameterize == params[:variant] }
+      found_variant || @variants.first
     else
       @variants.first
     end

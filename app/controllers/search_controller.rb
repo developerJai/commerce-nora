@@ -3,12 +3,18 @@ class SearchController < ApplicationController
     @q = params[:q]
 
     if @q.present?
-      @pagy, @products = pagy(
-        Product.active.search(@q).includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).ordered,
-        limit: 12
-      )
+      # Find matching categories to redirect to products page with filters
+      matching_categories = Category.active.root.where("name ILIKE ?", "%#{@q}%")
+      category_ids = matching_categories.pluck(:id)
+
+      if category_ids.any?
+        redirect_to products_path(category_ids: category_ids)
+      else
+        # No matching categories, redirect to products with search as keyword
+        redirect_to products_path(q: @q)
+      end
     else
-      @products = []
+      redirect_to products_path
     end
   end
 
@@ -62,6 +68,7 @@ class SearchController < ApplicationController
       {
         id: variant.id,
         name: variant.name,
+        slug: variant.slug,
         sku: variant.sku,
         product_name: variant.product.name,
         product_slug: variant.product.slug,

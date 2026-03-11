@@ -60,6 +60,10 @@ class ProductVariant < ApplicationRecord
     "#{product.name} - #{name}"
   end
 
+  def slug
+    name.parameterize
+  end
+
   def on_sale?
     compare_at_price.present? && compare_at_price > price
   end
