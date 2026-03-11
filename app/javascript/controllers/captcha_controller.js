@@ -136,6 +136,22 @@ export default class extends Controller {
     `
   }
 
+  togglePassword(event) {
+    const button = event.currentTarget
+    const fieldId = button.dataset.fieldId
+    const input = document.getElementById(fieldId)
+
+    const slash = button.querySelector(".eye-slash")
+
+    if (input.type === "password") {
+      input.type = "text"
+      slash.classList.remove("hidden")
+    } else {
+      input.type = "password"
+      slash.classList.add("hidden")
+    }
+  }
+
   verifyEmoji(event) {
     this.handleVerification(event)
   }
