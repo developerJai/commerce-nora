@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["pagination"]
+  static targets = ["pagination", "loadMoreContainer", "noMore"]
 
   connect() {
     // EMERGENCY BRAKE: Detect infinite reconnection loop
@@ -85,8 +85,14 @@ export default class extends Controller {
   setupObserver() {
     const { nextUrl, hasNext } = this.getPaginationData()
     
-    // Don't setup if no next page or already loading
-    if (!hasNext || !nextUrl || this.isLoading) {
+    // Show no more message if no next page
+    if (!hasNext) {
+      this.showNoMoreMessage()
+      return
+    }
+
+    // Don't setup if already loading
+    if (!nextUrl || this.isLoading) {
       return
     }
 
@@ -94,6 +100,10 @@ export default class extends Controller {
     if (this.loadedPages.has(nextUrl)) {
       return
     }
+
+    // Hide no more message and load more button when setting up observer
+    this.hideNoMoreMessage()
+    this.hideLoadMoreButton()
 
     // Create sentinel
     this.createSentinel()
@@ -239,6 +249,9 @@ export default class extends Controller {
     const grid = document.getElementById('products-grid')
     if (!grid) return
 
+    // Show load more button as fallback
+    this.showLoadMoreButton()
+
     const errorHTML = `
       <div class="error-message col-span-full mt-4 p-4 text-center text-red-600 bg-red-50 border border-red-200 rounded-lg">
         <div class="flex items-center justify-center gap-2">
@@ -255,6 +268,31 @@ export default class extends Controller {
       const error = document.querySelector('.error-message')
       if (error) error.remove()
     }, 5000)
+  }
+
+  showLoadMoreButton() {
+    if (this.hasLoadMoreContainerTarget) {
+      this.loadMoreContainerTarget.style.display = 'block'
+    }
+  }
+
+  hideLoadMoreButton() {
+    if (this.hasLoadMoreContainerTarget) {
+      this.loadMoreContainerTarget.style.display = 'none'
+    }
+  }
+
+  showNoMoreMessage() {
+    if (this.hasMoreTarget) {
+      this.noMoreTarget.style.display = 'block'
+    }
+    this.hideLoadMoreButton()
+  }
+
+  hideNoMoreMessage() {
+    if (this.hasMoreTarget) {
+      this.noMoreTarget.style.display = 'none'
+    }
   }
 
   removeSentinel() {

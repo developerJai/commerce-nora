@@ -62,6 +62,12 @@ module ApplicationHelper
     html.html_safe
   end
 
+  def is_android_app
+    is_android = request.user_agent&.include?("NoraLooks/Android")
+    Rails.logger.info "User Agent: #{request.user_agent}=====#{is_android}"
+    is_android
+  end
+
   private
 
   def star_icon(type)
