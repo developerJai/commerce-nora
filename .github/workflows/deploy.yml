@@ -1,0 +1,35 @@
+name: Deploy Rails
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            if [[ "${{ github.ref_name }}" == "staging" ]]; then
+              cd /var/www/backoffice-storefront-staging/ &&
+              sudo git pull origin staging -ff &&
+              bundle install &&
+              RAILS_ENV=staging rails db:migrate &&
+              RAILS_ENV=staging rails assets:precompile &&
+              sudo service nginx restart
+            else
+              cd /var/www/backoffice-storefront/ &&
+              sudo git pull origin main -ff &&
+              bundle install &&
+              RAILS_ENV=production rails db:migrate &&
+              RAILS_ENV=production rails assets:precompile &&
+              sudo service nginx restart
+            fi
