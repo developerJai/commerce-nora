@@ -14,7 +14,7 @@ class Customer < ApplicationRecord
   validates :email, presence: true, uniqueness: { case_sensitive: false },
             format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :first_name, :last_name, presence: true
-  validates :password, length: { minimum: 8 }, if: -> { new_record? || password.present? }
+  validates :password, length: { minimum: 6 }, if: -> { new_record? || password.present? }
   validates :phone, format: { with: /\A\+[\d\s\-\(\)]+\z/, message: "must be a valid international phone number" }, allow_blank: true
 
   before_save :downcase_email
