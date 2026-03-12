@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: ${{ github.ref_name }}
 
     steps:
       - name: Deploy to Server
