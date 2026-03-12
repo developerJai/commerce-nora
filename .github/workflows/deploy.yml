@@ -21,14 +21,14 @@ jobs:
           script: |
             if [[ "${{ github.ref_name }}" == "staging" ]]; then
               cd /var/www/backoffice-storefront-staging/ &&
-              sudo git pull origin staging -ff &&
+              sudo git pull origin1 staging -ff &&
               bundle install &&
               RAILS_ENV=staging rails db:migrate &&
               RAILS_ENV=staging rails assets:precompile &&
               sudo service nginx restart
             else
               cd /var/www/backoffice-storefront/ &&
-              sudo git pull origin main -ff &&
+              sudo git pull origin1 main -ff &&
               bundle install &&
               RAILS_ENV=production rails db:migrate &&
               RAILS_ENV=production rails assets:precompile &&
