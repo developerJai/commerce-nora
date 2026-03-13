@@ -21,7 +21,7 @@
         <% if @vendor.has_pending_payout_request? %>
           Payout request pending
         <% elsif @available_for_payout >= @config.minimum_payout_amount %>
-          <%= link_to "Request Payout →", new_payout_admin_vendor_earnings_path, class: "text-green-700 hover:text-green-900 font-medium" %>
+          <%= link_to "Request Payout →", admin_new_payout_vendor_earnings_path, class: "text-green-700 hover:text-green-900 font-medium" %>
         <% else %>
           Min ₹<%= @config.minimum_payout_amount %> to payout
         <% end %>
@@ -85,7 +85,7 @@
           <p class="mt-1 text-sm text-gray-500">Select orders to request a payout</p>
         </div>
         <% if @available_for_payout >= @config.minimum_payout_amount && !@vendor.has_pending_payout_request? %>
-          <%= link_to new_payout_admin_vendor_earnings_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700" do %>
+          <%= link_to admin_new_payout_vendor_earnings_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700" do %>
             Request Payout
           <% end %>
         <% end %>
@@ -147,7 +147,7 @@
       </div>
       <% if @ready_orders.count > 10 %>
         <div class="px-4 py-3 border-t border-gray-200 text-center">
-          <%= link_to new_payout_admin_vendor_earnings_path, class: "text-indigo-600 hover:text-indigo-900 text-sm font-medium" do %>
+          <%= link_to admin_new_payout_vendor_earnings_path, class: "text-indigo-600 hover:text-indigo-900 text-sm font-medium" do %>
             View all <%= @vendor.ready_orders_for_payout.count %> orders →
           <% end %>
         </div>
