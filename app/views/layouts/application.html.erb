@@ -294,9 +294,9 @@
         <div>
           <h4 class="text-white font-medium mb-4 text-sm">Shop</h4>
           <ul class="space-y-2 text-sm">
-            <li><%= link_to 'All Jewellery', products_path, class: 'text-stone-400 hover:text-rose-400 transition' %></li>
+            <li><%= link_to 'All Jewellery', products_path(sort: 'price_low'), class: 'text-stone-400 hover:text-rose-400 transition' %></li>
             <li><%= link_to 'New Arrivals', products_path(sort: 'newest'), class: 'text-stone-400 hover:text-rose-400 transition' %></li>
-            <li><%= link_to 'Best Sellers', products_path(featured: true), class: 'text-stone-400 hover:text-rose-400 transition' %></li>
+            <li><%= link_to 'Best Sellers', products_path(sort: 'rating'), class: 'text-stone-400 hover:text-rose-400 transition' %></li>
           </ul>
         </div>
         <div>

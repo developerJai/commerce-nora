@@ -5,7 +5,9 @@ class CategoriesController < ApplicationController
     # For root categories, include all child category IDs so products from
     # subcategories also appear. For leaf categories, just use their own ID.
     category_ids = category.self_and_children_ids
-
+  
     redirect_to products_path(category_ids: category_ids, **params.except(:slug, :controller, :action).permit!)
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_path
   end
 end

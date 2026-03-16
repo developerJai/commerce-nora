@@ -4,7 +4,7 @@ class CartsController < ApplicationController
 
   def show
     @cart = current_cart
-    @cart_items = @cart.cart_items.includes(product_variant: [ :product, image_attachment: :blob ])
+    @cart_items = @cart.cart_items.includes(product_variant: [ { product: :vendor }, image_attachment: :blob ])
 
     # Check if cart has multiple vendors
     @vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
@@ -67,6 +67,53 @@ class CartsController < ApplicationController
       format.turbo_stream do
         @cart = current_cart
         @cart_items = @cart.cart_items.includes(product_variant: [ :product, image_attachment: :blob ])
+
+        # Check if cart has multiple vendors (same logic as show action)
+        vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
+        @multi_vendor = vendor_ids.size > 1
+
+        # Group items by vendor if multi-vendor
+        if @multi_vendor
+          @items_by_vendor = @cart_items.group_by { |item| item.product_variant.product.vendor }
+        end
+
+        streams = []
+
+        # Update cart content based on whether cart is empty or not
+        if current_cart.empty?
+          streams << turbo_stream.replace("cart-content", 
+            partial: "carts/empty_cart")
+          streams << turbo_stream.update("cart-header",
+            partial: "carts/header",
+            locals: { cart: @cart })
+        else
+          streams << turbo_stream.update("cart-items",
+            partial: @multi_vendor ? "carts/items_by_vendor" : "carts/items",
+            locals: @multi_vendor ? { items_by_vendor: @items_by_vendor } : { cart_items: @cart_items })
+          streams << turbo_stream.update("cart-summary",
+            partial: "carts/summary",
+            locals: { cart: @cart })
+          streams << turbo_stream.update("cart-summary-mobile",
+            partial: "carts/summary_mobile",
+            locals: { cart: @cart })
+        end
+
+        # Update cart count badges
+        streams << turbo_stream.update("cart-count", partial: "shared/cart_count_badge")
+        streams << turbo_stream.update("mobile-cart-count", partial: "shared/mobile_cart_count_badge")
+        streams << turbo_stream.update("cart-item-count", current_cart.item_count.to_s)
+
+        # Update product controls if we have a variant
+        if @variant
+          streams << turbo_stream.replace("cart-controls-#{@variant.id}",
+            partial: "shared/cart_controls",
+            locals: { variant: @variant, cart_item: @cart_item })
+          streams << turbo_stream.update("product-cart-controls-#{@variant.id}",
+            partial: "products/cart_controls",
+            locals: { variant: @variant, cart_item: @cart_item })
+        end
+
+        render turbo_stream: streams
       end
     end
   end
@@ -82,7 +129,16 @@ class CartsController < ApplicationController
       format.html { redirect_to cart_path, notice: "Item removed from cart" }
       format.turbo_stream do
         @cart = current_cart
-        @cart_items = @cart.cart_items.includes(product_variant: [ :product, image_attachment: :blob ])
+        @cart_items = @cart.cart_items.includes(product_variant: [ { product: :vendor }, image_attachment: :blob ])
+
+        # Check if cart has multiple vendors (same logic as show action)
+        vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
+        @multi_vendor = vendor_ids.size > 1
+
+        # Group items by vendor if multi-vendor
+        if @multi_vendor
+          @items_by_vendor = @cart_items.group_by { |item| item.product_variant.product.vendor }
+        end
 
         streams = [
           turbo_stream.replace("cart-controls-#{@variant.id}",
@@ -93,17 +149,27 @@ class CartsController < ApplicationController
             locals: { variant: @variant, cart_item: nil }),
           turbo_stream.update("cart-count", partial: "shared/cart_count_badge"),
           turbo_stream.update("mobile-cart-count", partial: "shared/mobile_cart_count_badge"),
-          turbo_stream.update("cart-item-count", current_cart.item_count.to_s),
-          turbo_stream.update("cart-items",
-            partial: "carts/items",
-            locals: { cart_items: @cart_items }),
-          turbo_stream.update("cart-summary",
+          turbo_stream.update("cart-item-count", current_cart.item_count.to_s)
+        ]
+
+        # Update cart content based on whether cart is empty or not
+        if current_cart.empty?
+          streams << turbo_stream.replace("cart-content", 
+            partial: "carts/empty_cart")
+          streams << turbo_stream.update("cart-header",
+            partial: "carts/header",
+            locals: { cart: @cart })
+        else
+          streams << turbo_stream.update("cart-items",
+            partial: @multi_vendor ? "carts/items_by_vendor" : "carts/items",
+            locals: @multi_vendor ? { items_by_vendor: @items_by_vendor } : { cart_items: @cart_items })
+          streams << turbo_stream.update("cart-summary",
             partial: "carts/summary",
-            locals: { cart: @cart }),
-          turbo_stream.update("cart-summary-mobile",
+            locals: { cart: @cart })
+          streams << turbo_stream.update("cart-summary-mobile",
             partial: "carts/summary_mobile",
             locals: { cart: @cart })
-        ]
+        end
 
         render turbo_stream: streams
       end
