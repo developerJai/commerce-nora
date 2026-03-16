@@ -2,17 +2,9 @@
 
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4 md:py-8">
   <!-- Header -->
-  <% unless @cart.empty? %>
-    <div class="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
-      <h1 class="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-stone-900">
-        Shopping Bag
-        <span class="text-stone-400 font-sans font-normal text-sm sm:text-base">(<span id="cart-item-count"><%= @cart.item_count %></span>)</span>
-      </h1>
-      <%= button_to 'Clear All', clear_cart_path, method: :delete, 
-          class: 'text-xs sm:text-sm text-stone-500 hover:text-rose-700 transition', 
-          form: { data: { turbo_confirm: 'Clear your entire bag?' } } %>
-    </div>
-  <% end %>
+  <div id="cart-header">
+    <%= render 'header', cart: @cart %>
+  </div>
 
   <div id="cart-content">
     <% if @cart.empty? %>
@@ -50,7 +42,7 @@
         </div>
 
         <!-- Order Summary -->
-        <div class="fixed lg:static lg:w-80 lg:mt-0 z-40 bottom-0 left-0 right-0 lg:z-auto overflow-y-auto <%= is_android_app ? 'pb-14' : 'pb-[max(56px,env(safe-area-inset-bottom))]' %> lg:pb-0">
+        <div class="<%= is_android_app ? 'bottom-0 left-0 right-0 lg:relative lg:w-80 lg:mt-0 z-40 pb-14 lg:pb-0' : 'fixed lg:static lg:w-80 lg:mt-0 z-40 bottom-0 left-0 right-0 lg:z-auto overflow-y-auto pb-[max(56px,env(safe-area-inset-bottom))] lg:pb-0' %>">
           <div class="bg-white border-t-2 border-stone-200 lg:border lg:border-t lg:rounded-xl shadow-[0_-2px_12px_rgba(0,0,0,0.08)] lg:shadow-sm p-3.5 lg:p-5 lg:sticky lg:top-24">
             <h2 class="hidden lg:block text-sm sm:text-base font-serif font-semibold text-stone-900 mb-3 sm:mb-4">Order Summary</h2>
 
@@ -101,8 +93,10 @@
             </div>
 
             <!-- Checkout -->
-            <%= link_to checkout_path, class: 'w-full block py-3 lg:py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-center text-base font-semibold rounded-xl lg:rounded-lg transition shadow-lg lg:shadow-none' do %>
-              Proceed to Checkout
+            <% unless @cart.empty? %>
+              <%= link_to checkout_path, class: 'w-full block py-3 lg:py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-center text-base font-semibold rounded-xl lg:rounded-lg transition shadow-lg lg:shadow-none' do %>
+                Proceed to Checkout
+              <% end %>
             <% end %>
 
             <div class="hidden lg:block mt-2.5 sm:mt-3 text-center">

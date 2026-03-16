@@ -4,7 +4,7 @@ class ProductsController < ApplicationController
     @category_ids = Array(params[:category_ids]).reject(&:blank?)
     @min_price    = params[:min_price]
     @max_price    = params[:max_price]
-    @sort         = params[:sort].presence || "rating"
+    @sort         = params[:sort].presence || "newest"
     @colors       = Array(params[:colors]).reject(&:blank?)
     @materials    = Array(params[:materials]).reject(&:blank?)
     @gemstones    = Array(params[:gemstones]).reject(&:blank?)

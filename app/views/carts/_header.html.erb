@@ -1,0 +1,11 @@
+<% unless @cart.empty? %>
+  <div class="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+    <h1 class="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-stone-900">
+      Shopping Bag
+      <span class="text-stone-400 font-sans font-normal text-sm sm:text-base">(<span id="cart-item-count"><%= @cart.item_count %></span>)</span>
+    </h1>
+    <%= button_to 'Clear All', clear_cart_path, method: :delete, 
+        class: 'text-xs sm:text-sm text-stone-500 hover:text-rose-700 transition', 
+        form: { data: { turbo_confirm: 'Clear your entire bag?' } } %>
+  </div>
+<% end %>

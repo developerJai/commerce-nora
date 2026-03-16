@@ -194,7 +194,7 @@
 
           <!-- Wishlist (outside cart form to avoid nested forms) -->
           <div id="wishlist-toggle-<%= @product.id %>">
-            <%= render 'shared/wishlist_toggle', product: @product, icon_only: true %>
+            <%= render 'shared/wishlist_toggle', product: @product, icon_only: true, variant_id: @selected_variant&.id %>
           </div>
         </div>
       </div>
