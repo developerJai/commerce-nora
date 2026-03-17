@@ -168,7 +168,6 @@ export default class extends Controller {
   setupSpacePrevention() {
     const spacePreventedFields = [
       this.hasFirstNameTarget ? this.firstNameTarget : null,
-      this.hasLastNameTarget ? this.lastNameTarget : null,
       this.hasPasswordTarget ? this.passwordTarget : null,
       this.hasPasswordConfirmationTarget ? this.passwordConfirmationTarget : null
     ].filter(Boolean)
@@ -185,10 +184,31 @@ export default class extends Controller {
 } 
 
   removeSpaces(event) {
-    event.target.value = event.target.value.replace(/\s/g, '')
+    const field = event.target
+
+    // First Name: prevent leading space only
+    if (field === this.firstNameTarget) {
+      // Remove space only at the start
+      field.value = field.value.replace(/^\s+/, '')
+      return
+    }
+
+    // Other fields: remove all spaces
+    field.value = field.value.replace(/\s/g, '')
   }
 
   preventSpaceKey(event) {
+    const field = event.target
+
+    // First Name: allow space if cursor not at start
+    if (field === this.firstNameTarget) {
+      if (field.selectionStart === 0 && event.key === ' ') {
+        event.preventDefault() // prevent space at start
+      }
+      return // allow space elsewhere
+    }
+
+    // Other fields: block all spaces
     if (event.key === ' ') {
       event.preventDefault()
     }
@@ -222,7 +242,7 @@ export default class extends Controller {
     if (this.hasPasswordTarget) {
       if (this.hasPasswordConfirmationTarget) {
         // Signup form - require minimum 8 characters
-        if (this.passwordTarget.value.length < 8) {
+        if (this.passwordTarget.value.length < 6) {
           this.passwordTarget.classList.add('border-red-500')
           isValid = false
         } else {

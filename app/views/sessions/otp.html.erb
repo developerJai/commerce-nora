@@ -1,0 +1,81 @@
+<div class="max-w-md mx-auto bg-white border border-stone-300 rounded-xl p-6 shadow-sm">
+   <% if @otp_type == "whatsapp" %>
+   <h1 class="text-2xl font-semibold text-stone-900 mb-3">
+      Verify with WhatsApp
+   </h1>
+   <%else%>
+   <h1 class="text-2xl font-semibold text-stone-900 mb-3">
+      Authentication required
+   </h1>
+   <%end%>
+   <!-- Phone -->
+   <div class="mb-4 text-sm">
+      <span class="text-stone-800 font-medium">
+      <%= @country_code %> <%= @login %>
+      </span>
+      <%= link_to "Change",
+         signin_path,
+         class: "text-blue-600 ml-2 hover:underline" %>
+   </div>
+   <% if @otp_type == "whatsapp" %>
+		<p class="text-stone-800 font-small">Enter the OTP we sent you on WhatsApp.</p>
+   <%else%>
+   <p class="text-sm text-stone-800 mb-2">
+      We've sent a One Time Password (OTP) to the mobile number above.
+      Please enter it to complete verification
+   </p>
+   <%end%>
+  
+   <!-- OTP FORM -->
+   <%= form_with url: verify_otp_path, method: :post, class: "space-y-4" do %>
+   <%= hidden_field_tag :login, @login %>
+   <%= hidden_field_tag :country_code, @country_code %>
+   <label class="text-sm font-medium text-stone-800">
+   Enter OTP
+   </label>
+   <%= text_field_tag :otp, nil,
+      maxlength: 6,
+      class: "w-full px-4 py-2 border border-stone-400 rounded-xl focus:ring-2 focus:ring-blue-400 focus:outline-none" %>
+   <!-- Continue -->
+   <%= submit_tag "Verify",
+      class: "w-full py-2 rounded-full bg-rose-800 text-white text-base font-medium rounded-[34px] 
+      hover:bg-rose-900" %>
+   <% end %>
+   <!-- Resend -->
+   <div data-controller="login-input" class="text-center mt-4">
+      <span data-login-input-target="timerText" class="text-sm text-stone-500">
+      Resend OTP in
+      <span data-login-input-target="countdown">30</span>s
+      </span>
+      <%= button_to "Resend OTP",
+         resend_otp_path,
+         method: :post,
+         params: { login: @login, country_code: @country_code },
+         data: { login_input_target: "resendButton" },
+         class: "hidden text-blue-600 text-sm bg-transparent border-0 hover:underline" %>
+   </div>
+   <!-- Divider -->
+   <div class="flex items-center my-5">
+      <div class="flex-grow border-t border-stone-300"></div>
+      <span class="mx-3 text-sm text-stone-500">or</span>
+      <div class="flex-grow border-t border-stone-300"></div>
+   </div>
+   <% if @otp_type == "whatsapp" %>
+   <%= button_to "Send OTP",
+      send_otp_path,
+      method: :post,
+      params: { login: @login, country_code: @country_code, type: "sms" },
+      class: "block w-full text-center py-2 mb-3  border border-stone-400 rounded-full hover:bg-stone-50" %>
+   <%else%>
+   <%= button_to "Sign in with WhatsApp OTP",
+      send_otp_path,
+      method: :post,
+      params: { login: @login, country_code: @country_code, type: "whatsapp" },
+      class: "block w-full text-center py-2 mb-3 border border-stone-400 rounded-full hover:bg-stone-50" %>
+   <%end%>
+
+   
+   <%= link_to "Sign in with your password",
+      signin_path(login: @login),
+      class: "block w-full text-center py-2 border border-stone-400 rounded-full hover:bg-stone-50" %>
+</div>

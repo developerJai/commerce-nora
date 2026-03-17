@@ -1,0 +1,47 @@
+<div class="max-w-md mx-auto bg-white rounded-xl p-6">
+
+  <!-- Heading -->
+  <h2 class="text-xl font-bold text-stone-900 mb-4">
+    It looks like you are new to Noralooks
+  </h2>
+
+  <!-- Phone -->
+<div class="mb-4 text-sm">
+  <span class="text-stone-800 font-medium">
+
+    <% if @login.to_s.match?(/\A\d+\z/) %>
+      <%= @country_code %> <%= @login %>
+    <% else %>
+      <%= @login %>
+    <% end %>
+
+  </span>
+
+  <%= link_to "Change", signin_path,
+      class: "text-blue-600 ml-2 hover:underline" %>
+</div>
+
+  <p class="text-stone-700 mb-5">
+    Let's create an account using your mobile number
+  </p>
+
+  <!-- Create account button -->
+  <%= link_to "Proceed to create an account",
+      signup_path(phone: @login),
+      class: "block w-full text-center py-2 bg-yellow-400 hover:bg-yellow-500 rounded-full font-medium text-black mb-5" %>
+
+  <!-- Divider -->
+  <div class="flex items-center my-4">
+    <div class="flex-grow border-t border-stone-300"></div>
+  </div>
+
+  <!-- Already customer -->
+  <p class="text-sm font-medium text-stone-900 mb-1">
+    Already a customer?
+  </p>
+
+  <%= link_to "Sign in with another email or mobile number",
+      signin_path,
+      class: "text-blue-600 text-sm hover:underline" %>
+
+</div>

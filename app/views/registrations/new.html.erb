@@ -87,17 +87,17 @@
           </div>
         <% end %>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="">
           <div>
-            <%= f.label :first_name, class: 'block text-sm font-medium text-stone-700 mb-1' %>
+            <%= f.label :Your_name, class: 'block text-sm font-medium text-stone-700 mb-1' %>
             <%= f.text_field :first_name, required: true, placeholder: 'First name',
-                class: 'mobile-input w-full px-3 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
+                class: 'mobile-input w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
                 data: { signup_form_target: 'firstName' } %>
           </div>
           <div>
-            <%= f.label :last_name, class: 'block text-sm font-medium text-stone-700 mb-1' %>
-            <%= f.text_field :last_name, required: true, placeholder: 'Last name',
-                class: 'mobile-input w-full px-3 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
+            <%#= f.label :last_name, class: 'block text-sm font-medium text-stone-700 mb-1' %>
+            <%#= f.text_field :last_name, required: true, placeholder: 'Last name',
+                class: 'mobile-input w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
                 data: { signup_form_target: 'lastName' } %>
           </div>
         </div>
@@ -105,19 +105,18 @@
         <div>
           <%= f.label :email, class: 'block text-sm font-medium text-stone-700 mb-1' %>
           <div class="relative">
-            <%= f.email_field :email, autofocus: true, autocomplete: 'email', required: true,
+            <%= f.email_field :email, autofocus: true, autocomplete: 'email', required: false,
                 placeholder: 'Enter your email',
-                class: 'mobile-input w-full px-3 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
-                data: { signup_form_target: 'email', action: 'input->signup-form#validateEmail blur->signup-form#validateEmail' } %>
+                class: 'mobile-input w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
+                data: { signup_form_target: 'email' } %>
           </div>
-          <div id="email-error" class="mt-1 text-xs text-red-600 hidden" data-signup-form-target="emailError"></div>
         </div>
 
         <div>
           <%= f.label :phone, class: 'block text-sm font-medium text-stone-700 mb-1' %>
           <div class="relative">
-            <%= f.telephone_field :phone, autocomplete: 'tel', placeholder: 'Phone number (optional)',
-                class: 'mobile-input w-full px-3 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
+            <%= f.telephone_field :phone, autocomplete: 'tel', placeholder: 'Phone number',required: true,
+                class: 'mobile-input w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
                 id: 'phone',
                 data: { signup_form_target: 'phone', action: 'input->signup-form#validatePhone blur->signup-form#validatePhone' } %>
             <div id="phone-error" class="mt-1 text-xs text-red-600 hidden" data-signup-form-target="phoneError"></div>
@@ -129,7 +128,7 @@
           <div class="relative">
             <%= f.password_field :password, autocomplete: 'new-password', required: true,
                 placeholder: 'Create password',
-                class: 'mobile-input w-full px-3 py-3 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
+                class: 'mobile-input w-full px-3 py-2 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
                 id: 'customer_password',
                 data: { signup_form_target: 'password' } %>
             <button type="button" 
@@ -143,7 +142,7 @@
               </svg>
             </button>
           </div>
-          <p class="mt-1 text-xs text-stone-500">Minimum 8 characters</p>
+          <p class="mt-1 text-xs text-stone-500">Minimum 6 characters</p>
         </div>
 
         <div>
@@ -151,7 +150,7 @@
           <div class="relative">
             <%= f.password_field :password_confirmation, autocomplete: 'new-password', required: true,
                 placeholder: 'Confirm password',
-                class: 'mobile-input w-full px-3 py-3 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
+                class: 'mobile-input w-full px-3 py-2 pr-12 border border-stone-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent',
                 id: 'customer_password_confirmation',
                 data: { signup_form_target: 'passwordConfirmation' } %>
             <button type="button" 
@@ -174,13 +173,13 @@
         </div>
 
         <%= f.submit 'Create Account', 
-            class: 'mobile-input w-full py-4 px-4 bg-rose-800 text-white text-base font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer shadow-md',
+            class: 'mobile-input w-full py-2 px-4 bg-rose-800 text-white text-base font-medium rounded-lg hover:bg-rose-900 transition cursor-pointer shadow-md',
             data: { signup_form_target: 'submitButton' } %>
       <% end %>
 
       <p class="mt-5 text-center text-sm text-stone-600">
         Already have an account?
-        <%= link_to 'Sign in', login_path, class: 'text-rose-700 hover:text-rose-900 font-medium' %>
+        <%= link_to 'Sign in', signin_path, class: 'text-rose-700 hover:text-rose-900 font-medium' %>
       </p>
     </div>
   </div>

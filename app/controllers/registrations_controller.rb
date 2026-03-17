@@ -6,11 +6,19 @@ class RegistrationsController < ApplicationController
   end
 
   def create
+    # Split full name if only first_name is provided
+    if params[:customer][:first_name].present? && params[:customer][:last_name].blank?
+      full_name = params[:customer][:first_name].strip
+      names = full_name.split(" ")
+      params[:customer][:first_name] = names.first
+      params[:customer][:last_name] = names[1..].join(" ") # all after first word
+    end
+
     @customer = Customer.new(customer_params)
 
     if @customer.save
       session[:customer_id] = @customer.id
-      
+
       # Merge guest cart
       if session[:cart_token]
         guest_cart = Cart.find_by(token: session[:cart_token])

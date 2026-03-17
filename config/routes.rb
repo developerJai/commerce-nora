@@ -174,8 +174,15 @@ Rails.application.routes.draw do
   get "signup", to: "registrations#new"
   post "signup", to: "registrations#create"
   get "login", to: "sessions#new"
-  post "login", to: "sessions#create"
+  post "signin", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
+  get "signin", to: "sessions#signin"
+  post "check_login", to: "sessions#check_login"
+  post "create_account", to: "sessions#create_account"
+  post "send_otp", to: "sessions#send_otp"
+  post "verify_otp", to: "sessions#verify_otp"
+  get "otp/:token", to: "sessions#otp", as: :otp
+  post "resend_otp", to: "sessions#resend_otp"
 
   # Account
   resource :account, only: [ :show, :edit, :update ] do
