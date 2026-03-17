@@ -230,37 +230,48 @@
     <% unless controller_name == 'products' && action_name == 'index' %>
       <nav class="hidden sm:block border-t border-stone-100">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div class="flex items-center gap-1 sm:gap-4 h-10 overflow-x-auto scrollbar-hide">
-            <% active_class = 'px-3 py-1.5 text-sm text-rose-700 font-medium whitespace-nowrap' %>
-            <% inactive_class = 'px-3 py-1.5 text-sm text-stone-600 hover:text-rose-800 whitespace-nowrap transition' %>
-            <% selected_category_ids = Array(params[:category_ids]).reject(&:blank?).map(&:to_s) %>
-            <% collections_active = params[:featured].present? && ActiveModel::Type::Boolean.new.cast(params[:featured]) %>
-            <% all_active = selected_category_ids.empty? && !collections_active %>
+          <div class="overflow-x-auto overflow-y-visible scrollbar-hide">
+            <div class="flex items-center gap-1 sm:gap-4 h-10 min-w-max">
+              <% active_class = 'px-3 py-1.5 text-sm text-rose-700 font-medium whitespace-nowrap' %>
+              <% inactive_class = 'px-3 py-1.5 text-sm text-stone-600 hover:text-rose-800 whitespace-nowrap transition' %>
+              <% selected_category_ids = Array(params[:category_ids]).reject(&:blank?).map(&:to_s) %>
+              <% collections_active = params[:featured].present? && ActiveModel::Type::Boolean.new.cast(params[:featured]) %>
+              <% all_active = selected_category_ids.empty? && !collections_active %>
+              <% navbar_categories = Category.storefront_navbar_tree %>
+              <% standalone_subcategories = Category.storefront_navbar_standalone_subcategories %>
 
-            <%= link_to products_path, class: (all_active ? active_class : inactive_class) do %>
-              All
-            <% end %>
-            <%= link_to 'Collections', products_path(featured: true), class: (collections_active ? active_class : inactive_class) %>
-            <% Category.tree.each do |category| %>
-              <% category_active = selected_category_ids.include?(category.id.to_s) || category.children.any? { |c| selected_category_ids.include?(c.id.to_s) } %>
-              <% has_children = category.children.select(&:active?).any? %>
-              <% if has_children %>
-                <div class="relative group">
-                  <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
-                  <div class="absolute left-0 top-full pt-1 hidden group-hover:block z-50">
-                    <div class="bg-white border border-stone-200 rounded-lg shadow-lg py-2 min-w-[180px]">
-                      <% category.children.select(&:active?).sort_by { |c| [c.position, c.name] }.each do |child| %>
-                        <% child_active = selected_category_ids.include?(child.id.to_s) %>
-                        <%= link_to child.name, category_path(child.slug),
-                            class: "block px-4 py-2 text-sm transition #{child_active ? 'text-rose-700 font-medium bg-rose-50' : 'text-stone-600 hover:text-rose-800 hover:bg-rose-50'}" %>
-                      <% end %>
+              <%= link_to products_path, class: (all_active ? active_class : inactive_class) do %>
+                All
+              <% end %>
+              <%= link_to 'Collections', products_path(featured: true), class: (collections_active ? active_class : inactive_class) %>
+              <% navbar_categories.each do |category, visible_children| %>
+                <% category_active = selected_category_ids.include?(category.id.to_s) || visible_children.any? { |child| selected_category_ids.include?(child.id.to_s) } %>
+                <% if visible_children.any? %>
+                  <div class="relative" data-controller="dropdown" data-dropdown-fixed-value="true">
+                    <%= link_to category_path(category.slug), class: "flex items-center gap-1.5 px-3 py-1.5 text-sm whitespace-nowrap transition #{category_active ? 'text-rose-700 font-medium' : 'text-stone-600 hover:text-rose-800'}", data: { action: "mouseenter->dropdown#open mouseleave->dropdown#close" } do %>
+                      <span><%= category.name %></span>
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    <% end %>
+                    <div class="hidden" data-dropdown-target="menu" data-action="mouseenter->dropdown#open mouseleave->dropdown#close">
+                      <div class="bg-white border border-stone-200 rounded-lg shadow-lg py-2 min-w-[180px]">
+                        <% visible_children.each do |child| %>
+                          <% child_active = selected_category_ids.include?(child.id.to_s) %>
+                          <%= link_to child.name, category_path(child.slug), class: "block px-4 py-2 text-sm transition #{child_active ? 'text-rose-700 font-medium bg-rose-50' : 'text-stone-600 hover:text-rose-800 hover:bg-rose-50'}" %>
+                        <% end %>
+                      </div>
                     </div>
                   </div>
-                </div>
-              <% else %>
+                <% else %>
+                  <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
+                <% end %>
+              <% end %>
+              <% standalone_subcategories.each do |category| %>
+                <% category_active = selected_category_ids.include?(category.id.to_s) %>
                 <%= link_to category.name, category_path(category.slug), class: (category_active ? active_class : inactive_class) %>
               <% end %>
-            <% end %>
+            </div>
           </div>
         </div>
       </nav>

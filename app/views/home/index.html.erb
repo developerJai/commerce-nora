@@ -197,7 +197,7 @@
       <!-- Category Pills -->
       <div class="mt-6 sm:mt-8 -mx-3 sm:mx-0">
         <div class="flex md:flex-wrap md:justify-center gap-2 sm:gap-3 overflow-x-auto md:overflow-x-visible hide-scrollbar px-3 sm:px-0 pb-2 md:pb-0">
-          <% Category.active.root.ordered.limit(8).each do |category| %>
+          <% Category.storefront_hero_categories.each do |category| %>
             <%= link_to category.name, category_path(category.slug), 
                 class: 'px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-stone-600 text-xs sm:text-sm rounded-full border border-stone-200 hover:border-rose-300 hover:text-rose-800 transition shadow-sm whitespace-nowrap flex-shrink-0' %>
           <% end %>

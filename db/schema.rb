@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_01_125953) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_18_065000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -165,10 +165,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_01_125953) do
     t.string "name", null: false
     t.bigint "parent_id"
     t.integer "position", default: 0
+    t.boolean "show_in_hero_section", default: false, null: false
+    t.boolean "show_in_storefront_navbar", default: false, null: false
     t.string "slug", null: false
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_categories_on_deleted_at"
     t.index ["parent_id"], name: "index_categories_on_parent_id"
+    t.index ["show_in_hero_section"], name: "index_categories_on_show_in_hero_section"
+    t.index ["show_in_storefront_navbar"], name: "index_categories_on_show_in_storefront_navbar"
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
@@ -626,10 +630,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_01_125953) do
     t.datetime "created_at", null: false
     t.bigint "customer_id", null: false
     t.bigint "product_id", null: false
+    t.bigint "product_variant_id"
     t.datetime "updated_at", null: false
-    t.index ["customer_id", "product_id"], name: "index_wishlists_on_customer_id_and_product_id", unique: true
+    t.index ["customer_id", "product_id", "product_variant_id"], name: "index_wishlists_on_customer_product_and_variant", unique: true
     t.index ["customer_id"], name: "index_wishlists_on_customer_id"
     t.index ["product_id"], name: "index_wishlists_on_product_id"
+    t.index ["product_variant_id"], name: "index_wishlists_on_product_variant_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -668,5 +674,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_01_125953) do
   add_foreign_key "vendor_payout_orders", "vendor_payouts"
   add_foreign_key "vendor_payouts", "vendors"
   add_foreign_key "wishlists", "customers"
+  add_foreign_key "wishlists", "product_variants"
   add_foreign_key "wishlists", "products"
 end
