@@ -1,11 +1,12 @@
 <% icon_only ||= false %>
+<% variant_id ||= nil %>
 <% btn_class = icon_only ? 'w-12 h-12 flex-shrink-0' : 'w-full h-12' %>
 
 <% if customer_logged_in? %>
-  <% if current_customer.product_in_wishlist?(product) %>
-    <%= button_to wishlist_path(product_id: product.id),
+  <% if current_customer.product_in_wishlist?(product, variant_id: variant_id) %>
+    <%= button_to wishlist_path(product_id: product.id, variant_id: variant_id),
         method: :delete,
-        params: { icon_only: icon_only },
+        params: { icon_only: icon_only, variant_id: variant_id },
         class: "#{btn_class} inline-flex items-center justify-center border-2 border-rose-600 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition",
         form: { class: icon_only ? 'flex-shrink-0' : '' } do %>
       <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -13,8 +14,9 @@
       </svg>
     <% end %>
   <% else %>
-    <%= button_to wishlists_path(product_id: product.id, icon_only: icon_only),
+    <%= button_to wishlists_path(product_id: product.id),
         method: :post,
+        params: { icon_only: icon_only, variant_id: variant_id },
         class: "#{btn_class} inline-flex items-center justify-center border-2 border-stone-300 bg-white text-stone-600 rounded-lg hover:border-rose-600 hover:text-rose-600 transition",
         form: { class: icon_only ? 'flex-shrink-0' : '' } do %>
       <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

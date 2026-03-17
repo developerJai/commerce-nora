@@ -32,6 +32,8 @@ class SearchController < ApplicationController
                         .where("name ILIKE ?", "%#{query}%")
                         .limit(3)
                         .map do |cat|
+
+                          puts categories.inspect
       {
         id: cat.id,
         name: cat.name,
