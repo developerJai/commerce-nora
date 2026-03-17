@@ -1,7 +1,7 @@
-<%= turbo_stream.remove "wishlist-item-#{@product.id}" %>
+<%= turbo_stream.remove "wishlist-item-#{@product.id}-#{@variant_id || 'none'}" %>
 
 <%= turbo_stream.update "wishlist-toggle-#{@product.id}" do %>
-  <%= render 'shared/wishlist_toggle', product: @product, icon_only: @icon_only %>
+  <%= render 'shared/wishlist_toggle', product: @product, icon_only: @icon_only, variant_id: @variant_id %>
 <% end %>
 
 <%= turbo_stream.update 'wishlist-count' do %>

@@ -20,11 +20,34 @@ class Category < ApplicationRecord
   scope :root, -> { where(parent_id: nil) }
   scope :subcategories, -> { where.not(parent_id: nil) }
   scope :ordered, -> { order(:position, :name) }
+  scope :for_storefront_navbar, -> { where(show_in_storefront_navbar: true) }
+  scope :for_hero_section, -> { where(show_in_hero_section: true) }
 
   # ── Tree queries ──────────────────────────────────────────────────
 
   def self.tree
     root.active.ordered.includes(children: { image_attachment: :blob })
+  end
+
+  def self.storefront_navbar_tree
+    roots = active.root.for_storefront_navbar.ordered.includes(:children)
+
+    roots.map do |category|
+      visible_children = category.children
+                                 .select(&:active?)
+                                 .sort_by { |c| [c.position, c.name] }
+      [category, visible_children]
+    end
+  end
+
+  def self.storefront_hero_categories
+    active.for_hero_section.ordered
+  end
+
+  def self.storefront_navbar_standalone_subcategories
+    active.subcategories.for_storefront_navbar.includes(:parent)
+          .where.not(parent_id: active.root.for_storefront_navbar.select(:id))
+          .ordered
   end
 
   # Returns category tree for storefront filters.

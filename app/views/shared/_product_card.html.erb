@@ -1,14 +1,34 @@
 <% 
+  # Check if variant is explicitly passed (from wishlist)
+  explicit_variant = local_assigns.fetch(:variant, nil)
+  show_variant_info = local_assigns.fetch(:show_variant, false)
+  
   # Use in-stock variant when in-stock filter is active
   in_stock_filter_active = local_assigns.fetch(:in_stock_filter, false)
-  variant = in_stock_filter_active ? (product.first_in_stock_variant || product.default_variant) : product.default_variant
+  
+  # Determine which variant to display
+  variant = if explicit_variant.present?
+    explicit_variant
+  elsif in_stock_filter_active
+    product.first_in_stock_variant || product.default_variant
+  else
+    product.default_variant
+  end
+  
   cart_item = current_cart.cart_items.find_by(product_variant_id: variant&.id) if variant
   badge_side = local_assigns.fetch(:badge_side, :right)
+  
+  # Build product path with variant parameter if specific variant is selected
+  product_path_url = if explicit_variant.present?
+    product_path(product.slug, variant: explicit_variant.name.parameterize)
+  else
+    product_path(product.slug)
+  end
 %>
 
 <div class="group bg-white rounded-md sm:rounded-lg border border-stone-200 overflow-hidden hover:shadow-lg hover:border-stone-300 transition-all duration-200 flex flex-col"
-     id="product-card-<%= product.id %>">
-  <%= link_to product_path(product.slug), data: { turbo_frame: '_top' } do %>
+     id="product-card-<%= product.id %>-<%= variant&.id || 'default' %>">
+  <%= link_to product_path_url, data: { turbo_frame: '_top' } do %>
     <div class="aspect-square bg-stone-50 relative overflow-hidden">
       <% if variant&.image&.attached? %>
         <%= image_tag variant.image, class: 'w-full h-full object-cover group-hover:scale-105 transition duration-500', loading: 'lazy' %>
@@ -57,8 +77,13 @@
 
   <div class="p-2 sm:p-3 flex flex-col flex-1">
     <!-- Product Name -->
-    <%= link_to product_path(product.slug), data: { turbo_frame: '_top' }, class: 'block' do %>
+    <%= link_to product_path_url, data: { turbo_frame: '_top' }, class: 'block' do %>
       <h3 class="text-xs sm:text-sm font-medium text-stone-800 group-hover:text-rose-800 line-clamp-2 min-h-[2.25rem] sm:min-h-[2.5rem] transition"><%= product.name %></h3>
+    <% end %>
+    
+    <!-- Variant Name (when showing from wishlist) -->
+    <% if show_variant_info && variant&.name.present? %>
+      <p class="text-[10px] sm:text-xs text-stone-500 mt-0.5"><%= variant.name %></p>
     <% end %>
 
     <!-- Rating -->

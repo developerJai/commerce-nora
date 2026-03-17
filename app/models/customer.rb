@@ -53,8 +53,12 @@ class Customer < ApplicationRecord
     support_tickets.unread_for_customer.count
   end
 
-  def product_in_wishlist?(product)
-    wishlist_items.exists?(product_id: product.id)
+  def product_in_wishlist?(product, variant_id: nil)
+    if variant_id.present?
+      wishlist_items.exists?(product_id: product.id, product_variant_id: variant_id)
+    else
+      wishlist_items.exists?(product_id: product.id)
+    end
   end
 
   private

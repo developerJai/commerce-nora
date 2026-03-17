@@ -18,6 +18,10 @@ Rails.application.routes.draw do
     end
 
     resources :categories do
+      collection do
+        patch :update_storefront_navbar
+      end
+
       member do
         patch :toggle_status
       end
