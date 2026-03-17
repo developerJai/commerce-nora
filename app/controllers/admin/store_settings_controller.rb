@@ -4,6 +4,7 @@ module Admin
 
     def show
       @store_setting = StoreSetting.instance
+      @categories    = Category.includes(:children).order(:position, :name)
     end
 
     def update

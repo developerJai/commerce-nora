@@ -7,6 +7,17 @@ module Admin
       @categories = Category.includes(:parent, :children).order(:position, :name)
     end
 
+    def update_storefront_navbar
+      navbar_ids      = Array(params[:navbar_ids]).reject(&:blank?).map(&:to_i)
+      hero_ids        = Array(params[:hero_ids]).reject(&:blank?).map(&:to_i)
+
+      Category.update_all(show_in_storefront_navbar: false, show_in_hero_section: false)
+      Category.where(id: navbar_ids).update_all(show_in_storefront_navbar: true) if navbar_ids.any?
+      Category.where(id: hero_ids).update_all(show_in_hero_section: true)        if hero_ids.any?
+
+      redirect_back fallback_location: admin_categories_path, notice: "Storefront display settings updated successfully"
+    end
+
     def show
       @products = @category.products.order(:name)
     end
