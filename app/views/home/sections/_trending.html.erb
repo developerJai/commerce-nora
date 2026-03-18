@@ -87,9 +87,12 @@
               <!-- Add to Cart Controls -->
               <div class="mt-3">
                 <% if variant.nil? %>
-                  <button disabled class="w-full py-2 px-3 bg-stone-100 text-stone-400 text-xs font-medium rounded-lg cursor-not-allowed">
-                    Sold Out
-                  </button>
+                  <div class="min-h-[3.75rem] flex flex-col">
+                    <div class="flex-1"></div>
+                    <button disabled class="w-full py-2 px-3 bg-stone-100 text-stone-400 text-xs font-medium rounded-lg cursor-not-allowed">
+                      Sold Out
+                    </button>
+                  </div>
                 <% else %>
                   <%= render 'shared/cart_controls', variant: variant, cart_item: cart_item %>
                 <% end %>
