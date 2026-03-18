@@ -34,7 +34,6 @@ export default class extends Controller {
     if (this.hasChildrenTarget) {
       this.childrenTarget.querySelectorAll('input[type="checkbox"]').forEach(cb => {
         cb.checked = isChecked
-        this.updateChildLabel(cb)
       })
       if (isChecked && !this.openValue) {
         this.openValue = true
@@ -50,7 +49,6 @@ export default class extends Controller {
       this.openValue = true
       this.render()
     }
-    this.updateChildLabel(event.target)
     this.updateVisualState()
   }
 
@@ -77,12 +75,6 @@ export default class extends Controller {
 
   updateVisualState() {
     const parentChecked = this.hasParentCheckboxTarget && this.parentCheckboxTarget.checked
-    const anyChildChecked = this.hasChildrenTarget &&
-      Array.from(this.childrenTarget.querySelectorAll('input[type="checkbox"]')).some(cb => cb.checked)
-    const isSelected = parentChecked || anyChildChecked
-
-    this.element.classList.toggle('bg-rose-50/60', isSelected)
-    this.element.classList.toggle('hover:bg-stone-50', !isSelected)
 
     if (this.hasParentCheckboxTarget) {
       this.parentCheckboxTarget.classList.toggle('border-rose-800', parentChecked)
@@ -93,12 +85,5 @@ export default class extends Controller {
       this.parentNameTarget.classList.toggle('text-rose-900', parentChecked)
       this.parentNameTarget.classList.toggle('text-stone-700', !parentChecked)
     }
-  }
-
-  updateChildLabel(checkbox) {
-    const label = checkbox.closest('label')
-    if (!label) return
-    label.classList.toggle('bg-rose-100/60', checkbox.checked)
-    label.classList.toggle('hover:bg-white', !checkbox.checked)
   }
 }
