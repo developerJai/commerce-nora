@@ -22,6 +22,7 @@ import MultiImagePreviewController from "controllers/multi_image_preview_control
 import CollectionItemPreviewController from "controllers/collection_item_preview_controller"
 import CaptchaController from "controllers/captcha_controller"
 import PriceValidationController from "controllers/price_validation_controller"
+import ProductPageController from "controllers/product_page_controller"
 
 application.register("sidebar", SidebarController)
 application.register("dropdown", DropdownController)
@@ -34,6 +35,7 @@ application.register("cart-controls", CartControlsController)
 application.register("draft-order", DraftOrderController)
 application.register("product-gallery", ProductGalleryController)
 application.register("product-variant", ProductVariantController)
+application.register("product-page", ProductPageController)
 application.register("tabs", TabsController)
 application.register("quantity", QuantityController)
 application.register("image-preview", ImagePreviewController)

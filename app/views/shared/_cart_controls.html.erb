@@ -1,7 +1,7 @@
 <%# locals: (variant:, cart_item:) %>
 <% in_cart = cart_item.present? && cart_item.quantity > 0 %>
 
-<div id="cart-controls-<%= variant.id %>">
+<div id="cart-controls-<%= variant.id %>" class="min-h-[2.90rem] flex flex-col">
   <% if variant.out_of_stock? %>
     <button disabled class="w-full py-2.5 px-3 bg-stone-100 text-stone-400 text-xs sm:text-sm font-medium rounded-lg cursor-not-allowed">
       Sold Out
@@ -12,6 +12,7 @@
          data-cart-controls-update-url-value="<%= update_item_cart_path(variant.id) %>"
          data-cart-controls-current-quantity-value="<%= cart_item.quantity %>"
          data-cart-controls-max-stock-value="<%= variant.stock_quantity %>">
+      <div class="flex-1"></div>
       
       <div class="flex items-center justify-center gap-3">
         <!-- Decrease Button -->
@@ -38,8 +39,8 @@
           </svg>
         </button>
       </div>
-      
-      <p class="text-[10px] text-rose-700 text-center mt-1.5 font-medium">Added to bag</p>
+
+      <p class="text-[10px] text-rose-700 text-center mt-0.5 font-medium h-[0.765rem] leading-[0.765rem]">Added to bag</p>
     </div>
   <% else %>
     <!-- Add to Cart Button with Stimulus -->
