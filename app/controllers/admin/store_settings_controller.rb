@@ -9,23 +9,31 @@ module Admin
 
     def update
       @store_setting = StoreSetting.instance
+      updates = {}
 
-      # Convert checkbox params ("1"/"0") to boolean hash for filters
-      filter_config = {}
-      StoreSetting::FILTER_KEYS.each do |key|
-        filter_config[key] = params.dig(:store_setting, :filter_config, key) == "1"
+      # Only update filter_config when those params were submitted (filter form)
+      if params.dig(:store_setting, :filter_config).present?
+        filter_config = {}
+        StoreSetting::FILTER_KEYS.each do |key|
+          filter_config[key] = params.dig(:store_setting, :filter_config, key) == "1"
+        end
+        updates[:filter_config] = filter_config
       end
 
-      # Convert checkbox params for payment methods
-      payment_config = {}
-      StoreSetting::PAYMENT_KEYS.each do |key|
-        payment_config[key] = params.dig(:store_setting, :payment_config, key) == "1"
+      # Only update payment_config when those params were submitted (main settings form)
+      if params.dig(:store_setting, :payment_config).present?
+        payment_config = {}
+        StoreSetting::PAYMENT_KEYS.each do |key|
+          payment_config[key] = params.dig(:store_setting, :payment_config, key) == "1"
+        end
+        updates[:payment_config] = payment_config
       end
 
-      # Update company details and coupon setting
-      company_params = params.require(:store_setting).permit(:gst_number, :company_address, :company_phone, :enable_coupons)
+      # Company details and coupon — permit individually so missing keys are safely ignored
+      company_params = params.fetch(:store_setting, {}).permit(:gst_number, :company_address, :company_phone, :enable_coupons)
+      updates.merge!(company_params)
 
-      if @store_setting.update(filter_config: filter_config, payment_config: payment_config, **company_params)
+      if @store_setting.update(**updates)
         redirect_to admin_store_settings_path, notice: "Store settings updated successfully"
       else
         render :show, status: :unprocessable_entity

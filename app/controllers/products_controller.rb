@@ -62,7 +62,7 @@ class ProductsController < ApplicationController
     products = build_sorted_products(final_product_ids, @sort, @in_stock)
 
     @pagy, @products = pagy(products, limit: 16)
-    @category_tree = Category.grouped_for_filters(product_counts: @category_counts)
+    @category_tree = Category.grouped_for_filters
 
     # ── Filter visibility (admin-configurable) ───────────────────────
     @filter_config = StoreSetting.instance.effective_filter_config
