@@ -42,7 +42,9 @@ class SessionsController < ApplicationController
     password = params[:password]
     country_code = params[:country_code]
     phone = "#{country_code}#{login}"
+
     customer = Customer.find_by(email: login) || Customer.find_by(phone: phone)
+
     if customer&.authenticate(password)
       session[:customer_id] = customer.id
       redirect_to root_path, notice: "Logged in successfully"
@@ -59,6 +61,7 @@ class SessionsController < ApplicationController
 
   def create_account
     @customer = Customer.new(customer_params)
+
     if @customer.save
       session[:customer_id] = @customer.id
       redirect_to root_path
@@ -78,57 +81,96 @@ class SessionsController < ApplicationController
 
   def otp
     if params[:token] != session[:otp_token]
-      redirect_to login_path, alert: "Invalid session"
+      redirect_to signin_path, alert: "Invalid session"
       return
     end
+
     phone = session[:otp_phone]
+
     @country_code = phone[0..2]
     @login = phone[3..]
     @otp_type = session[:otp_type]
   end
 
+  # SEND OTP
   def send_otp
     phone = params[:login]
     country_code = params[:country_code]
     otp_type = params[:type] || "sms"
+
     full_phone = "#{country_code}#{phone}"
+
     otp = rand(100000..999999)
     token = SecureRandom.uuid
-    session[:otp] = otp
+
+    record = OtpVerification.find_or_initialize_by(phone: full_phone)
+
+    record.update(
+      otp: otp,
+      expires_at: 5.minutes.from_now
+    )
+
     session[:otp_phone] = full_phone
     session[:otp_token] = token
     session[:otp_type] = otp_type
+
     Rails.logger.info "OTP ===== #{otp}"
-    if otp_type == "whatsapp"
-      # WhatsappService.send(full_phone, otp)
-    else
-      # SmsService.send(full_phone, otp)
-    end
 
     redirect_to otp_path(token: token)
   end
 
+  # RESEND OTP
   def resend_otp
+    phone = session[:otp_phone]
+
+    record = OtpVerification.find_by(phone: phone)
+
+    if record.nil?
+      redirect_to signin_path, alert: "Session expired"
+      return
+    end
+
     otp = rand(100000..999999)
 
-    session[:otp] = otp
-
-    phone = session[:otp_phone]
+    record.update(
+      otp: otp,
+      expires_at: 5.minutes.from_now
+    )
 
     Rails.logger.info "Resend OTP ===== #{otp}"
 
-    redirect_back fallback_location: login_path,
+    redirect_back fallback_location: signin_path,
                   notice: "OTP resent successfully"
   end
 
+  # VERIFY OTP
   def verify_otp
-    entered_otp = params[:otp]
-    if entered_otp.to_s == session[:otp].to_s
-      customer = Customer.find_by(phone: session[:otp_phone])
+    phone = session[:otp_phone]
+
+    record = OtpVerification.find_by(phone: phone)
+
+    if record.nil?
+      redirect_to signin_path, alert: "Session expired"
+      return
+    end
+
+    if record.expired?
+      record.destroy
+      redirect_to signin_path, alert: "OTP expired. Please request a new OTP."
+      return
+    end
+
+    if params[:otp].to_s == record.otp.to_s
+
+      customer = Customer.find_by(phone: phone)
+
       session[:customer_id] = customer.id if customer
-      session.delete(:otp)
+
+      record.destroy
+
       session.delete(:otp_phone)
       session.delete(:otp_token)
+
       redirect_to root_path, notice: "Logged in successfully"
 
     else

@@ -5,54 +5,56 @@ export default class extends Controller {
   static targets = [
     "input",
     "countryCode",
+    "countryWrapper",
     "submit",
     "error",
-    "countdown",
-    "timerText",
-    "resendButton"
+    "dropdown",
+    "search",
+    "list",
+    "button"
   ]
 
-  connect(){
+  // ================= DROPDOWN =================
 
-    // OTP TIMER
-    if(this.hasCountdownTarget){
+  toggle() {
+    this.dropdownTarget.classList.toggle("hidden")
 
-      this.timeLeft = 30
-
-      this.timer = setInterval(() => {
-
-        this.timeLeft--
-
-        this.countdownTarget.textContent = this.timeLeft
-
-        if(this.timeLeft <= 0){
-
-          clearInterval(this.timer)
-
-          if(this.hasTimerTextTarget){
-            this.timerTextTarget.classList.add("hidden")
-          }
-
-          if(this.hasResendButtonTarget){
-            this.resendButtonTarget.classList.remove("hidden")
-          }
-
-        }
-
-      },1000)
-
+    if (!this.dropdownTarget.classList.contains("hidden")) {
+      this.searchTarget.focus()
     }
-
   }
 
+  filter() {
+    const value = this.searchTarget.value.toLowerCase()
+
+    this.listTarget.querySelectorAll("li").forEach(item => {
+      const text = item.textContent.toLowerCase()
+      item.classList.toggle("hidden", !text.includes(value))
+    })
+  }
+
+  select(event) {
+    const item = event.currentTarget
+    const code = item.dataset.code
+
+    // ONLY CODE SHOW
+    this.buttonTarget.textContent = code
+
+    // hidden input
+    this.countryCodeTarget.value = code
+
+    this.dropdownTarget.classList.add("hidden")
+  }
+
+  // ================= VALIDATION =================
 
   validate(){
 
     const value = this.inputTarget.value.trim()
 
-    // EMPTY FIELD
+    // EMPTY
     if(value === ""){
-      this.countryCodeTarget.classList.add("hidden")
+      this.countryWrapperTarget.classList.add("hidden")
       this.errorTarget.classList.add("hidden")
       this.submitTarget.disabled = true
       return
@@ -62,18 +64,17 @@ export default class extends Controller {
 
     if(isNumber){
 
-      this.countryCodeTarget.classList.remove("hidden")
+      this.countryWrapperTarget.classList.remove("hidden")
+
       const countryCode = this.countryCodeTarget.value
 
-      // INDIA VALIDATION
+      // INDIA
       if(countryCode === "+91"){
-
         if(value.length === 10 && /^[6-9]/.test(value)){
           this.enable()
         }else{
-          this.disable("Enter valid Indian mobile number")
+          this.disable("Enter valid mobile number")
         }
-
         return
       }
 
@@ -87,8 +88,9 @@ export default class extends Controller {
       return
     }
 
-    // EMAIL VALIDATION
-    this.countryCodeTarget.classList.add("hidden")
+    // EMAIL
+    this.countryWrapperTarget.classList.add("hidden")
+    this.dropdownTarget.classList.add("hidden") // close dropdown
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -99,7 +101,6 @@ export default class extends Controller {
     }
 
   }
-
 
   enable(){
     this.submitTarget.disabled = false

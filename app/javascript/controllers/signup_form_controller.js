@@ -109,7 +109,7 @@ export default class extends Controller {
         if (countryData.iso2 === 'in') {
           const phoneNumber = this.phoneTarget.value.replace(/\D/g, '')
           if (phoneNumber.length !== 10) {
-            errorMessage = 'Indian phone numbers must be exactly 10 digits'
+            errorMessage = 'phone numbers must be exactly 10 digits'
           }
         }
 

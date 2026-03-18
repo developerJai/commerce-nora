@@ -171,8 +171,16 @@ Rails.application.routes.draw do
   root to: "home#index"
 
   # Customer authentication
-  get "signup", to: "registrations#new"
-  post "signup", to: "registrations#create"
+  # get "signup", to: "registrations#new"
+  # post "signup", to: "registrations#create"
+
+  get  "signup", to: "registrations#new"
+  post "signup", to: "registrations#send_otp"
+  get  "signup/verify", to: "registrations#verify"
+  post "signup/confirm_otp", to: "registrations#confirm_otp"
+  post "signup/resend_otp", to: "registrations#resend_otp"
+
+
   get "login", to: "sessions#new"
   post "signin", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
