@@ -14,8 +14,6 @@ export default class extends Controller {
     "button"
   ]
 
-  // ================= DROPDOWN =================
-
   toggle() {
     this.dropdownTarget.classList.toggle("hidden")
 

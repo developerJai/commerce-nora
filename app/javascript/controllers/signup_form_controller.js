@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["firstName", "lastName", "email", "emailError", "phone", "phoneError", "password", "passwordConfirmation","passwordMatchError", "form", "submitButton"]
+  static targets = ["firstName", "lastName", "email", "emailError", "phone", "phoneError", "password", "passwordConfirmation","passwordMatchError","passwordError", "form", "submitButton"]
   
   connect() {
     this.phoneInputInstance = null
@@ -214,60 +214,61 @@ export default class extends Controller {
     }
   }
 
-  // Form Validation
+    // Form Validation
   validateForm() {
     let isValid = true
 
-    // Validate required fields (only if targets exist)
-    if (this.hasFirstNameTarget && this.firstNameTarget.value.trim() === '') {
-      this.firstNameTarget.classList.add('border-red-500')
-      isValid = false
-    } else if (this.hasFirstNameTarget) {
-      this.firstNameTarget.classList.remove('border-red-500')
-    }
-
-    if (this.hasLastNameTarget && this.lastNameTarget.value.trim() === '') {
-      this.lastNameTarget.classList.add('border-red-500')
-      isValid = false
-    } else if (this.hasLastNameTarget) {
-      this.lastNameTarget.classList.remove('border-red-500')
-    }
-
-    // Validate email
-    if (!this.validateEmail()) {
-      isValid = false
-    }
-
-    // Password validation: different for signup vs signin
     if (this.hasPasswordTarget) {
-      if (this.hasPasswordConfirmationTarget) {
-        // Signup form - require minimum 8 characters
-        if (this.passwordTarget.value.length < 6) {
-          this.passwordTarget.classList.add('border-red-500')
+
+      const password = this.passwordTarget.value
+      const confirmPassword = this.hasPasswordConfirmationTarget ? this.passwordConfirmationTarget.value : ""
+
+      // ✅ STEP 1: Length check
+      if (password.length < 6) {
+
+        this.passwordTarget.classList.add('border-red-500')
+
+        if (this.hasPasswordErrorTarget) {
+          this.passwordErrorTarget.textContent = "Password must be at least 6 characters"
+          this.passwordErrorTarget.classList.remove('hidden')
+        }
+
+        // ❌ Match error hide rahega
+        if (this.hasPasswordMatchErrorTarget) {
+          this.passwordMatchErrorTarget.classList.add('hidden')
+        }
+
+        isValid = false
+
+      } else {
+
+        // ✅ Length sahi → error hatao
+        this.passwordTarget.classList.remove('border-red-500')
+
+        if (this.hasPasswordErrorTarget) {
+          this.passwordErrorTarget.classList.add('hidden')
+        }
+
+        // ✅ STEP 2: Match check (ONLY after length valid)
+        if (this.hasPasswordConfirmationTarget && password !== confirmPassword) {
+
+          this.passwordConfirmationTarget.classList.add('border-red-500')
+
+          if (this.hasPasswordMatchErrorTarget) {
+            this.passwordMatchErrorTarget.classList.remove('hidden')
+          }
+
           isValid = false
-        } else {
-          this.passwordTarget.classList.remove('border-red-500')
+
+        } else if (this.hasPasswordConfirmationTarget) {
+
+          this.passwordConfirmationTarget.classList.remove('border-red-500')
+
+          if (this.hasPasswordMatchErrorTarget) {
+            this.passwordMatchErrorTarget.classList.add('hidden')
+          }
         }
       }
-    }
-
-    if (this.hasPasswordConfirmationTarget && this.hasPasswordTarget &&
-        this.passwordConfirmationTarget.value !== this.passwordTarget.value) {
-
-      this.passwordConfirmationTarget.classList.add('border-red-500')
-      this.passwordMatchErrorTarget.classList.remove('hidden')
-      isValid = false
-
-    } else if (this.hasPasswordConfirmationTarget) {
-
-      this.passwordConfirmationTarget.classList.remove('border-red-500')
-      this.passwordMatchErrorTarget.classList.add('hidden')
-
-    }
-
-    // Validate phone number
-    if (!this.validatePhone()) {
-      isValid = false
     }
 
     return isValid
@@ -276,11 +277,31 @@ export default class extends Controller {
   checkPasswordMatch() {
     if (!this.hasPasswordTarget || !this.hasPasswordConfirmationTarget) return
 
-    if (this.passwordTarget.value !== this.passwordConfirmationTarget.value) {
-      this.passwordConfirmationTarget.classList.add('border-red-700')
+    const password = this.passwordTarget.value
+    const confirmPassword = this.passwordConfirmationTarget.value
+
+    // ❌ Jab tak password < 6 → kuch mat dikhao
+    if (password.length < 6) {
+      this.passwordMatchErrorTarget.classList.add('hidden')
+      this.passwordConfirmationTarget.classList.remove('border-red-500')
+      return
+    }
+
+    // ❌ Agar confirm empty hai → error mat dikhao
+    if (confirmPassword.length === 0) {
+      this.passwordMatchErrorTarget.classList.add('hidden')
+      this.passwordConfirmationTarget.classList.remove('border-red-500')
+      return
+    }
+
+    // ❌ Match nahi
+    if (password !== confirmPassword) {
+      this.passwordConfirmationTarget.classList.add('border-red-500')
       this.passwordMatchErrorTarget.classList.remove('hidden')
-    } else {
-      this.passwordConfirmationTarget.classList.remove('border-red-700')
+    } 
+    // ✅ Match ho gaya
+    else {
+      this.passwordConfirmationTarget.classList.remove('border-red-500')
       this.passwordMatchErrorTarget.classList.add('hidden')
     }
   }

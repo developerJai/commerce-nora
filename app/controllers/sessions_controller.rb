@@ -43,19 +43,26 @@ class SessionsController < ApplicationController
     country_code = params[:country_code]
     phone = "#{country_code}#{login}"
 
-    customer = Customer.find_by(email: login) || Customer.find_by(phone: phone)
+    customer = Customer.find_by(email: params[:login]) || Customer.find_by(phone: params[:login])
 
-    if customer&.authenticate(password)
+    if customer&.authenticate(params[:password])
       session[:customer_id] = customer.id
       redirect_to root_path, notice: "Logged in successfully"
     else
-      flash.now[:alert] = "Invalid password"
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "login_error",
+            partial: "shared/error_message",
+            locals: { message: "Incorrect password. Please try again." }
+          )
+        end
 
-      render turbo_stream: turbo_stream.replace(
-        "login_step",
-        partial: "sessions/password_step",
-        locals: { login: login, country_code: country_code }
-      )
+        format.html do
+          flash.now[:alert] = "Incorrect password. Please try again."
+          render :new
+        end
+      end
     end
   end
 
@@ -144,40 +151,47 @@ class SessionsController < ApplicationController
   end
 
   # VERIFY OTP
-  def verify_otp
-    phone = session[:otp_phone]
+def verify_otp
+  phone = session[:otp_phone]
+  record = OtpVerification.find_by(phone: phone)
 
-    record = OtpVerification.find_by(phone: phone)
+  if record.nil?
+    redirect_to signin_path, alert: "Session expired"
+    return
+  end
 
-    if record.nil?
-      redirect_to signin_path, alert: "Session expired"
-      return
-    end
+  if record.expired?
+    record.destroy
+    redirect_to signin_path, alert: "OTP expired. Please request a new OTP."
+    return
+  end
 
-    if record.expired?
-      record.destroy
-      redirect_to signin_path, alert: "OTP expired. Please request a new OTP."
-      return
-    end
+  if params[:otp].to_s == record.otp.to_s
+    customer = Customer.find_by(phone: phone)
 
-    if params[:otp].to_s == record.otp.to_s
+    session[:customer_id] = customer.id if customer
 
-      customer = Customer.find_by(phone: phone)
+    record.destroy
+    session.delete(:otp_phone)
+    session.delete(:otp_token)
 
-      session[:customer_id] = customer.id if customer
+    redirect_to root_path, notice: "Logged in successfully"
+  else
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          "otp_error",
+          partial: "shared/otp_error",
+          locals: { message: "Invalid OTP. Please check your code and try again." }
+        )
+      end
 
-      record.destroy
-
-      session.delete(:otp_phone)
-      session.delete(:otp_token)
-
-      redirect_to root_path, notice: "Logged in successfully"
-
-    else
-      flash.now[:alert] = "Invalid OTP"
-      render :otp
+      format.html do
+        render :otp
+      end
     end
   end
+end
 
   private
 
