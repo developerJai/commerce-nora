@@ -3,7 +3,6 @@ class RegistrationsController < ApplicationController
 
   def new
     @customer = Customer.new
-
     @customer.phone = params[:phone] if params[:phone].present?
     @customer.email = params[:email] if params[:email].present?
 
@@ -11,11 +10,52 @@ class RegistrationsController < ApplicationController
   end
 
   def send_otp
-    phone = params[:customer][:phone]
+    phone = params[:customer][:phone].to_s.strip
+    email = params[:customer][:email].to_s.strip.downcase
+    otp_type = params[:type] || "sms"
+
+    email = nil if email.blank?
+
+    # ❌ PHONE EXISTS
+    if Customer.exists?(phone: phone)
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "signup_error",
+            partial: "shared/error_message",
+            locals: { message: "Phone number already registered. Please login." }
+          )
+        end
+        format.html do
+          redirect_to signup_path, alert: "Phone number already registered."
+        end
+      end
+      return
+    end
+
+    # ❌ EMAIL EXISTS
+    if email.present? && Customer.exists?(email: email)
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "signup_error",
+            partial: "shared/error_message",
+            locals: { message: "Email already registered. Please login." }
+          )
+        end
+        format.html do
+          redirect_to signup_path, alert: "Email already registered."
+        end
+      end
+      return
+    end
+
+    # ✅ OTP FLOW
+    record = OtpVerification.find_or_initialize_by(phone: phone)
 
     otp = rand(100000..999999).to_s
 
-    OtpVerification.create(
+    record.update(
       phone: phone,
       otp: otp,
       expires_at: 5.minutes.from_now
@@ -23,21 +63,28 @@ class RegistrationsController < ApplicationController
 
     session[:signup_phone] = phone
     session[:signup_data]  = customer_params
-
-    Rails.logger.info "OTP for #{phone} is #{otp}"
+    session[:otp_type]     = otp_type
+    session[:otp_sent_at]  = Time.current.to_i
 
     redirect_to signup_verify_path
   end
 
+
   def verify
     @phone = session[:signup_phone]
+    @otp_type = session[:otp_type] || "sms"
+
+    if session[:otp_sent_at].present?
+      elapsed = Time.current.to_i - session[:otp_sent_at].to_i
+      @remaining_time = [30 - elapsed, 0].max
+    else
+      @remaining_time = 30
+    end
   end
-
+  
   def confirm_otp
-
     phone = session[:signup_phone]
-
-    record = OtpVerification.find_by(phone: phone)
+    record = OtpVerification.where(phone: phone).order(created_at: :desc).first
 
     if record.nil?
       redirect_to signup_path, alert: "Session expired"
@@ -45,72 +92,95 @@ class RegistrationsController < ApplicationController
     end
 
     if record.expired?
-      flash[:alert] = "OTP expired. Please request a new OTP."
-      redirect_to signup_verify_path
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "otp_error",
+            partial: "shared/otp_error",
+            locals: { message: "OTP expired. Please request a new OTP." }
+          )
+        end
+
+        format.html do
+          flash[:alert] = "OTP expired"
+          redirect_to signup_verify_path
+        end
+      end
       return
     end
 
+    # ✅ CORRECT OTP
     if params[:otp].to_s == record.otp.to_s
 
-    data = session[:signup_data].symbolize_keys
+      data = session[:signup_data].symbolize_keys
 
-    if data[:first_name].present?
-      names = data[:first_name].strip.split(" ")
-      data[:first_name] = names.first
-      data[:last_name]  = names[1..].join(" ")
-      data[:last_name]  = "" if data[:last_name].blank?
-    end
+      if data[:first_name].present?
+        names = data[:first_name].strip.split(" ")
+        data[:first_name] = names.first
+        data[:last_name]  = names[1..].join(" ")
+        data[:last_name]  = "" if data[:last_name].blank?
+      end
 
       @customer = Customer.new(data)
 
       if @customer.save
-
         session[:customer_id] = @customer.id
 
-        if session[:cart_token]
-          guest_cart = Cart.find_by(token: session[:cart_token])
-          if guest_cart
-            @customer.active_cart.merge_with!(guest_cart)
-            session.delete(:cart_token)
-          end
-        end
-
         record.destroy
-
         session.delete(:signup_phone)
         session.delete(:signup_data)
 
-        redirect_to root_path, notice: "Welcome to Noralooks!"
-
+        redirect_to root_path, notice: "Welcome!"
       else
         render :verify
       end
 
     else
-      flash.now[:alert] = "Invalid OTP"
-      render :verify
-    end
+      # ❌ WRONG OTP (IMPORTANT PART)
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "otp_error",
+            partial: "shared/otp_error",
+            locals: { message: "Invalid OTP. Please check and try again." }
+          )
+        end
 
+        format.html do
+          flash.now[:alert] = "Invalid OTP"
+          render :verify
+        end
+      end
+    end
   end
 
   def resend_otp
     phone = session[:signup_phone]
 
-    otp = rand(100000..999999)
-
     record = OtpVerification.find_by(phone: phone)
+
+    if record.nil?
+      redirect_to signin_path, alert: "Session expired"
+      return
+    end
+
+    otp = rand(100000..999999)
 
     record.update(
       otp: otp,
       expires_at: 5.minutes.from_now
     )
 
-    Rails.logger.info "Resent OTP #{otp}"
+    # ✅ UPDATE TYPE (MAIN FIX)
+    session[:otp_type] = params[:type] if params[:type].present?
 
-    redirect_to signup_verify_path, notice: "OTP sent again"
+    # ✅ RESET TIMER
+    session[:otp_sent_at] = Time.current.to_i
 
+    redirect_back fallback_location: signup_verify_path,
+                  notice: "OTP resent successfully"
   end
-
+  
   # def create
   #   @customer = Customer.new(customer_params)
   #   if @customer.save
@@ -131,7 +201,7 @@ class RegistrationsController < ApplicationController
   private
 
   def customer_params
-    params.require(:customer).permit(
+    data = params.require(:customer).permit(
       :first_name,
       :last_name,
       :email,
@@ -139,6 +209,10 @@ class RegistrationsController < ApplicationController
       :password,
       :password_confirmation
     )
+
+    # ✅ blank email → nil
+    data[:email] = nil if data[:email].blank?
+    data
   end
 
   def redirect_if_logged_in

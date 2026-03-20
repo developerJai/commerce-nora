@@ -325,22 +325,22 @@ export default class extends Controller {
     // Form will submit normally - don't prevent default
   }
 
-  showLoading() {
-    if (this.hasSubmitButtonTarget) {
-      this.submitButtonTarget.disabled = true
-      this.submitButtonTarget.dataset.originalText = this.submitButtonTarget.value
-      this.submitButtonTarget.value = 'Loading...'
-      this.submitButtonTarget.classList.add('opacity-75', 'cursor-not-allowed')
-    }
-  }
+  // showLoading() {
+  //   if (this.hasSubmitButtonTarget) {
+  //     this.submitButtonTarget.disabled = true
+  //     this.submitButtonTarget.dataset.originalText = this.submitButtonTarget.value
+  //     this.submitButtonTarget.value = 'Loading...'
+  //     this.submitButtonTarget.classList.add('opacity-75', 'cursor-not-allowed')
+  //   }
+  // }
 
-  hideLoading() {
-    if (this.hasSubmitButtonTarget && this.submitButtonTarget.dataset.originalText) {
-      this.submitButtonTarget.disabled = false
-      this.submitButtonTarget.value = this.submitButtonTarget.dataset.originalText
-      this.submitButtonTarget.classList.remove('opacity-75', 'cursor-not-allowed')
-    }
-  }
+  // hideLoading() {
+  //   if (this.hasSubmitButtonTarget && this.submitButtonTarget.dataset.originalText) {
+  //     this.submitButtonTarget.disabled = false
+  //     this.submitButtonTarget.value = this.submitButtonTarget.dataset.originalText
+  //     this.submitButtonTarget.classList.remove('opacity-75', 'cursor-not-allowed')
+  //   }
+  // }
 
   // Password Toggle - Fixed for mobile touch
   togglePassword(event) {

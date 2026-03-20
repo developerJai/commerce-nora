@@ -191,6 +191,10 @@ Rails.application.routes.draw do
   post "verify_otp", to: "sessions#verify_otp"
   get "otp/:token", to: "sessions#otp", as: :otp
   post "resend_otp", to: "sessions#resend_otp"
+  get   "/forgotpassword", to: "sessions#forgot_password"
+  get   "/forgototp", to: "sessions#forgot_otp"
+  get   "/change/password", to: "sessions#change_password"
+  post 'password_update', to: 'sessions#password_update'
 
   # Account
   resource :account, only: [ :show, :edit, :update ] do

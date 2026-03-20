@@ -45,18 +45,17 @@
       hover:bg-rose-900" %>
    <% end %>
    <!-- Resend -->
-   <div data-controller="login-input" class="text-center mt-4">
-      <!--<span data-login-input-target="timerText" class="text-sm text-stone-500">
-      Resend OTP in
-      <span data-login-input-target="countdown">30</span>s-->
-      </span>
-      <%= button_to "Resend OTP",
-         resend_otp_path,
-         method: :post,
-         params: { login: @login, country_code: @country_code },
-         data: { login_input_target: "resendButton" },
-         class: "text-blue-600 text-sm bg-transparent border-0 hover:underline" %>
-   </div>
+<div data-controller="otp" class="text-center mt-4" data-otp-time-value="<%= @remaining_time %>">
+  <span data-otp-target="timerText" class="text-gray-500 text-sm">
+    Resend OTP in <span data-otp-target="countdown"><%= @remaining_time %></span>s
+  </span>
+
+  <%= button_to "Resend OTP",
+      resend_otp_path,
+      method: :post,
+      class: "text-blue-600 text-sm bg-transparent border-0 hover:underline hidden",
+      data: { otp_target: "resendBtn" } %>
+</div>
    <!-- Divider -->
    <div class="flex items-center my-5">
       <div class="flex-grow border-t border-stone-300"></div>
