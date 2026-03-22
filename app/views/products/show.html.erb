@@ -1,12 +1,11 @@
 <% content_for(:title) { @product.name } %>
-<% content_for(:meta_description) { truncate(@product.description.to_s, length: 155).presence || "Buy #{@product.name} at Noralooks. Premium quality artificial jewellery with free shipping above ₹999. Lifetime exchange policy available." } %>
+<% content_for(:meta_description) { truncate(@product.description.to_s, length: 155).presence || "Buy #{@product.name} at Noralooks. Premium quality artificial jewellery with free shipping above #{format_price(free_delivery_threshold)}. #{@product.exchange_in_days.to_i > 0 ? "#{@product.exchange_in_days}-day exchange available." : 'Quality checked before dispatch.'}" } %>
 <% content_for(:meta_keywords) { [@product.category&.name, "artificial jewellery", "buy #{@product.name.downcase}"].compact } %>
-<% if @product.images.attached? || @selected_variant&.image&.attached? %>
-  <% content_for(:og_image) { url_for(@selected_variant&.image || @product.images.first) } %>
-<% end %>
+<% og_image = @selected_variant&.image&.attached? ? @selected_variant.image : (@product.images.attached? ? @product.images.first : nil) %>
+<% content_for(:og_image) { url_for(og_image) } if og_image %>
 <% default_variant = @selected_variant %>
 
-<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6" data-controller="product-gallery product-variant product-page">
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 pb-24 sm:pb-6" data-controller="product-gallery product-variant product-page">
   <!-- Breadcrumb -->
   <nav class="mb-2 sm:mb-4 md:mb-6 overflow-x-auto hide-scrollbar" aria-label="Breadcrumb">
     <ol class="flex items-center gap-2 text-[10px] sm:text-xs md:text-sm whitespace-nowrap">
@@ -23,16 +22,16 @@
   </nav>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8 lg:gap-10 items-start">
-    <!-- Product Images - Vertical Thumbnails on Left -->
-    <div class="lg:col-span-7">
-      <div class="lg:sticky lg:top-24">
+    <!-- Product Images -->
+    <div class="lg:col-span-6">
+      <div>
         <div class="flex flex-row gap-3">
           <% variant_image = default_variant&.image&.attached? ? default_variant.image : nil %>
           <% gallery_images = [] %>
           <% gallery_images << variant_image if variant_image %>
           <% gallery_images.concat(@product.images.to_a) if @product.images.attached? %>
 
-          <!-- Vertical Thumbnails (Left Side) -->
+          <!-- Vertical Thumbnails (Desktop) -->
           <% if gallery_images.count > 1 %>
             <div class="hidden sm:block w-16 md:w-20 flex-shrink-0">
               <div class="flex flex-col gap-1.5 md:gap-2">
@@ -49,13 +48,13 @@
             </div>
           <% end %>
 
-          <!-- Main Image -->
+          <!-- Main Image with Zoom -->
           <div class="flex-1 min-w-0">
-            <div class="aspect-square bg-stone-100 rounded-lg md:rounded-xl overflow-hidden relative">
+            <div class="aspect-square bg-stone-100 rounded-lg md:rounded-xl overflow-hidden relative group cursor-zoom-in" data-product-gallery-target="zoomContainer">
               <% if gallery_images.any? %>
                 <% gallery_images.each_with_index do |image, index| %>
                   <div class="absolute inset-0 transition-opacity duration-300 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>" data-product-gallery-target="slide">
-                    <%= image_tag image, class: 'w-full h-full object-cover' %>
+                    <%= image_tag image, class: 'w-full h-full object-cover transition-transform duration-200', data: { product_gallery_target: 'zoomImage' } %>
                   </div>
                 <% end %>
               <% else %>
@@ -65,9 +64,9 @@
                   </svg>
                 </div>
               <% end %>
-              
+
               <!-- Badges -->
-              <div class="absolute top-3 left-3 flex flex-col gap-1">
+              <div class="absolute top-3 left-3 flex flex-col gap-1 z-[1]">
                 <% if @product.featured? %>
                   <span class="px-2.5 py-1 bg-rose-800 text-white text-xs font-medium rounded">Bestseller</span>
                 <% end %>
@@ -77,7 +76,7 @@
               </div>
             </div>
 
-            <!-- Mobile Thumbnails (Horizontal - Below Image) -->
+            <!-- Mobile Thumbnails (Horizontal) -->
             <% if gallery_images.count > 1 %>
               <div class="sm:hidden flex gap-1.5 mt-2 overflow-x-auto hide-scrollbar pb-1">
                 <% gallery_images.each_with_index do |image, index| %>
@@ -97,244 +96,395 @@
     </div>
 
     <!-- Product Info -->
-    <div class="lg:col-span-5">
-      <div class="bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6 lg:sticky lg:top-24">
-      <!-- Title -->
-      <h1 class="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-stone-900 leading-tight"><%= @product.name %></h1>
-      
-      <!-- Rating Summary -->
-      <% if @product.average_rating > 0 %>
-        <div class="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-3">
-          <div class="flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 bg-emerald-600 text-white rounded">
-            <span class="font-semibold text-xs sm:text-sm"><%= @product.average_rating.round(1) %></span>
-            <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-            </svg>
-          </div>
-          <a href="#reviews" class="text-xs sm:text-sm text-stone-500 hover:text-rose-700">
-            <%= @product.ratings_count %> <%= 'Review'.pluralize(@product.ratings_count) %>
-          </a>
-        </div>
-      <% end %>
-
-      <!-- Price Section -->
-      <div class="mt-3 sm:mt-4 pb-3 sm:pb-4 border-b border-stone-200">
-        <div class="flex items-baseline gap-2 sm:gap-3 flex-wrap" data-product-variant-target="priceSection">
-          <span class="text-xl sm:text-2xl md:text-3xl font-semibold text-stone-900" data-product-variant-target="price">
-            <%= format_price(default_variant&.price) %>
-          </span>
-          <% if default_variant&.on_sale? %>
-            <span class="text-base sm:text-lg text-stone-400 line-through" data-product-variant-target="comparePrice">
-              <%= format_price(default_variant.compare_at_price) %>
-            </span>
-            <span class="px-1.5 sm:px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-medium rounded" data-product-variant-target="discount">
-              Save <%= default_variant.discount_percentage %>%
-            </span>
-          <% else %>
-            <span class="hidden text-base sm:text-lg text-stone-400 line-through" data-product-variant-target="comparePrice"></span>
-            <span class="hidden px-1.5 sm:px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-medium rounded" data-product-variant-target="discount"></span>
-          <% end %>
-        </div>
-        <p class="text-[10px] sm:text-xs text-stone-500 mt-0.5 sm:mt-1">Inclusive of all taxes</p>
-      </div>
-
-      <!-- Variant Selection (Inline Tabs) -->
-      <% if @variants.count > 1 %>
-        <div class="mt-3 sm:mt-4">
-          <p class="text-xs sm:text-sm font-medium text-stone-700 mb-2 sm:mb-3">
-            Select: <span class="text-stone-900" data-product-variant-target="selectedName"><%= default_variant&.name %></span>
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <% @variants.each do |variant| %>
-              <button type="button"
-                      data-action="click->product-variant#selectVariant"
-                      data-product-variant-target="option"
-                      data-variant-slug="<%= variant.name.parameterize %>"
-                      class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md sm:rounded-lg border-2 transition <%= variant.id == @selected_variant.id ? 'border-rose-500 bg-rose-50 text-rose-800' : 'border-stone-200 text-stone-700 hover:border-rose-300' %> <%= variant.in_stock? ? '' : 'opacity-50' %>">
-                <%= variant.name %>
-                <% unless variant.in_stock? %>
-                  <span class="block text-[10px] text-stone-500 font-normal">Out of Stock</span>
-                <% end %>
-              </button>
+    <div class="lg:col-span-6">
+      <div class="bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6">
+        <!-- Title & Share -->
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h1 class="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-stone-900 leading-tight"><%= @product.name %></h1>
+            <% if @product.short_description.present? %>
+              <p class="text-xs sm:text-sm text-stone-500 mt-1"><%= @product.short_description %></p>
             <% end %>
           </div>
+          <button type="button" onclick="navigator.share ? navigator.share({title: '<%= j @product.name %>', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => this.querySelector('span').textContent = 'Copied!')" class="flex-shrink-0 p-2 text-stone-400 hover:text-rose-600 transition" title="Share">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/>
+            </svg>
+          </button>
         </div>
-      <% end %>
 
-      <!-- Stock Status -->
-      <div class="mt-3 sm:mt-4" data-product-variant-target="stockStatus">
-        <% if default_variant&.in_stock? %>
-          <% if default_variant.low_stock? %>
-            <p class="text-xs sm:text-sm text-amber-600 flex items-center gap-1 sm:gap-1.5">
-              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        <!-- Rating Summary -->
+        <% if @product.average_rating > 0 %>
+          <div class="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-3">
+            <div class="flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 bg-emerald-600 text-white rounded">
+              <span class="font-semibold text-xs sm:text-sm"><%= @product.average_rating.round(1) %></span>
+              <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
               </svg>
-              Only <%= default_variant.stock_quantity %> left in stock
+            </div>
+            <a href="#reviews" class="text-xs sm:text-sm text-stone-500 hover:text-rose-700">
+              <%= @product.ratings_count %> <%= 'Review'.pluralize(@product.ratings_count) %>
+            </a>
+          </div>
+        <% end %>
+
+        <!-- Price Section -->
+        <div class="mt-3 sm:mt-4 pb-3 sm:pb-4 border-b border-stone-200">
+          <div class="flex items-baseline gap-2 sm:gap-3 flex-wrap" data-product-variant-target="priceSection">
+            <span class="text-xl sm:text-2xl md:text-3xl font-semibold text-stone-900" data-product-variant-target="price">
+              <%= format_price(default_variant&.price) %>
+            </span>
+            <% if default_variant&.on_sale? %>
+              <span class="text-base sm:text-lg text-stone-400 line-through" data-product-variant-target="comparePrice">
+                <%= format_price(default_variant.compare_at_price) %>
+              </span>
+              <span class="px-1.5 sm:px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-medium rounded" data-product-variant-target="discount">
+                Save <%= default_variant.discount_percentage %>%
+              </span>
+            <% else %>
+              <span class="hidden text-base sm:text-lg text-stone-400 line-through" data-product-variant-target="comparePrice"></span>
+              <span class="hidden px-1.5 sm:px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-medium rounded" data-product-variant-target="discount"></span>
+            <% end %>
+          </div>
+          <p class="text-[10px] sm:text-xs text-stone-500 mt-0.5 sm:mt-1">Inclusive of all taxes</p>
+          <% if default_variant&.price.to_f >= free_delivery_threshold %>
+            <p class="text-[10px] sm:text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              FREE Delivery
             </p>
           <% else %>
-            <p class="text-xs sm:text-sm text-emerald-600 flex items-center gap-1 sm:gap-1.5">
-              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              In Stock
-            </p>
+            <p class="text-[10px] sm:text-xs text-stone-500 mt-1">Free delivery on orders above <%= format_price(free_delivery_threshold) %></p>
           <% end %>
-        <% else %>
-          <p class="text-xs sm:text-sm text-stone-500">Currently unavailable</p>
-        <% end %>
-      </div>
+        </div>
 
-      <!-- Action Buttons -->
-      <div class="mt-4 sm:mt-6">
-        <div class="flex items-center gap-2 sm:gap-3">
-          <% if @selected_variant&.in_stock? %>
-            <div id="product-cart-controls-<%= @selected_variant.id %>" class="flex-1">
-              <%= render 'products/cart_controls', variant: @selected_variant, cart_item: @cart_item %>
+        <!-- Available Offers -->
+        <% if @available_coupons.any? %>
+          <div class="mt-3 sm:mt-4 pb-3 sm:pb-4 border-b border-stone-200">
+            <h3 class="text-xs sm:text-sm font-semibold text-stone-900 mb-2 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+              Available Offers
+            </h3>
+            <div class="space-y-2">
+              <% @available_coupons.each do |coupon| %>
+                <div class="flex items-start gap-2 text-xs sm:text-sm">
+                  <span class="mt-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                  <p class="text-stone-600">
+                    <% if coupon.percentage? %>
+                      Get <span class="font-semibold text-stone-900"><%= coupon.discount_value.to_i %>% off</span><%= " (up to #{format_price(coupon.maximum_discount)})" if coupon.maximum_discount.present? %>
+                    <% else %>
+                      Get <span class="font-semibold text-stone-900"><%= format_price(coupon.discount_value) %> off</span>
+                    <% end %>
+                    <% if coupon.minimum_order_amount.to_f > 0 %>
+                      on orders above <%= format_price(coupon.minimum_order_amount) %>
+                    <% end %>
+                    — use code <button type="button" onclick="navigator.clipboard.writeText('<%= coupon.code %>'); this.textContent='Copied!'; setTimeout(() => this.textContent='<%= coupon.code %>', 2000)" class="font-bold text-rose-700 border border-dashed border-rose-300 px-1.5 py-0.5 rounded bg-rose-50 hover:bg-rose-100 transition cursor-pointer"><%= coupon.code %></button>
+                  </p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Variant Selection -->
+        <% if @variants.count > 1 %>
+          <div class="mt-3 sm:mt-4">
+            <p class="text-xs sm:text-sm font-medium text-stone-700 mb-2 sm:mb-3">
+              Select: <span class="text-stone-900" data-product-variant-target="selectedName"><%= default_variant&.name %></span>
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <% @variants.each do |variant| %>
+                <button type="button"
+                        data-action="click->product-variant#selectVariant"
+                        data-product-variant-target="option"
+                        data-variant-slug="<%= variant.name.parameterize %>"
+                        class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md sm:rounded-lg border-2 transition <%= variant.id == @selected_variant.id ? 'border-rose-500 bg-rose-50 text-rose-800' : 'border-stone-200 text-stone-700 hover:border-rose-300' %> <%= variant.in_stock? ? '' : 'opacity-50' %>">
+                  <%= variant.name %>
+                  <% unless variant.in_stock? %>
+                    <span class="block text-[10px] text-stone-500 font-normal">Out of Stock</span>
+                  <% end %>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Stock Status -->
+        <div class="mt-3 sm:mt-4" data-product-variant-target="stockStatus">
+          <% if default_variant&.in_stock? %>
+            <% if default_variant.low_stock? %>
+              <p class="text-xs sm:text-sm text-amber-600 flex items-center gap-1 sm:gap-1.5">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                Hurry! Only <%= default_variant.stock_quantity %> left in stock
+              </p>
+            <% else %>
+              <p class="text-xs sm:text-sm text-emerald-600 flex items-center gap-1 sm:gap-1.5">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                In Stock
+              </p>
+            <% end %>
+          <% else %>
+            <p class="text-xs sm:text-sm text-stone-500">Currently unavailable</p>
+          <% end %>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-4 sm:mt-6">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <% if @selected_variant&.in_stock? %>
+              <div id="product-cart-controls-<%= @selected_variant.id %>" class="flex-1">
+                <%= render 'products/cart_controls', variant: @selected_variant, cart_item: @cart_item %>
+              </div>
+            <% else %>
+              <button disabled class="flex-1 h-11 sm:h-12 px-4 sm:px-6 bg-stone-200 text-stone-500 text-sm sm:text-base font-medium rounded-lg cursor-not-allowed">
+                Out of Stock
+              </button>
+            <% end %>
+
+            <div id="wishlist-toggle-<%= @product.id %>">
+              <%= render 'shared/wishlist_toggle', product: @product, icon_only: true, variant_id: @selected_variant&.id %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Info -->
+        <div class="mt-4 sm:mt-5 p-3 sm:p-4 bg-stone-50 rounded-lg sm:rounded-xl">
+          <div class="flex items-start gap-3 text-xs sm:text-sm">
+            <svg class="w-5 h-5 text-stone-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375c-.621 0-1.125-.504-1.125-1.125V14.25m0 0h13.5m-13.5 0V4.875c0-.621.504-1.125 1.125-1.125h8.25c.621 0 1.125.504 1.125 1.125v9.375m-4.5 4.5h4.5m0 0h2.25a1.125 1.125 0 001.125-1.125v-4.5A1.125 1.125 0 0019.125 9h-2.25a1.125 1.125 0 00-1.125 1.125v8.625"/>
+            </svg>
+            <div class="flex-1">
+              <p class="font-medium text-stone-900">Delivery in 3–5 business days</p>
+              <p class="text-stone-500 mt-0.5">Dispatched within 24 hours</p>
+              <div class="flex items-center gap-3 mt-2">
+                <% if StoreSetting.instance.cod_enabled? %>
+                  <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs text-stone-600">
+                    <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    COD Available
+                  </span>
+                <% end %>
+                <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs text-stone-600">
+                  <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  Secure Payments
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust Badges -->
+        <% exchange_days = @product.exchange_in_days.to_i
+           return_days   = @product.return_in_days.to_i %>
+        <div class="mt-4 sm:mt-5 grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            <div>
+              <p class="text-[10px] sm:text-xs font-medium text-stone-900">Certified Quality</p>
+              <p class="text-[9px] sm:text-[10px] text-stone-500">Checked Before Dispatch</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div>
+              <p class="text-[10px] sm:text-xs font-medium text-stone-900">24-Hour Dispatch</p>
+              <p class="text-[9px] sm:text-[10px] text-stone-500">Fast Processing</p>
+            </div>
+          </div>
+          <% if exchange_days > 0 %>
+            <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <div>
+                <p class="text-[10px] sm:text-xs font-medium text-stone-900"><%= exchange_days %>-Day Exchange</p>
+                <p class="text-[9px] sm:text-[10px] text-stone-500">Easy Replacement</p>
+              </div>
             </div>
           <% else %>
-            <button disabled class="flex-1 h-11 sm:h-12 px-4 sm:px-6 bg-stone-200 text-stone-500 text-sm sm:text-base font-medium rounded-lg cursor-not-allowed">
-              Out of Stock
-            </button>
+            <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              <div>
+                <p class="text-[10px] sm:text-xs font-medium text-stone-900">Secure Payments</p>
+                <p class="text-[9px] sm:text-[10px] text-stone-500">Safe Checkout</p>
+              </div>
+            </div>
           <% end %>
-
-          <!-- Wishlist (outside cart form to avoid nested forms) -->
-          <div id="wishlist-toggle-<%= @product.id %>">
-            <%= render 'shared/wishlist_toggle', product: @product, icon_only: true, variant_id: @selected_variant&.id %>
-          </div>
+          <% if return_days > 0 %>
+            <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/></svg>
+              <div>
+                <p class="text-[10px] sm:text-xs font-medium text-stone-900"><%= return_days %>-Day Returns</p>
+                <p class="text-[9px] sm:text-[10px] text-stone-500">Easy Refund</p>
+              </div>
+            </div>
+          <% else %>
+            <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+              <div>
+                <p class="text-[10px] sm:text-xs font-medium text-stone-900">Gift-Ready Packaging</p>
+                <p class="text-[9px] sm:text-[10px] text-stone-500">Signature Noralooks Finish</p>
+              </div>
+            </div>
+          <% end %>
         </div>
-      </div>
-
-      <!-- Trust Badges -->
-      <div class="mt-4 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-3">
-        <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
-          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          <div>
-            <p class="text-[10px] sm:text-xs font-medium text-stone-900">100% Certified</p>
-            <p class="text-[9px] sm:text-[10px] text-stone-500">BIS Hallmarked</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
-          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          <div>
-            <p class="text-[10px] sm:text-xs font-medium text-stone-900">Lifetime Exchange</p>
-            <p class="text-[9px] sm:text-[10px] text-stone-500">On all products</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
-          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-          <div>
-            <p class="text-[10px] sm:text-xs font-medium text-stone-900">Free Shipping</p>
-            <p class="text-[9px] sm:text-[10px] text-stone-500">Orders above ₹999</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
-          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <div>
-            <p class="text-[10px] sm:text-xs font-medium text-stone-900">30-Day Returns</p>
-            <p class="text-[9px] sm:text-[10px] text-stone-500">Easy refund</p>
-          </div>
-        </div>
-      </div>
 
       </div>
     </div>
   </div>
 
-  <!-- Product Details Tabs -->
-  <div class="mt-6 sm:mt-8 md:mt-10 lg:mt-12 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6" data-controller="tabs">
-    <div class="border-b border-stone-200">
-      <nav class="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto hide-scrollbar">
-        <button type="button" data-action="click->tabs#select" data-tabs-target="tab" data-tab="description"
-                class="pb-2 sm:pb-3 text-xs sm:text-sm font-medium border-b-2 border-rose-700 text-rose-800 whitespace-nowrap">
-          Description
-        </button>
-        <button type="button" data-action="click->tabs#select" data-tabs-target="tab" data-tab="details"
-                class="pb-2 sm:pb-3 text-xs sm:text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 whitespace-nowrap">
-          Product Details
-        </button>
-        <button type="button" data-action="click->tabs#select" data-tabs-target="tab" data-tab="shipping"
-                class="pb-2 sm:pb-3 text-xs sm:text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 whitespace-nowrap">
-          Shipping & Returns
-        </button>
-      </nav>
-    </div>
+  <!-- Product Information Sections (Accordion) -->
+  <div class="mt-4 sm:mt-6 md:mt-8 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 divide-y divide-stone-200">
 
-    <div class="pt-4 sm:pt-6">
-      <div data-tabs-target="panel" data-tab="description">
-        <% if @product.description.present? %>
-          <div class="prose prose-sm prose-stone max-w-none text-stone-600 text-sm">
+    <!-- Description -->
+    <% if @product.description.present? %>
+      <details open class="group">
+        <summary class="flex items-center justify-between px-4 sm:px-5 md:px-6 py-3.5 sm:py-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+          <h2 class="text-sm sm:text-base font-semibold text-stone-900">Description</h2>
+          <svg class="w-5 h-5 text-stone-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="px-4 sm:px-5 md:px-6 pb-4 sm:pb-5 md:pb-6">
+          <div class="prose prose-sm prose-stone max-w-none text-stone-600 leading-relaxed">
             <%= simple_format(@product.description) %>
           </div>
-        <% else %>
-          <p class="text-stone-500 text-xs sm:text-sm">No description available.</p>
-        <% end %>
-      </div>
+        </div>
+      </details>
+    <% end %>
 
-      <div data-tabs-target="panel" data-tab="details" class="hidden">
-        <div class="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm">
-          <div class="p-2 sm:p-3 bg-stone-50 rounded-md sm:rounded-lg">
-            <p class="text-stone-500 text-[10px] sm:text-xs">SKU</p>
-            <p class="font-medium text-stone-900 text-xs sm:text-sm"><%= default_variant&.sku.presence || @product.sku.presence || 'N/A' %></p>
-          </div>
-          <% if @product.category %>
-            <div class="p-3 bg-stone-50 rounded-lg">
-              <p class="text-stone-500">Category</p>
-              <p class="font-medium text-stone-900"><%= @product.category.name %></p>
-            </div>
-          <% end %>
-          <%# Dynamic product attributes from category config %>
-          <% @product.filled_attributes.each do |label, value| %>
-            <div class="p-3 bg-stone-50 rounded-lg">
-              <p class="text-stone-500"><%= label %></p>
-              <p class="font-medium text-stone-900"><%= value %></p>
-            </div>
-          <% end %>
-          <%# Variant-level attributes %>
-          <% if default_variant %>
-            <% (default_variant.variant_attribute_definitions).each do |defn| %>
-              <% val = default_variant.attribute_value(defn[:key]) %>
-              <% if val.present? %>
-                <div class="p-3 bg-stone-50 rounded-lg">
-                  <p class="text-stone-500"><%= defn[:label] %></p>
-                  <p class="font-medium text-stone-900"><%= val %></p>
-                </div>
+    <!-- Product Details -->
+    <details open class="group">
+      <summary class="flex items-center justify-between px-4 sm:px-5 md:px-6 py-3.5 sm:py-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+        <h2 class="text-sm sm:text-base font-semibold text-stone-900">Product Details</h2>
+        <svg class="w-5 h-5 text-stone-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+      </summary>
+      <div class="px-4 sm:px-5 md:px-6 pb-4 sm:pb-5 md:pb-6">
+        <table class="w-full text-xs sm:text-sm">
+          <tbody class="divide-y divide-stone-100">
+            <tr>
+              <td class="py-2.5 sm:py-3 pr-4 text-stone-500 w-2/5 align-top">SKU</td>
+              <td class="py-2.5 sm:py-3 font-medium text-stone-900"><%= default_variant&.sku.presence || @product.sku.presence || 'N/A' %></td>
+            </tr>
+            <% if @product.category %>
+              <tr>
+                <td class="py-2.5 sm:py-3 pr-4 text-stone-500 align-top">Category</td>
+                <td class="py-2.5 sm:py-3 font-medium text-stone-900"><%= @product.category.name %></td>
+              </tr>
+            <% end %>
+            <% @product.filled_attributes.each do |label, value| %>
+              <tr>
+                <td class="py-2.5 sm:py-3 pr-4 text-stone-500 align-top"><%= label %></td>
+                <td class="py-2.5 sm:py-3 font-medium text-stone-900"><%= value %></td>
+              </tr>
+            <% end %>
+            <% if default_variant %>
+              <% default_variant.variant_attribute_definitions.each do |defn| %>
+                <% val = default_variant.attribute_value(defn[:key]) %>
+                <% if val.present? %>
+                  <tr>
+                    <td class="py-2.5 sm:py-3 pr-4 text-stone-500 align-top"><%= defn[:label] %></td>
+                    <td class="py-2.5 sm:py-3 font-medium text-stone-900"><%= val %></td>
+                  </tr>
+                <% end %>
+              <% end %>
+              <% if default_variant.weight.present? && default_variant.weight > 0 %>
+                <tr>
+                  <td class="py-2.5 sm:py-3 pr-4 text-stone-500 align-top">Weight</td>
+                  <td class="py-2.5 sm:py-3 font-medium text-stone-900"><%= default_variant.weight %> g</td>
+                </tr>
               <% end %>
             <% end %>
-            <% if default_variant.weight.present? && default_variant.weight > 0 %>
-              <div class="p-3 bg-stone-50 rounded-lg">
-                <p class="text-stone-500">Weight</p>
-                <p class="font-medium text-stone-900"><%= default_variant.weight %> g</p>
-              </div>
+            <% if @variants.count > 1 %>
+              <tr>
+                <td class="py-2.5 sm:py-3 pr-4 text-stone-500 align-top">Variants</td>
+                <td class="py-2.5 sm:py-3 font-medium text-stone-900"><%= @variants.count %> options available</td>
+              </tr>
             <% end %>
-          <% end %>
-          <div class="p-3 bg-stone-50 rounded-lg">
-            <p class="text-stone-500">Variants</p>
-            <p class="font-medium text-stone-900"><%= @variants.count %> options available</p>
-          </div>
-        </div>
+            <% if @product.country_of_origin.present? %>
+              <tr>
+                <td class="py-2.5 sm:py-3 pr-4 text-stone-500 align-top">Country of Origin</td>
+                <td class="py-2.5 sm:py-3 font-medium text-stone-900"><%= @product.country_of_origin %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
+    </details>
 
-      <div data-tabs-target="panel" data-tab="shipping" class="hidden">
-        <div class="space-y-3 sm:space-y-4 text-xs sm:text-sm text-stone-600">
-          <div>
-            <h4 class="font-medium text-stone-900 mb-1">Shipping</h4>
-            <p>Free shipping on orders above ₹999. Standard delivery takes 3-5 business days.</p>
+    <!-- Shipping & Returns -->
+    <details class="group">
+      <summary class="flex items-center justify-between px-4 sm:px-5 md:px-6 py-3.5 sm:py-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+        <h2 class="text-sm sm:text-base font-semibold text-stone-900">Shipping & Returns</h2>
+        <svg class="w-5 h-5 text-stone-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+      </summary>
+      <div class="px-4 sm:px-5 md:px-6 pb-4 sm:pb-5 md:pb-6">
+        <div class="space-y-4 sm:space-y-5">
+          <!-- Shipping -->
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-sky-50 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375c-.621 0-1.125-.504-1.125-1.125V14.25m0 0h13.5m-13.5 0V4.875c0-.621.504-1.125 1.125-1.125h8.25c.621 0 1.125.504 1.125 1.125v9.375"/></svg>
+            </div>
+            <div class="text-xs sm:text-sm">
+              <p class="font-medium text-stone-900 mb-0.5">Shipping</p>
+              <p class="text-stone-600 leading-relaxed">Free shipping on orders above <%= format_price(free_delivery_threshold) %>. Orders below this are charged <%= format_price(delivery_charge) %>. Dispatched within 24 hours, delivered in 3–5 business days.</p>
+            </div>
           </div>
-          <div>
-            <h4 class="font-medium text-stone-900 mb-1">Returns & Exchange</h4>
-            <p>Easy 30-day returns. Lifetime exchange available on all products.</p>
-          </div>
-          <div>
-            <h4 class="font-medium text-stone-900 mb-1">Quality Assurance</h4>
-            <p>All products are 100% certified and come with BIS Hallmark certification.</p>
+
+          <!-- Exchange -->
+          <% if exchange_days > 0 %>
+            <div class="flex gap-3">
+              <div class="flex-shrink-0 w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center">
+                <svg class="w-4.5 h-4.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              </div>
+              <div class="text-xs sm:text-sm">
+                <p class="font-medium text-stone-900 mb-0.5"><%= exchange_days %>-Day Easy Exchange</p>
+                <p class="text-stone-600 leading-relaxed">If the product doesn't meet your expectations, request an exchange within <%= exchange_days %> days of delivery. We'll replace it at no extra cost.</p>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Returns -->
+          <% if return_days > 0 %>
+            <div class="flex gap-3">
+              <div class="flex-shrink-0 w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center">
+                <svg class="w-4.5 h-4.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/></svg>
+              </div>
+              <div class="text-xs sm:text-sm">
+                <p class="font-medium text-stone-900 mb-0.5"><%= return_days %>-Day Returns</p>
+                <p class="text-stone-600 leading-relaxed">Not satisfied? Return within <%= return_days %> days for an easy refund. Product must be in original condition with tags attached.</p>
+              </div>
+            </div>
+          <% end %>
+
+          <% if exchange_days == 0 && return_days == 0 %>
+            <div class="flex gap-3">
+              <div class="flex-shrink-0 w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center">
+                <svg class="w-4.5 h-4.5 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+              </div>
+              <div class="text-xs sm:text-sm">
+                <p class="font-medium text-stone-900 mb-0.5">No Returns or Exchanges</p>
+                <p class="text-stone-600 leading-relaxed">This product is not eligible for returns or exchanges. Please review product details carefully before purchasing.</p>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Quality -->
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-rose-50 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            <div class="text-xs sm:text-sm">
+              <p class="font-medium text-stone-900 mb-0.5">Quality Assurance</p>
+              <p class="text-stone-600 leading-relaxed">Every product is inspected and quality-checked before dispatch. 100% certified quality guaranteed.</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </details>
+
   </div>
 
   <!-- Reviews Section -->
-  <section id="reviews" class="mt-6 sm:mt-8 md:mt-10 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6">
+  <section id="reviews" class="mt-4 sm:mt-6 md:mt-8 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6">
     <div class="sm:flex sm:items-start sm:justify-between mb-4 sm:mb-6">
       <div>
         <h2 class="text-base sm:text-lg md:text-xl font-serif font-semibold text-stone-900">Customer Reviews</h2>
@@ -354,39 +504,72 @@
         <% end %>
       </div>
     </div>
-    
+
+    <!-- Rating Distribution Bars -->
+    <% if @rating_distribution.any? %>
+      <div class="mb-5 sm:mb-6 pb-5 sm:pb-6 border-b border-stone-200">
+        <div class="max-w-sm space-y-1.5">
+          <% (5).downto(1).each do |star| %>
+            <% count = @rating_distribution[star] || 0 %>
+            <% pct = @product.ratings_count > 0 ? (count.to_f / @product.ratings_count * 100).round : 0 %>
+            <div class="flex items-center gap-2 text-xs sm:text-sm">
+              <span class="w-4 text-stone-600 text-right font-medium"><%= star %></span>
+              <svg class="w-3.5 h-3.5 text-amber-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+              <div class="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full <%= star >= 4 ? 'bg-emerald-500' : star == 3 ? 'bg-amber-400' : 'bg-red-400' %>" style="width: <%= pct %>%"></div>
+              </div>
+              <span class="w-8 text-stone-500 text-right text-xs"><%= count %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <% if @reviews.any? %>
       <div class="space-y-3 sm:space-y-4">
-        <% @reviews.each do |review| %>
+        <% avatar_colors = %w[bg-rose-100 bg-amber-100 bg-emerald-100 bg-sky-100 bg-violet-100 bg-pink-100 bg-teal-100 bg-indigo-100] %>
+        <% text_colors = %w[text-rose-700 text-amber-700 text-emerald-700 text-sky-700 text-violet-700 text-pink-700 text-teal-700 text-indigo-700] %>
+        <% @reviews.each_with_index do |review, idx| %>
+          <% initials = review.customer&.first_name&.first.to_s.upcase + review.customer&.last_name&.first.to_s.upcase %>
+          <% initials = "AN" if initials.blank? %>
+          <% color_idx = idx % avatar_colors.length %>
           <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 p-3 sm:p-4 md:p-5">
-            <div class="flex items-start justify-between gap-4">
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1">
+            <div class="flex items-start gap-3">
+              <!-- Avatar -->
+              <div class="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full <%= avatar_colors[color_idx] %> flex items-center justify-center">
+                <span class="text-xs sm:text-sm font-semibold <%= text_colors[color_idx] %>"><%= initials %></span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-medium text-stone-900 text-sm"><%= review.customer_name %></span>
+                  <span class="text-stone-300 text-xs">|</span>
+                  <span class="text-xs text-stone-400"><%= review.created_at.strftime('%b %d, %Y') %></span>
+                </div>
+                <div class="flex items-center gap-1.5 mt-1">
                   <div class="flex items-center gap-0.5">
                     <% 5.times do |i| %>
-                      <svg class="w-4 h-4 <%= i < review.rating ? 'text-amber-400' : 'text-stone-200' %>" fill="currentColor" viewBox="0 0 20 20">
+                      <svg class="w-3.5 h-3.5 <%= i < review.rating ? 'text-amber-400' : 'text-stone-200' %>" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                       </svg>
                     <% end %>
                   </div>
                   <% if review.title.present? %>
-                    <span class="font-medium text-stone-900 text-sm"><%= review.title %></span>
+                    <span class="font-medium text-stone-800 text-xs sm:text-sm"><%= review.title %></span>
                   <% end %>
                 </div>
-                <p class="text-xs text-stone-500">
-                  <%= review.customer_name %> • <%= review.created_at.strftime('%B %d, %Y') %>
-                </p>
+                <% if review.body.present? %>
+                  <p class="text-stone-600 text-sm mt-2"><%= review.body %></p>
+                <% end %>
+                <% if review.has_admin_response? %>
+                  <div class="mt-3 ml-2 pl-3 border-l-2 border-rose-200 py-1.5">
+                    <p class="text-xs font-medium text-rose-800 mb-0.5">Response from Noralooks</p>
+                    <p class="text-sm text-rose-700"><%= review.admin_response %></p>
+                  </div>
+                <% end %>
               </div>
             </div>
-            <% if review.body.present? %>
-              <p class="text-stone-600 text-sm mt-3"><%= review.body %></p>
-            <% end %>
-            <% if review.has_admin_response? %>
-              <div class="mt-4 ml-4 pl-4 border-l-2 border-rose-200 py-2">
-                <p class="text-xs font-medium text-rose-800 mb-1">Response from Noralooks</p>
-                <p class="text-sm text-rose-700"><%= review.admin_response %></p>
-              </div>
-            <% end %>
           </div>
         <% end %>
       </div>
@@ -403,7 +586,7 @@
 
   <!-- Related Products -->
   <% if @related_products.any? %>
-    <section class="mt-6 sm:mt-8 md:mt-10 lg:mt-12 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6">
+    <section class="mt-4 sm:mt-6 md:mt-8 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6">
       <h2 class="text-base sm:text-lg md:text-xl font-serif font-semibold text-stone-900 mb-4 sm:mb-6">You May Also Like</h2>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
         <% @related_products.each do |product| %>
@@ -413,3 +596,12 @@
     </section>
   <% end %>
 </div>
+
+<!-- Sticky Mobile Bottom Bar -->
+<% if @selected_variant %>
+  <div class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-3 py-2.5 z-40 safe-area-bottom">
+    <div id="mobile-sticky-bar-<%= @selected_variant.id %>" class="flex items-center gap-3">
+      <%= render 'products/mobile_sticky_bar', variant: @selected_variant, cart_item: @cart_item %>
+    </div>
+  </div>
+<% end %>

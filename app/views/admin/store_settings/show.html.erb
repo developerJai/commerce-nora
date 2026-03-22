@@ -39,6 +39,44 @@
       </div>
     </div>
 
+    <!-- Delivery Settings Section -->
+    <div class="mt-8">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">Delivery Settings</h2>
+      <p class="text-sm text-gray-500 mb-4">Configure free delivery threshold and delivery charges for orders below the threshold.</p>
+      
+      <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <%= f.label :free_delivery_min_amount, "Free Delivery Minimum Order (₹)", class: "block text-sm font-semibold text-gray-900 mb-1" %>
+            <%= f.number_field :free_delivery_min_amount,
+                value: @store_setting.effective_free_delivery_min_amount,
+                min: 0, step: 1,
+                placeholder: "e.g., 499",
+                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+            <p class="text-xs text-gray-500 mt-1">Orders at or above this amount get free delivery. Set to 0 for free delivery on all orders.</p>
+          </div>
+          <div>
+            <%= f.label :delivery_charge_amount, "Delivery Charge (₹)", class: "block text-sm font-semibold text-gray-900 mb-1" %>
+            <%= f.number_field :delivery_charge_amount,
+                value: @store_setting.effective_delivery_charge_amount,
+                min: 0, step: 1,
+                placeholder: "e.g., 99",
+                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+            <p class="text-xs text-gray-500 mt-1">Flat delivery charge for orders below the free delivery minimum.</p>
+          </div>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <p class="text-xs text-blue-800">
+            <strong>Current policy:</strong> Orders of 
+            <strong><%= number_to_currency(@store_setting.effective_free_delivery_min_amount, unit: "₹", precision: 0) %></strong> 
+            or above get free delivery. Orders below this amount are charged 
+            <strong><%= number_to_currency(@store_setting.effective_delivery_charge_amount, unit: "₹", precision: 0) %></strong> 
+            for delivery.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Coupon Settings Section -->
     <div class="mt-8">
       <h2 class="text-lg font-bold text-gray-900 mb-4">Coupon Settings</h2>

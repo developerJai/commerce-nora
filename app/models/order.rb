@@ -48,8 +48,8 @@ class Order < ApplicationRecord
 
   STATUSES = %w[pending confirmed processing shipped delivered cancelled].freeze
 
-  SHIPPING_FREE_THRESHOLD = 999
-  SHIPPING_FLAT_FEE = 99
+  SHIPPING_FREE_THRESHOLD = 999  # Deprecated: now driven by StoreSetting.free_delivery_threshold
+  SHIPPING_FLAT_FEE = 99          # Deprecated: now driven by StoreSetting.flat_delivery_charge
   TAX_RATE = 0.18 # Legacy fallback; prefer HSN-based calculation
   DEFAULT_JEWELLERY_GST_RATE = 3.0
   PAYMENT_STATUSES = %w[pending paid failed refunded].freeze
@@ -331,8 +331,9 @@ class Order < ApplicationRecord
 
   def self.calculate_shipping_amount(discounted_subtotal)
     amount = discounted_subtotal.to_f
-    return 0 if amount >= SHIPPING_FREE_THRESHOLD
-    SHIPPING_FLAT_FEE
+    threshold = StoreSetting.free_delivery_threshold
+    return 0 if amount >= threshold
+    StoreSetting.flat_delivery_charge
   end
 
   # Legacy class method kept for backward compatibility

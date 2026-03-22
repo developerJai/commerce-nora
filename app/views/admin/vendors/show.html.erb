@@ -1,75 +1,235 @@
 <% content_for(:title) { @vendor.business_name } %>
 
 <div class="space-y-6">
+  <!-- Header -->
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-bold text-gray-900"><%= @vendor.business_name %></h1>
-    <div class="flex gap-3">
-      <%= link_to 'Inventory', admin_inventory_index_path(vendor_id: @vendor.id), class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium' %>
-      <%= link_to 'Orders', admin_orders_path(vendor_id: @vendor.id), class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium' %>
+    <div>
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-bold text-gray-900"><%= @vendor.business_name %></h1>
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium <%= @vendor.active? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+          <%= @vendor.active? ? 'Active' : 'Inactive' %>
+        </span>
+      </div>
+      <p class="text-sm text-gray-500 mt-1"><%= @vendor.contact_name %> &bull; <%= @vendor.email %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to admin_products_path(vendor_id: @vendor.id), class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium' do %>
+        Products (<%= @products_count %>)
+      <% end %>
+      <%= link_to admin_orders_path(vendor_id: @vendor.id), class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium' do %>
+        Orders (<%= @orders_count %>)
+      <% end %>
+      <%= link_to admin_inventory_index_path(vendor_id: @vendor.id), class: 'px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium' do %>
+        Inventory
+      <% end %>
       <%= button_to "Act as Vendor", act_as_admin_vendor_path(@vendor), method: :post, class: 'px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm font-medium' %>
       <%= link_to 'Edit', edit_admin_vendor_path(@vendor), class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium' %>
     </div>
   </div>
 
-  <!-- Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="bg-white rounded-lg shadow-sm p-6">
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div class="bg-white rounded-lg shadow-sm p-5">
       <div class="text-sm font-medium text-gray-500">Products</div>
-      <div class="mt-1 text-3xl font-bold text-gray-900"><%= @products_count %></div>
+      <div class="mt-1 text-2xl font-bold text-gray-900"><%= @products_count %></div>
+      <p class="text-xs text-gray-400 mt-1"><%= @active_products_count %> active</p>
     </div>
-    <div class="bg-white rounded-lg shadow-sm p-6">
-      <div class="text-sm font-medium text-gray-500">Orders</div>
-      <div class="mt-1 text-3xl font-bold text-gray-900"><%= @orders_count %></div>
+    <div class="bg-white rounded-lg shadow-sm p-5">
+      <div class="text-sm font-medium text-gray-500">Total Orders</div>
+      <div class="mt-1 text-2xl font-bold text-gray-900"><%= @orders_count %></div>
+      <p class="text-xs text-gray-400 mt-1"><%= @order_stats[:delivered] %> delivered</p>
     </div>
-    <div class="bg-white rounded-lg shadow-sm p-6">
-      <div class="text-sm font-medium text-gray-500">Total Revenue</div>
-      <div class="mt-1 text-3xl font-bold text-gray-900"><%= number_to_currency(@total_revenue, unit: "\u20B9", precision: 0) %></div>
+    <div class="bg-white rounded-lg shadow-sm p-5">
+      <div class="text-sm font-medium text-gray-500">Revenue</div>
+      <div class="mt-1 text-2xl font-bold text-gray-900"><%= number_to_currency(@total_revenue, unit: "\u20B9", precision: 0) %></div>
+      <p class="text-xs text-gray-400 mt-1">Total order value</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm p-5">
+      <div class="text-sm font-medium text-gray-500">Earnings</div>
+      <div class="mt-1 text-2xl font-bold text-emerald-600"><%= number_to_currency(@total_earnings, unit: "\u20B9", precision: 0) %></div>
+      <p class="text-xs text-gray-400 mt-1">After fees</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm p-5">
+      <div class="text-sm font-medium text-gray-500">Pending</div>
+      <div class="mt-1 text-2xl font-bold text-amber-600"><%= @order_stats[:confirmed] + @order_stats[:processing] %></div>
+      <p class="text-xs text-gray-400 mt-1">Not yet shipped</p>
     </div>
   </div>
 
-  <!-- Details -->
+  <!-- Order Status Breakdown -->
   <div class="bg-white rounded-lg shadow-sm p-6">
-    <h2 class="text-lg font-medium text-gray-900 mb-4">Vendor Details</h2>
-
-    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Contact Name</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @vendor.contact_name %></dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Email</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @vendor.email %></dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Phone</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @vendor.phone.presence || '-' %></dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">GST Number</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @vendor.gst_number.presence || '-' %></dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Status</dt>
-        <dd class="mt-1">
-          <% if @vendor.active? %>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
-          <% else %>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
-          <% end %>
-        </dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Vendor Login</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @admin_user&.email || 'No login configured' %></dd>
-      </div>
-      <% if @vendor.address_line1.present? %>
-        <div class="md:col-span-2">
-          <dt class="text-sm font-medium text-gray-500">Address</dt>
-          <dd class="mt-1 text-sm text-gray-900">
-            <%= [@vendor.address_line1, @vendor.address_line2, @vendor.city, @vendor.state, @vendor.pincode].compact_blank.join(', ') %>
-          </dd>
-        </div>
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Status Breakdown</h2>
+    <div class="flex flex-wrap gap-3">
+      <% { confirmed: ['bg-blue-100 text-blue-800', 'Confirmed'], processing: ['bg-indigo-100 text-indigo-800', 'Processing'], shipped: ['bg-purple-100 text-purple-800', 'Shipped'], delivered: ['bg-green-100 text-green-800', 'Delivered'], cancelled: ['bg-red-100 text-red-800', 'Cancelled'] }.each do |status, (classes, label)| %>
+        <%= link_to admin_orders_path(vendor_id: @vendor.id, status: status), class: 'flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 hover:border-gray-300 transition text-sm' do %>
+          <span class="px-2 py-0.5 rounded-full text-xs font-medium <%= classes %>"><%= @order_stats[status] %></span>
+          <span class="text-gray-700 font-medium"><%= label %></span>
+        <% end %>
       <% end %>
-    </dl>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Recent Orders -->
+    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900">Recent Orders</h2>
+        <%= link_to 'View All', admin_orders_path(vendor_id: @vendor.id), class: 'text-sm text-indigo-600 hover:text-indigo-900 font-medium' %>
+      </div>
+      <% if @recent_orders.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <% @recent_orders.each do |order| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <%= link_to order.order_number, admin_order_path(order), class: 'text-sm font-medium text-indigo-600 hover:text-indigo-900' %>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <% if order.customer %>
+                      <div class="text-sm text-gray-900"><%= order.customer.full_name %></div>
+                      <div class="text-xs text-gray-500"><%= order.customer.email %></div>
+                    <% else %>
+                      <span class="text-sm text-gray-500">Guest</span>
+                    <% end %>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <%= order_status_class(order.status) %>">
+                      <%= order.status.titleize %>
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <%= payment_status_class(order.payment_status) %>">
+                      <%= order.payment_status.titleize %>
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+                    <%= format_price(order.total_amount) %>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                    <%= order.placed_at&.strftime('%b %d, %Y') %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="p-8 text-center text-sm text-gray-500">No orders yet</div>
+      <% end %>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Vendor Details -->
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Vendor Details</h2>
+        <dl class="space-y-3 text-sm">
+          <div>
+            <dt class="text-gray-500">Contact Name</dt>
+            <dd class="font-medium text-gray-900 mt-0.5"><%= @vendor.contact_name %></dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Email</dt>
+            <dd class="font-medium text-gray-900 mt-0.5"><%= @vendor.email %></dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Phone</dt>
+            <dd class="font-medium text-gray-900 mt-0.5"><%= @vendor.phone.presence || '-' %></dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">GST Number</dt>
+            <dd class="font-medium text-gray-900 mt-0.5">
+              <% if @vendor.gst_number.present? %>
+                <code class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-xs"><%= @vendor.gst_number %></code>
+              <% else %>
+                <span class="text-gray-400">Not provided</span>
+              <% end %>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Vendor Login</dt>
+            <dd class="font-medium text-gray-900 mt-0.5"><%= @admin_user&.email || 'No login configured' %></dd>
+          </div>
+          <% if @vendor.address_line1.present? %>
+            <div>
+              <dt class="text-gray-500">Address</dt>
+              <dd class="font-medium text-gray-900 mt-0.5 leading-relaxed">
+                <%= [@vendor.address_line1, @vendor.address_line2, @vendor.city, @vendor.state, @vendor.pincode].compact_blank.join(', ') %>
+              </dd>
+            </div>
+          <% end %>
+          <div>
+            <dt class="text-gray-500">Member Since</dt>
+            <dd class="font-medium text-gray-900 mt-0.5"><%= @vendor.created_at.strftime('%b %d, %Y') %></dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Top Products -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-gray-900">Top Products</h2>
+          <%= link_to 'All Products', admin_products_path(vendor_id: @vendor.id), class: 'text-sm text-indigo-600 hover:text-indigo-900 font-medium' %>
+        </div>
+        <% if @top_products.any? %>
+          <div class="divide-y divide-gray-200">
+            <% @top_products.each do |product| %>
+              <%= link_to admin_product_path(product), class: 'block p-4 hover:bg-gray-50 transition-colors' do %>
+                <div class="flex items-center gap-3">
+                  <% if product.images.attached? %>
+                    <div class="flex-shrink-0 w-10 h-10 bg-gray-100 rounded overflow-hidden">
+                      <%= image_tag product.images.first, class: 'w-full h-full object-cover' %>
+                    </div>
+                  <% else %>
+                    <div class="flex-shrink-0 w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
+                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                  <% end %>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate"><%= product.name %></p>
+                    <p class="text-xs text-gray-500"><%= product.orders_count %> orders &bull; <%= format_price(product.items_revenue) %></p>
+                  </div>
+                  <span class="flex-shrink-0 w-2 h-2 rounded-full <%= product.active? ? 'bg-green-500' : 'bg-gray-300' %>"></span>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="p-6 text-center text-sm text-gray-500">No product sales yet</div>
+        <% end %>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Links</h2>
+        <div class="space-y-2">
+          <%= link_to admin_orders_path(vendor_id: @vendor.id, not_shipped: 1), class: 'w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition' do %>
+            <span>Not Shipped Orders</span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800"><%= @order_stats[:confirmed] + @order_stats[:processing] %></span>
+          <% end %>
+          <%= link_to admin_products_path(vendor_id: @vendor.id, status: 'draft'), class: 'w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition' do %>
+            <span>Draft Products</span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700"><%= @products_count - @active_products_count %></span>
+          <% end %>
+          <%= link_to admin_inventory_index_path(vendor_id: @vendor.id), class: 'w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition' do %>
+            Inventory Management
+          <% end %>
+          <%= link_to admin_support_tickets_path(vendor_id: @vendor.id), class: 'w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition' do %>
+            Support Tickets
+          <% end %>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

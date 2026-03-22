@@ -10,14 +10,17 @@ class OrderItem < ApplicationRecord
   before_validation :calculate_total_price, if: -> { quantity.present? && unit_price.present? }
 
   def self.from_cart_item(cart_item)
+    product = cart_item.product_variant.product
     new(
       product_variant: cart_item.product_variant,
-      product_name: cart_item.product_variant.product.name,
+      product_name: product.name,
       variant_name: cart_item.product_variant.name,
       sku: cart_item.product_variant.sku,
       quantity: cart_item.quantity,
       unit_price: cart_item.unit_price,
-      total_price: cart_item.total_price
+      total_price: cart_item.total_price,
+      return_in_days: product.return_in_days,
+      exchange_in_days: product.exchange_in_days
     )
   end
 

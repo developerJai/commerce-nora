@@ -29,8 +29,8 @@ module Admin
         updates[:payment_config] = payment_config
       end
 
-      # Company details and coupon — permit individually so missing keys are safely ignored
-      company_params = params.fetch(:store_setting, {}).permit(:gst_number, :company_address, :company_phone, :enable_coupons)
+      # Company details, coupon, and delivery — permit individually so missing keys are safely ignored
+      company_params = params.fetch(:store_setting, {}).permit(:gst_number, :company_address, :company_phone, :enable_coupons, :free_delivery_min_amount, :delivery_charge_amount)
       updates.merge!(company_params)
 
       if @store_setting.update(**updates)

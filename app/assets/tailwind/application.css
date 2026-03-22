@@ -81,6 +81,19 @@ input:focus, select:focus, textarea:focus {
   padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
+.safe-area-bottom {
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+/* Accordion (details/summary) transitions */
+details > summary {
+  transition: margin 150ms ease-out;
+}
+
+details[open] > summary {
+  margin-bottom: 0;
+}
+
 /* Dual-range price slider */
 .range-slider::before {
   content: '';

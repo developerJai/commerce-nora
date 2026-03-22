@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_18_065000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_22_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -221,6 +221,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_065000) do
     t.datetime "deleted_at"
     t.string "email", null: false
     t.string "first_name", null: false
+    t.boolean "is_bot", default: false, null: false
     t.datetime "last_login_at"
     t.string "last_name", null: false
     t.string "password_digest", null: false
@@ -305,10 +306,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_065000) do
   create_table "order_items", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
+    t.integer "exchange_in_days", default: 0, null: false
     t.bigint "order_id", null: false
     t.string "product_name", null: false
     t.bigint "product_variant_id"
     t.integer "quantity", default: 1, null: false
+    t.integer "return_in_days", default: 0, null: false
     t.string "sku"
     t.decimal "tax_amount", precision: 10, scale: 2, default: "0.0"
     t.jsonb "tax_details", default: {}
@@ -457,6 +460,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_065000) do
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.text "description"
+    t.integer "exchange_in_days", default: 0, null: false
     t.boolean "featured", default: false, null: false
     t.string "gemstone"
     t.boolean "hot_selling", default: false, null: false
@@ -468,6 +472,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_065000) do
     t.decimal "price", precision: 10, scale: 2, default: "0.0"
     t.jsonb "properties", default: {}
     t.integer "ratings_count", default: 0
+    t.integer "return_in_days", default: 0, null: false
     t.text "short_description"
     t.string "sku"
     t.string "slug", null: false
@@ -529,8 +534,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_065000) do
     t.text "company_address"
     t.string "company_phone"
     t.datetime "created_at", null: false
+    t.decimal "delivery_charge_amount", precision: 10, scale: 2, default: "99.0", null: false
     t.boolean "enable_coupons", default: true
     t.jsonb "filter_config", default: {}, null: false
+    t.decimal "free_delivery_min_amount", precision: 10, scale: 2, default: "499.0", null: false
     t.string "gst_number"
     t.jsonb "payment_config", default: {}
     t.datetime "updated_at", null: false

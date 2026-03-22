@@ -1,0 +1,423 @@
+<% content_for(:title) { "#{@variant.name} - #{@product.name}" } %>
+
+<div class="space-y-6">
+  <!-- Breadcrumb & Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
+        <%= link_to 'Products', admin_products_path, class: 'hover:text-indigo-600' %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <%= link_to @product.name, admin_product_path(@product), class: 'hover:text-indigo-600' %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <span class="text-gray-700"><%= @variant.name %></span>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @variant.name %></h1>
+      <p class="text-sm text-gray-500 mt-0.5">SKU: <code class="font-mono bg-gray-100 px-1.5 py-0.5 rounded"><%= @variant.sku %></code></p>
+    </div>
+    <div class="flex gap-3">
+      <%= link_to 'Edit Variant', edit_admin_product_variant_path(@product, @variant), class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium' %>
+      <%= link_to 'Edit Product', edit_admin_product_path(@product), class: 'px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium' %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Variant Details -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h2 class="text-lg font-semibold text-gray-900">Variant Details</h2>
+        </div>
+        <div class="p-6">
+          <div class="flex gap-6">
+            <% if @variant.image.attached? %>
+              <div class="flex-shrink-0 w-32 h-32 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                <%= image_tag @variant.image, class: 'w-full h-full object-cover' %>
+              </div>
+            <% end %>
+            <dl class="flex-1 grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <dt class="text-gray-500">Name</dt>
+                <dd class="font-medium text-gray-900"><%= @variant.name %></dd>
+              </div>
+              <div>
+                <dt class="text-gray-500">Status</dt>
+                <dd>
+                  <span class="px-2 py-1 rounded-full text-xs font-medium <%= @variant.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+                    <%= @variant.active? ? 'Active' : 'Inactive' %>
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-gray-500">Selling Price</dt>
+                <dd class="font-medium text-gray-900 text-lg"><%= format_price(@variant.price) %></dd>
+              </div>
+              <div>
+                <dt class="text-gray-500">MRP / Compare at Price</dt>
+                <dd class="font-medium text-gray-900">
+                  <% if @variant.compare_at_price.present? %>
+                    <span class="<%= @variant.on_sale? ? 'line-through text-gray-400' : '' %>"><%= format_price(@variant.compare_at_price) %></span>
+                    <% if @variant.on_sale? %>
+                      <span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium"><%= @variant.discount_percentage %>% OFF</span>
+                    <% end %>
+                  <% else %>
+                    <span class="text-gray-400">-</span>
+                  <% end %>
+                </dd>
+              </div>
+              <% if @variant.color.present? %>
+                <div>
+                  <dt class="text-gray-500">Color</dt>
+                  <dd class="font-medium text-gray-900"><%= @variant.color %></dd>
+                </div>
+              <% end %>
+              <% if @variant.size.present? %>
+                <div>
+                  <dt class="text-gray-500">Size</dt>
+                  <dd class="font-medium text-gray-900"><%= @variant.size %></dd>
+                </div>
+              <% end %>
+              <% if @variant.weight.present? %>
+                <div>
+                  <dt class="text-gray-500">Weight</dt>
+                  <dd class="font-medium text-gray-900"><%= @variant.weight %> g</dd>
+                </div>
+              <% end %>
+              <div>
+                <dt class="text-gray-500">Position</dt>
+                <dd class="font-medium text-gray-900"><%= @variant.position || '-' %></dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Dynamic Variant Attributes -->
+          <% if @variant.properties.present? %>
+            <div class="mt-6 pt-6 border-t border-gray-200">
+              <h3 class="text-sm font-semibold text-gray-900 mb-3">Additional Attributes</h3>
+              <dl class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                <% @variant.properties.each do |key, value| %>
+                  <% next if value.blank? %>
+                  <div>
+                    <dt class="text-gray-500"><%= key.titleize %></dt>
+                    <dd class="font-medium text-gray-900"><%= value %></dd>
+                  </div>
+                <% end %>
+              </dl>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Product Details (Parent) -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Product Details</h2>
+            <%= link_to 'View Product', admin_product_path(@product), class: 'text-sm text-indigo-600 hover:text-indigo-900 font-medium' %>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="flex gap-5">
+            <% if @product.images.attached? %>
+              <div class="flex-shrink-0 w-24 h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                <%= image_tag @product.images.first, class: 'w-full h-full object-cover' %>
+              </div>
+            <% end %>
+            <div class="flex-1">
+              <h3 class="text-base font-semibold text-gray-900">
+                <%= link_to @product.name, admin_product_path(@product), class: 'hover:text-indigo-600' %>
+              </h3>
+              <p class="text-sm text-gray-500 mt-0.5">SKU: <code class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-xs"><%= @product.sku || '-' %></code></p>
+              <div class="flex flex-wrap gap-2 mt-2">
+                <span class="px-2 py-0.5 rounded-full text-xs font-medium <%= @product.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+                  <%= @product.active? ? 'Active' : 'Draft' %>
+                </span>
+                <% if @product.featured? %>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">Featured</span>
+                <% end %>
+                <% if @product.hot_selling? %>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Hot Selling</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <dl class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm mt-5 pt-5 border-t border-gray-200">
+            <% if @product.vendor.present? %>
+              <div>
+                <dt class="text-gray-500">Vendor</dt>
+                <dd class="font-medium text-gray-900">
+                  <% if admin_role? && !vendor_context? %>
+                    <%= link_to @product.vendor.business_name, admin_vendor_path(@product.vendor), class: 'text-indigo-600 hover:text-indigo-900 hover:underline' %>
+                  <% else %>
+                    <%= @product.vendor.business_name %>
+                  <% end %>
+                </dd>
+              </div>
+            <% end %>
+            <div>
+              <dt class="text-gray-500">Category</dt>
+              <dd class="font-medium text-gray-900"><%= @product.category&.display_name || '-' %></dd>
+            </div>
+            <div>
+              <dt class="text-gray-500">Base Price</dt>
+              <dd class="font-medium text-gray-900"><%= format_price(@product.price) %></dd>
+            </div>
+            <div>
+              <dt class="text-gray-500">HSN Code</dt>
+              <dd class="font-medium text-gray-900"><%= @product.hsn_code&.code || '-' %></dd>
+            </div>
+            <div>
+              <dt class="text-gray-500">GST Rate</dt>
+              <dd class="font-medium text-gray-900"><%= @product.hsn_code&.gst_rate || '3.0' %>%</dd>
+            </div>
+            <div>
+              <dt class="text-gray-500">Return Window</dt>
+              <dd>
+                <% if @product.return_in_days.to_i > 0 %>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-xs font-medium"><%= @product.return_in_days %> days</span>
+                <% else %>
+                  <span class="text-gray-400 text-xs">No return</span>
+                <% end %>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-gray-500">Exchange Window</dt>
+              <dd>
+                <% if @product.exchange_in_days.to_i > 0 %>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded text-xs font-medium"><%= @product.exchange_in_days %> days</span>
+                <% else %>
+                  <span class="text-gray-400 text-xs">No exchange</span>
+                <% end %>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-gray-500">Rating</dt>
+              <dd class="font-medium text-gray-900"><%= @product.average_rating %> (<%= @product.ratings_count %> reviews)</dd>
+            </div>
+            <div>
+              <dt class="text-gray-500">Total Variants</dt>
+              <dd class="font-medium text-gray-900"><%= @product.variants.count %></dd>
+            </div>
+          </dl>
+
+          <% if @product.description.present? %>
+            <div class="mt-5 pt-5 border-t border-gray-200">
+              <h3 class="text-sm font-medium text-gray-700 mb-1">Description</h3>
+              <p class="text-sm text-gray-600 leading-relaxed"><%= @product.description %></p>
+            </div>
+          <% end %>
+
+          <!-- Dynamic Product Attributes -->
+          <% filled = @product.filled_attributes %>
+          <% if filled.any? %>
+            <div class="mt-5 pt-5 border-t border-gray-200">
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Product Attributes</h3>
+              <dl class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                <% filled.each do |label, value| %>
+                  <div>
+                    <dt class="text-gray-500"><%= label %></dt>
+                    <dd class="font-medium text-gray-900"><%= value %></dd>
+                  </div>
+                <% end %>
+              </dl>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Stock & Inventory -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h2 class="text-lg font-semibold text-gray-900">Stock & Inventory</h2>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold <%= @variant.out_of_stock? ? 'text-red-600' : (@variant.low_stock? ? 'text-yellow-600' : 'text-gray-900') %>">
+                <%= @variant.stock_quantity %>
+              </p>
+              <p class="text-xs text-gray-500 mt-1">Current Stock</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+              <p class="text-sm font-medium">
+                <% case @variant.stock_status %>
+                <% when :in_stock %>
+                  <span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">In Stock</span>
+                <% when :low_stock %>
+                  <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">Low Stock</span>
+                <% when :out_of_stock %>
+                  <span class="px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium">Out of Stock</span>
+                <% end %>
+              </p>
+              <p class="text-xs text-gray-500 mt-2">Status</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-gray-900"><%= @variant.reorder_point || '-' %></p>
+              <p class="text-xs text-gray-500 mt-1">Reorder Point</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+              <p class="text-sm font-medium">
+                <span class="px-3 py-1 rounded-full text-xs font-medium <%= @variant.track_inventory? ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600' %>">
+                  <%= @variant.track_inventory? ? 'Tracked' : 'Not Tracked' %>
+                </span>
+              </p>
+              <p class="text-xs text-gray-500 mt-2">Inventory Tracking</p>
+            </div>
+          </div>
+
+          <!-- Adjust Stock Form -->
+          <div class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">Adjust Stock</h3>
+            <%= form_with url: update_stock_admin_product_variant_path(@product, @variant), method: :patch, class: 'space-y-3' do |f| %>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Quantity Change</label>
+                  <input type="number" name="quantity_change" required placeholder="e.g. 10 or -5" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                  <p class="text-[10px] text-gray-500 mt-0.5">Positive to add, negative to remove</p>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Reason</label>
+                  <select name="reason" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <% StockAdjustment::REASONS.each do |key, label| %>
+                      <option value="<%= key %>" <%= key == 'restock' ? 'selected' : '' %>><%= label %></option>
+                    <% end %>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                <input type="text" name="notes" placeholder="e.g. Received new shipment" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+              </div>
+              <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition">
+                Update Stock
+              </button>
+            <% end %>
+          </div>
+
+          <% if @stock_adjustments.any? %>
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">Recent Stock History</h3>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Change</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">After</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  <% @stock_adjustments.each do |adj| %>
+                    <tr>
+                      <td class="px-4 py-2 text-gray-500 whitespace-nowrap"><%= adj.created_at.strftime('%b %d, %Y %I:%M %p') %></td>
+                      <td class="px-4 py-2">
+                        <span class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                          <%= StockAdjustment::REASONS[adj.reason] || adj.reason&.titleize %>
+                        </span>
+                      </td>
+                      <td class="px-4 py-2 text-right font-medium whitespace-nowrap <%= adj.quantity_change > 0 ? 'text-green-600' : 'text-red-600' %>">
+                        <%= adj.quantity_change > 0 ? "+#{adj.quantity_change}" : adj.quantity_change %>
+                      </td>
+                      <td class="px-4 py-2 text-right text-gray-900"><%= adj.quantity_after %></td>
+                      <td class="px-4 py-2 text-gray-500 truncate max-w-[200px]"><%= adj.notes || '-' %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div class="space-y-2">
+          <%= link_to edit_admin_product_variant_path(@product, @variant), class: 'w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition' do %>
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Edit Variant
+          <% end %>
+          <%= button_to toggle_status_admin_product_variant_path(@product, @variant),
+              method: :patch,
+              class: "w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition #{@variant.active? ? 'text-yellow-700 bg-yellow-50 hover:bg-yellow-100' : 'text-green-700 bg-green-50 hover:bg-green-100'}" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+            <%= @variant.active? ? 'Disable Variant' : 'Enable Variant' %>
+          <% end %>
+          <%= button_to admin_product_variant_path(@product, @variant),
+              method: :delete,
+              class: 'w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition',
+              form: { data: { turbo_confirm: 'Are you sure you want to delete this variant?' } } do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Delete Variant
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Other Variants of This Product -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h2 class="text-lg font-semibold text-gray-900">Other Variants (<%= @other_variants.count %>)</h2>
+        </div>
+        <% if @other_variants.any? %>
+          <div class="divide-y divide-gray-200">
+            <% @other_variants.each do |variant| %>
+              <%= link_to admin_product_variant_path(@product, variant), class: 'block p-4 hover:bg-gray-50 transition-colors' do %>
+                <div class="flex items-center gap-3">
+                  <% if variant.image.attached? %>
+                    <div class="flex-shrink-0 w-10 h-10 bg-gray-100 rounded overflow-hidden">
+                      <%= image_tag variant.image, class: 'w-full h-full object-cover' %>
+                    </div>
+                  <% else %>
+                    <div class="flex-shrink-0 w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
+                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                  <% end %>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate"><%= variant.name %></p>
+                    <p class="text-xs text-gray-500"><%= format_price(variant.price) %></p>
+                  </div>
+                  <div class="flex-shrink-0 flex items-center gap-2">
+                    <% if variant.out_of_stock? %>
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-100 text-red-700">OOS</span>
+                    <% elsif variant.low_stock? %>
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-yellow-100 text-yellow-700"><%= variant.stock_quantity %></span>
+                    <% else %>
+                      <span class="text-xs text-gray-500"><%= variant.stock_quantity %></span>
+                    <% end %>
+                    <span class="w-2 h-2 rounded-full <%= variant.active? ? 'bg-green-500' : 'bg-gray-300' %>"></span>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="p-6 text-center text-sm text-gray-500">
+            This is the only variant for this product.
+          </div>
+        <% end %>
+        <div class="px-6 py-3 border-t border-gray-200 bg-gray-50">
+          <%= link_to 'Add New Variant', new_admin_product_variant_path(@product), class: 'text-sm text-indigo-600 hover:text-indigo-900 font-medium' %>
+        </div>
+      </div>
+
+      <!-- Product Images -->
+      <% if @product.images.attached? %>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Product Images</h2>
+          <div class="grid grid-cols-3 gap-2">
+            <% @product.images.each do |image| %>
+              <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                <%= image_tag image, class: 'w-full h-full object-cover' %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 module Admin
   class ProductsController < BaseController
-    before_action :set_product, only: [ :show, :edit, :update, :destroy ]
+    before_action :set_product, only: [ :show, :edit, :update, :destroy, :generate_reviews ]
 
     def index
       @q = params[:q]
@@ -60,7 +60,12 @@ module Admin
       @product.vendor = current_vendor if vendor_context?
 
       if @product.save
-        redirect_to admin_product_path(@product), notice: "Product created successfully"
+        first_variant = @product.variants.ordered.first
+        if first_variant
+          redirect_to admin_product_variant_path(@product, first_variant), notice: "Product created successfully"
+        else
+          redirect_to admin_product_path(@product), notice: "Product created successfully"
+        end
       else
         render :new, status: :unprocessable_entity
       end
@@ -88,6 +93,13 @@ module Admin
     def destroy
       @product.destroy
       redirect_to admin_products_path, notice: "Product deleted successfully"
+    end
+
+    def generate_reviews
+      count = (params[:count] || 3).to_i.clamp(1, 200)
+      generator = BotReviewGenerator.new(@product)
+      created = generator.generate(count)
+      redirect_to admin_product_path(@product), notice: "#{created} review#{'s' if created != 1} generated successfully"
     end
 
     # GET /admin/products/attribute_fields?category_id=X&product_id=Y
@@ -124,6 +136,7 @@ module Admin
         :name, :slug, :description, :short_description, :category_id,
         :sku, :price, :active, :featured, :hot_selling, :hsn_code_id,
         :base_material, :plating, :gemstone, :occasion, :ideal_for, :country_of_origin,
+        :return_in_days, :exchange_in_days,
         images: [],
         variants_attributes: [
           :id, :name, :sku, :price, :compare_at_price, :stock_quantity,

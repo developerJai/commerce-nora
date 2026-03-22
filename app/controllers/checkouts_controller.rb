@@ -354,15 +354,18 @@ class CheckoutsController < ApplicationController
     )
 
     items.each do |item|
+      product = item.product_variant.product
       order.order_items.build(
         product_variant: item.product_variant,
         vendor_id: vendor_id,
-        product_name: item.product_variant.product.name,
+        product_name: product.name,
         variant_name: item.product_variant.name,
         sku: item.product_variant.sku,
         quantity: item.quantity,
         unit_price: item.unit_price,
-        total_price: item.total_price
+        total_price: item.total_price,
+        return_in_days: product.return_in_days,
+        exchange_in_days: product.exchange_in_days
       )
     end
 
@@ -413,7 +416,7 @@ class CheckoutsController < ApplicationController
 
       discounted_subtotal = vendor_subtotal - vendor_discount
 
-      # Calculate shipping per vendor (FREE if vendor subtotal >= 999)
+      # Calculate shipping per vendor (FREE if above StoreSetting threshold)
       shipping = Order.calculate_shipping_amount(discounted_subtotal)
 
       # Calculate tax per vendor

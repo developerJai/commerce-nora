@@ -1,18 +1,35 @@
+<% subtotal = cart.subtotal %>
+<%# Calculate shipping per-vendor to match checkout logic %>
+<% items_by_vendor = cart.cart_items.includes(product_variant: { product: :vendor }).group_by { |item| item.product_variant.product.vendor_id } %>
+<% estimated_shipping = items_by_vendor.sum do |_vid, items|
+  vendor_subtotal = items.sum(&:total_price)
+  Order.calculate_shipping_amount(vendor_subtotal)
+end %>
+<% est_total = subtotal + estimated_shipping %>
+
 <div class="space-y-2 text-sm mb-3">
   <div class="flex justify-between">
     <span class="text-stone-600">Subtotal (<%= cart.item_count %> <%= cart.item_count == 1 ? 'item' : 'items' %>)</span>
-    <span class="text-stone-900 font-medium"><%= format_price(cart.subtotal) %></span>
+    <span class="text-stone-900 font-medium"><%= format_price(subtotal) %></span>
   </div>
   <div class="flex justify-between">
     <span class="text-stone-600">Shipping</span>
-    <span class="text-stone-500 text-xs">Calculated at checkout</span>
+    <span class="<%= estimated_shipping > 0 ? 'text-stone-900' : 'text-emerald-600 font-medium' %> text-xs">
+      <%= estimated_shipping > 0 ? format_price(estimated_shipping) : 'FREE' %>
+    </span>
   </div>
+  <% if estimated_shipping > 0 %>
+    <% remaining = free_delivery_threshold - subtotal %>
+    <% if remaining > 0 %>
+      <p class="text-[10px] text-rose-600">Add <%= format_price(remaining) %> more for free delivery</p>
+    <% end %>
+  <% end %>
   <div class="flex justify-between">
     <span class="text-stone-600">Taxes</span>
     <span class="text-stone-500 text-xs">Calculated at checkout</span>
   </div>
 </div>
 <div class="flex justify-between items-center pt-2 border-t border-stone-200">
-  <span class="text-base font-semibold text-stone-900">Total</span>
-  <span class="text-xl font-bold text-stone-900"><%= format_price(cart.subtotal) %></span>
+  <span class="text-base font-semibold text-stone-900">Est. Total</span>
+  <span class="text-xl font-bold text-stone-900"><%= format_price(est_total) %></span>
 </div>

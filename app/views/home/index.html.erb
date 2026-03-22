@@ -1,5 +1,5 @@
 <% content_for(:title) { "Home" } %>
-<% content_for(:meta_description) { "Discover exquisite artificial jewellery, traditional ethnic wear, and thoughtful gifts at Noralooks. Shop premium quality fashion jewellery online with free shipping on orders above ₹999. Easy 7-day returns & lifetime exchange policy." } %>
+<% content_for(:meta_description) { "Discover exquisite artificial jewellery, traditional ethnic wear, and thoughtful gifts at Noralooks. Shop premium quality fashion jewellery online with free shipping on orders above #{format_price(free_delivery_threshold)}. Quality checked before dispatch & 24-hour shipping." } %>
 <% content_for(:meta_keywords) { ["buy artificial jewellery online", "fashion jewellery India", "ethnic wear online", "traditional wear shopping", "imitation jewellery", "costume jewellery", "online gift shopping", "jewellery store India", "affordable jewellery", "women's jewellery"] } %>
 <% content_for(:hide_header_search) { true } %>
 
@@ -363,7 +363,7 @@
           </svg>
         </div>
         <h3 class="font-medium text-stone-900 text-xs sm:text-sm mb-0.5 sm:mb-1">Free Shipping</h3>
-        <p class="text-stone-500 text-[10px] sm:text-xs">On orders above ₹999</p>
+        <p class="text-stone-500 text-[10px] sm:text-xs">On orders above <%= format_price(free_delivery_threshold) %></p>
       </div>
       <div class="text-center">
         <div class="w-12 sm:w-14 h-12 sm:h-14 mx-auto mb-3 sm:mb-4 bg-white rounded-full flex items-center justify-center shadow-sm">

@@ -77,6 +77,18 @@
               <% end %>
             </dd>
           </div>
+          <% if @product.vendor.present? %>
+            <div>
+              <dt class="text-gray-500">Vendor</dt>
+              <dd class="font-medium text-gray-900">
+                <% if admin_role? && !vendor_context? %>
+                  <%= link_to @product.vendor.business_name, admin_vendor_path(@product.vendor), class: 'text-indigo-600 hover:text-indigo-900 hover:underline' %>
+                <% else %>
+                  <%= @product.vendor.business_name %>
+                <% end %>
+              </dd>
+            </div>
+          <% end %>
           <div>
             <dt class="text-gray-500">Base Price</dt>
             <dd class="font-medium text-gray-900"><%= format_price(@product.price) %></dd>
@@ -84,6 +96,26 @@
           <div>
             <dt class="text-gray-500">Rating</dt>
             <dd class="font-medium text-gray-900"><%= @product.average_rating %> (<%= @product.ratings_count %> reviews)</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Return Window</dt>
+            <dd class="font-medium text-gray-900">
+              <% if @product.return_in_days.to_i > 0 %>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-xs font-medium"><%= @product.return_in_days %> days</span>
+              <% else %>
+                <span class="text-gray-400 text-xs">No return</span>
+              <% end %>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Exchange Window</dt>
+            <dd class="font-medium text-gray-900">
+              <% if @product.exchange_in_days.to_i > 0 %>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded text-xs font-medium"><%= @product.exchange_in_days %> days</span>
+              <% else %>
+                <span class="text-gray-400 text-xs">No exchange</span>
+              <% end %>
+            </dd>
           </div>
         </dl>
 
@@ -137,7 +169,7 @@
                       <% if variant.image.attached? %>
                         <%= image_tag variant.image, class: 'h-8 w-8 rounded object-cover' %>
                       <% end %>
-                      <%= variant.name %>
+                      <%= link_to variant.name, admin_product_variant_path(@product, variant), class: 'text-indigo-600 hover:text-indigo-900 hover:underline' %>
                     </div>
                   </td>
                   <td class="px-4 py-4 text-sm text-gray-600">
@@ -207,7 +239,25 @@
       </div>
 
       <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Reviews</h2>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Recent Reviews</h2>
+          <div class="relative" data-controller="dropdown">
+            <button type="button" data-action="click->dropdown#toggle click@window->dropdown#hide"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-md transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              Generate Reviews
+            </button>
+            <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <p class="px-4 py-1 text-xs text-gray-500">How many reviews?</p>
+              <% [2, 3, 5, 10, 20, 50, 100, 150].each do |n| %>
+                <%= button_to "Generate #{n} reviews", generate_reviews_admin_product_path(@product, count: n),
+                    method: :post,
+                    class: 'w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition',
+                    form: { data: { turbo_confirm: "This will create #{n} bot reviews for #{@product.name}. Continue?" } } %>
+              <% end %>
+            </div>
+          </div>
+        </div>
         <% if @reviews.any? %>
           <div class="space-y-4">
             <% @reviews.each do |review| %>
@@ -215,6 +265,9 @@
                 <div class="flex items-center gap-2 mb-1">
                   <span class="font-medium text-gray-900"><%= review.customer_name %></span>
                   <span class="text-yellow-500"><%= '★' * review.rating %></span>
+                  <% if review.customer&.is_bot? %>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-700">Bot</span>
+                  <% end %>
                 </div>
                 <p class="text-gray-600"><%= truncate(review.body, length: 100) %></p>
               </div>

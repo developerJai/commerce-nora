@@ -120,9 +120,14 @@ class Product < ApplicationRecord
     variants.active.order(:position).first || variants.first
   end
 
+  # Cheapest active variant — matches MIN(price) used in sort and listing display
+  def cheapest_variant
+    variants.active.order(:price, :position).first || variants.first
+  end
+
   # Get first in-stock variant (for display when in-stock filter is active)
   def first_in_stock_variant
-    variants.active.where("stock_quantity > 0").order(:position).first
+    variants.active.where("stock_quantity > 0").order(:price, :position).first
   end
 
   def price_range

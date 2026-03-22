@@ -5,8 +5,11 @@ module Admin
 
     def index
       @q = params[:q]
+      @filter = params[:filter]
       customers = Customer.all
-      customers = customers.where("email ILIKE :q OR first_name ILIKE :q OR last_name ILIKE :q", q: "%#{@q}%") if @q.present?
+      customers = customers.where("email ILIKE :q OR first_name ILIKE :q OR last_name ILIKE :q OR phone ILIKE :q", q: "%#{@q}%") if @q.present?
+      customers = customers.where(is_bot: true) if @filter == "bots"
+      customers = customers.where(is_bot: [false, nil]) if @filter == "real"
       customers = customers.order(created_at: :desc)
       @pagy, @customers = pagy(customers, limit: 20)
     end
@@ -48,7 +51,7 @@ module Admin
     end
 
     def customer_params
-      params.require(:customer).permit(:first_name, :last_name, :email, :phone, :active)
+      params.require(:customer).permit(:first_name, :last_name, :email, :phone, :active, :password, :is_bot)
     end
   end
 end

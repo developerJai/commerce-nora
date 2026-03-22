@@ -13,9 +13,33 @@ module Admin
 
     def show
       @products_count = @vendor.products.count
+      @active_products_count = @vendor.products.where(active: true).count
       @orders_count = @vendor.orders.placed.count
       @total_revenue = @vendor.orders.placed.sum(:total_amount)
+      @total_earnings = @vendor.total_earnings
       @admin_user = @vendor.admin_users.first
+
+      # Order stats by status
+      placed_orders = @vendor.orders.placed
+      @order_stats = {
+        confirmed: placed_orders.where(status: "confirmed").count,
+        processing: placed_orders.where(status: "processing").count,
+        shipped: placed_orders.where(status: "shipped").count,
+        delivered: placed_orders.where(status: "delivered").count,
+        cancelled: placed_orders.where(status: "cancelled").count
+      }
+
+      # Recent orders
+      @recent_orders = @vendor.orders.placed.includes(:customer).recent.limit(10)
+
+      # Top products by order count
+      @top_products = @vendor.products
+        .joins(:variants => :order_items)
+        .joins("INNER JOIN orders ON orders.id = order_items.order_id AND orders.is_draft = false AND orders.placed_at IS NOT NULL")
+        .select("products.*, COUNT(DISTINCT orders.id) as orders_count, SUM(order_items.total_price) as items_revenue")
+        .group("products.id")
+        .order("orders_count DESC")
+        .limit(5)
     end
 
     def new

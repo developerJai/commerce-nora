@@ -8,9 +8,25 @@
   <!-- Search -->
   <div class="bg-white rounded-lg shadow-sm p-4">
     <%= form_with url: admin_customers_path, method: :get, class: 'flex gap-4' do |f| %>
-      <%= f.search_field :q, value: @q, placeholder: 'Search by name or email...', 
+      <%= hidden_field_tag :filter, @filter if @filter.present? %>
+      <%= f.search_field :q, value: @q, placeholder: 'Search by name, email or phone...',
           class: 'flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
       <%= f.submit 'Search', class: 'px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer' %>
+      <% if @q.present? %>
+        <%= link_to 'Clear', admin_customers_path(filter: @filter), class: 'px-4 py-2 text-gray-600 hover:text-gray-900' %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="flex gap-2">
+    <% [
+      ["All", nil],
+      ["Real Customers", "real"],
+      ["Bot Customers", "bots"]
+    ].each do |label, filter_val| %>
+      <%= link_to label, admin_customers_path(q: @q, filter: filter_val),
+          class: "px-4 py-2 rounded-md text-sm font-medium #{@filter == filter_val ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'}" %>
     <% end %>
   </div>
 
