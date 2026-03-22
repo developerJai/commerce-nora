@@ -1,46 +1,45 @@
 <!-- Section: Ethnic Wear Collection -->
-<section class="relative py-20 sm:py-32 overflow-hidden">
-  <div class="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900"></div>
-  <div class="absolute top-10 left-10 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl animate-float-slow"></div>
-  <div class="absolute bottom-10 right-10 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl animate-float-medium"></div>
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-rose-400/5 rounded-full blur-3xl animate-float-fast"></div>
-  
-  <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
-  
+<section class="relative py-16 sm:py-24 md:py-28 overflow-hidden">
+  <!-- Rich dark background -->
+  <div class="absolute inset-0 bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900"></div>
+  <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 32px 32px;"></div>
+  <!-- Ambient glows -->
+  <div class="absolute top-0 left-1/4 w-64 h-32 bg-rose-500/[0.05] rounded-full blur-3xl"></div>
+  <div class="absolute bottom-0 right-1/4 w-80 h-40 bg-amber-500/[0.04] rounded-full blur-3xl"></div>
+
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center max-w-3xl mx-auto">
-      <div class="inline-block mb-6 animate-float-medium">
-        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-rose-400 to-amber-400 rounded-full flex items-center justify-center shadow-lg">
-          <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-          </svg>
-        </div>
+    <div class="text-center max-w-2xl mx-auto">
+      <!-- Icon -->
+      <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-rose-500/20 to-amber-500/20 rounded-2xl mb-6 border border-white/[0.08]">
+        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
       </div>
-      
-      <span class="inline-block text-rose-400 text-sm font-medium tracking-widest uppercase mb-4">Traditional Elegance</span>
-      <h2 class="text-3xl sm:text-4xl md:text-6xl font-serif font-semibold text-white mb-6 leading-tight">
+
+      <p class="text-amber-400/80 text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase mb-3 sm:mb-4">Traditional Elegance</p>
+      <h2 class="text-2xl sm:text-3xl md:text-5xl font-serif font-semibold text-white mb-4 sm:mb-6 leading-tight">
         Ethnic Wear<br/>
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-amber-400">Collection</span>
       </h2>
-      <p class="text-stone-300 text-base sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
+      <div class="w-16 h-px mx-auto mb-5 sm:mb-6" style="background: linear-gradient(90deg, transparent, #d4a853, transparent);"></div>
+      <p class="text-stone-400 text-sm sm:text-base mb-8 sm:mb-10 max-w-lg mx-auto leading-relaxed">
         Embrace your cultural heritage with our stunning ethnic wear collection. From traditional sarees to contemporary fusion wear, find the perfect outfit for every celebration.
       </p>
-      
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <%= link_to products_path, class: 'group inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-medium rounded-full hover:from-rose-600 hover:to-amber-600 transition-all duration-300 shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:-translate-y-0.5' do %>
-          <span>Explore Ethnic Wear</span>
-          <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
-        <% end %>
-      </div>
-      
-      <div class="mt-10 flex flex-wrap justify-center gap-3">
-        <span class="px-4 py-2 bg-white/10 text-white/80 text-sm rounded-full border border-white/20">Sarees</span>
-        <span class="px-4 py-2 bg-white/10 text-white/80 text-sm rounded-full border border-white/20">Kurtis</span>
-        <span class="px-4 py-2 bg-white/10 text-white/80 text-sm rounded-full border border-white/20">Lehengas</span>
-        <span class="px-4 py-2 bg-white/10 text-white/80 text-sm rounded-full border border-white/20">Suits</span>
-        <span class="px-4 py-2 bg-white/10 text-white/80 text-sm rounded-full border border-white/20">Fusion Wear</span>
+
+      <%= link_to products_path, class: 'group inline-flex items-center gap-2 px-7 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-rose-500 to-amber-500 text-white text-sm font-medium rounded-full hover:from-rose-600 hover:to-amber-600 transition-all shadow-lg shadow-rose-500/20 hover:shadow-rose-500/30' do %>
+        <span>Explore Ethnic Wear</span>
+        <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      <% end %>
+
+      <!-- Category pills -->
+      <div class="mt-8 sm:mt-10 flex flex-wrap justify-center gap-2">
+        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Sarees</span>
+        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Kurtis</span>
+        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Lehengas</span>
+        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Suits</span>
+        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Fusion Wear</span>
       </div>
     </div>
   </div>

@@ -1,23 +1,24 @@
 <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Background circle with brand gradient -->
   <defs>
-    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#881337;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#be123c;stop-opacity:1" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1410"/>
+      <stop offset="100%" style="stop-color:#2d1f18"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4a853"/>
+      <stop offset="50%" style="stop-color:#f0d48a"/>
+      <stop offset="100%" style="stop-color:#c49a3c"/>
     </linearGradient>
   </defs>
-  
-  <!-- Background circle -->
-  <circle cx="50" cy="50" r="48" fill="url(#brandGradient)"/>
-  
-  <!-- Stylized "N" letter for Noralooks -->
-  <path d="M 30 30 L 30 70 L 35 70 L 35 42 L 60 70 L 65 70 L 65 30 L 60 30 L 60 58 L 35 30 Z" 
-        fill="#fef2f2" 
-        stroke="#fbbf24" 
-        stroke-width="0.5"/>
-  
-  <!-- Decorative jewel/diamond accent -->
-  <path d="M 70 35 L 75 40 L 70 45 L 65 40 Z" 
-        fill="#fbbf24" 
-        opacity="0.9"/>
+
+  <!-- Dark rounded background -->
+  <rect x="2" y="2" width="96" height="96" rx="20" fill="url(#bg)"/>
+
+  <!-- Gold "N" lettermark -->
+  <path d="M 28 28 L 28 72 L 34 72 L 34 42 L 60 72 L 66 72 L 66 28 L 60 28 L 60 58 L 34 28 Z"
+        fill="url(#gold)"/>
+
+  <!-- Gold diamond accent -->
+  <path d="M 72 32 L 77 38 L 72 44 L 67 38 Z"
+        fill="url(#gold)" opacity="0.85"/>
 </svg>

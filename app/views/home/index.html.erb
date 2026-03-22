@@ -79,100 +79,72 @@
   </script>
 <% end %>
 
-<!-- CSS Animations - Cross Browser Support -->
 <style>
-  @keyframes float-slow {
-    0%, 100% { transform: translateY(0px) translateX(0px); }
-    50% { transform: translateY(-20px) translateX(10px); }
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  @keyframes float-medium {
-    0%, 100% { transform: translateY(0px) translateX(0px); }
-    50% { transform: translateY(-15px) translateX(-15px); }
-  }
-  @keyframes float-fast {
-    0%, 100% { transform: translateY(0px) translateX(0px); }
-    50% { transform: translateY(-25px) translateX(5px); }
-  }
-  @keyframes sparkle {
-    0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.2); }
-  }
-  @keyframes rotate-slow {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  @keyframes pulse-glow {
-    0%, 100% { filter: drop-shadow(0 0 5px rgba(225, 29, 72, 0.3)); }
-    50% { filter: drop-shadow(0 0 20px rgba(225, 29, 72, 0.6)); }
-  }
-  @keyframes shimmer {
+  @keyframes shimmer-gold {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
-  @keyframes heart-beat {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-  }
-  @keyframes bounce-subtle {
+  @keyframes gentle-float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-8px); }
   }
-  .animate-float-slow { 
-    animation: float-slow 8s ease-in-out infinite;
-    -webkit-animation: float-slow 8s ease-in-out infinite;
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out both;
   }
-  .animate-float-medium { 
-    animation: float-medium 6s ease-in-out infinite;
-    -webkit-animation: float-medium 6s ease-in-out infinite;
-  }
-  .animate-float-fast { 
-    animation: float-fast 4s ease-in-out infinite;
-    -webkit-animation: float-fast 4s ease-in-out infinite;
-  }
-  .animate-sparkle { 
-    animation: sparkle 2s ease-in-out infinite;
-    -webkit-animation: sparkle 2s ease-in-out infinite;
-  }
-  .animate-rotate-slow { 
-    animation: rotate-slow 20s linear infinite;
-    -webkit-animation: rotate-slow 20s linear infinite;
-  }
-  .animate-pulse-glow { 
-    animation: pulse-glow 3s ease-in-out infinite;
-    -webkit-animation: pulse-glow 3s ease-in-out infinite;
-  }
-  .animate-shimmer {
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  .animate-shimmer-gold {
+    background: linear-gradient(90deg, transparent 0%, rgba(217,175,105,0.15) 50%, transparent 100%);
     background-size: 200% 100%;
-    animation: shimmer 3s ease-in-out infinite;
-    -webkit-animation: shimmer 3s ease-in-out infinite;
+    animation: shimmer-gold 4s ease-in-out infinite;
   }
-  .animate-heart-beat {
-    animation: heart-beat 1.5s ease-in-out infinite;
-    -webkit-animation: heart-beat 1.5s ease-in-out infinite;
+  .animate-gentle-float {
+    animation: gentle-float 6s ease-in-out infinite;
   }
-  .animate-bounce-subtle {
-    animation: bounce-subtle 2s ease-in-out infinite;
-    -webkit-animation: bounce-subtle 2s ease-in-out infinite;
+  .gold-divider {
+    background: linear-gradient(90deg, transparent, #d4a853, transparent);
   }
 </style>
 
 
-<!-- Hero Section -->
-<section class="relative overflow-hidden bg-gradient-to-br from-rose-50 via-amber-50/30 to-stone-50">
-  <!-- Decorative elements (desktop only) -->
-  <div class="hidden sm:block absolute top-10 left-10 w-20 h-20 bg-rose-200/30 rounded-full blur-2xl"></div>
-  <div class="hidden sm:block absolute bottom-10 right-16 w-32 h-32 bg-amber-200/20 rounded-full blur-3xl"></div>
-  <div class="hidden sm:block absolute top-1/2 right-10 w-2 h-2 bg-amber-400/60 rounded-full animate-sparkle"></div>
-  <div class="hidden sm:block absolute top-20 right-1/4 w-1.5 h-1.5 bg-rose-400/50 rounded-full animate-sparkle" style="animation-delay: 1s;"></div>
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HERO SECTION                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section class="relative overflow-hidden bg-gradient-to-b from-[#1a1410] via-[#1c1612] to-[#211a14]">
+  <!-- Subtle texture overlay -->
+  <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 1px 1px, #d4a853 1px, transparent 0); background-size: 40px 40px;"></div>
+  <!-- Gold ambient glow - top center -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-amber-600/[0.07] rounded-full blur-3xl"></div>
+  <!-- Rose accent glow - bottom right -->
+  <div class="absolute bottom-0 right-0 w-[400px] h-[200px] bg-rose-800/[0.05] rounded-full blur-3xl"></div>
+  <!-- Warm glow - left -->
+  <div class="absolute top-1/2 left-0 w-[300px] h-[300px] bg-amber-700/[0.04] rounded-full blur-3xl"></div>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 md:py-20">
-    <div class="text-center">
-      <p class="inline-block text-rose-700 text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase mb-3 sm:mb-4 px-3 py-1 bg-rose-100/60 rounded-full">Timeless Elegance</p>
-      <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-stone-900 mb-3 sm:mb-5 mx-auto leading-tight sm:leading-tight tracking-tight max-w-3xl">
-        <%= @hero_heading %>
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6 sm:pt-14 sm:pb-10 md:pt-20 md:pb-14">
+    <div class="text-center max-w-3xl mx-auto">
+      <!-- Logo Mark -->
+      <div class="mb-5 sm:mb-7">
+        <%= image_tag asset_path('storefront/logo-icon.png'), class: 'w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto rounded-2xl sm:rounded-3xl shadow-2xl shadow-amber-900/40', alt: 'Noralooks' %>
+      </div>
+
+      <!-- Tagline -->
+      <p class="inline-flex items-center gap-2.5 text-amber-400/80 text-[10px] sm:text-xs font-medium tracking-[0.3em] uppercase mb-4 sm:mb-5">
+        <span class="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-amber-500/50"></span>
+        Timeless Elegance
+        <span class="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-amber-500/50"></span>
+      </p>
+
+      <!-- Heading with gold highlight -->
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-semibold mb-4 sm:mb-6 leading-tight tracking-tight">
+        <span class="text-stone-200">Discover</span>
+        <br class="sm:hidden">
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400"> <%= @hero_heading_highlight %></span>
       </h1>
-      <p class="text-xs sm:text-base md:text-lg text-stone-500 mb-6 sm:mb-10 max-w-xl mx-auto leading-relaxed">
+
+      <!-- Subtext - warmer tone -->
+      <p class="text-sm sm:text-base md:text-lg text-stone-400/90 mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed">
         Exquisite artificial jewellery, thoughtful gifts, and beautiful ethnic wear for every occasion
       </p>
 
@@ -180,80 +152,87 @@
       <div class="hidden sm:block max-w-xl mx-auto" data-controller="search-autocomplete">
         <%= form_with url: products_path, method: :get, class: 'relative', data: { turbo_frame: '_top' } do |f| %>
           <div class="relative group">
-            <svg class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400 group-focus-within:text-rose-500 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400 group-focus-within:text-amber-500 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input type="search" name="q" value="<%= params[:q] %>"
                    placeholder="<%= @search_placeholder %>"
-                   class="w-full h-13 sm:h-14 pl-13 pr-32 text-stone-800 bg-white rounded-full border border-stone-200/80 shadow-lg shadow-stone-200/50 focus:ring-2 focus:ring-rose-400 focus:border-transparent focus:shadow-xl focus:shadow-rose-100/50 placeholder:text-stone-400 text-sm transition-all"
+                   class="w-full h-14 pl-13 pr-32 text-stone-800 bg-white/95 backdrop-blur-sm rounded-full border border-white/20 shadow-xl shadow-black/25 focus:bg-white focus:ring-2 focus:ring-amber-400/50 focus:border-transparent placeholder:text-stone-400 text-sm transition-all"
                    autocomplete="off"
                    data-search-autocomplete-target="input"
                    data-action="input->search-autocomplete#search focus->search-autocomplete#search keydown.enter->search-autocomplete#submitForm">
-            <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-6 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-full transition shadow-md shadow-rose-800/25 hover:shadow-lg hover:shadow-rose-800/30">
+            <button type="submit" class="absolute right-1.5 top-1/2 -translate-y-1/2 h-11 px-6 bg-gradient-to-r from-rose-800 to-rose-900 hover:from-rose-700 hover:to-rose-800 text-white text-sm font-medium rounded-full transition shadow-lg shadow-rose-900/40">
               Search
             </button>
           </div>
-
           <div data-search-autocomplete-target="results"
-               class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-stone-200 overflow-hidden hidden z-50 text-left max-h-[60vh] overflow-y-auto">
+               class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-stone-200 overflow-hidden hidden z-50 text-left max-h-[60vh] overflow-y-auto">
           </div>
         <% end %>
       </div>
 
       <!-- Search Bar - Mobile -->
-      <div class="sm:hidden max-w-sm mx-auto" data-controller="search-autocomplete">
+      <div class="sm:hidden mx-auto" data-controller="search-autocomplete">
         <%= form_with url: products_path, method: :get, class: 'relative', data: { turbo_frame: '_top' } do |f| %>
           <div class="relative">
-            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input type="search" name="q" value="<%= params[:q] %>"
                    placeholder="Search jewellery, gifts..."
-                   class="w-full h-11 pl-10 pr-4 text-stone-800 bg-white rounded-full border border-stone-200 shadow-md shadow-stone-200/40 focus:ring-2 focus:ring-rose-400 focus:border-transparent placeholder:text-stone-400 text-sm"
+                   class="w-full h-11 pl-10 pr-4 text-stone-800 bg-white/95 rounded-full border border-white/20 shadow-lg shadow-black/25 focus:bg-white focus:ring-2 focus:ring-amber-400/50 placeholder:text-stone-400 text-sm"
                    autocomplete="off"
                    data-search-autocomplete-target="input"
                    data-action="input->search-autocomplete#search focus->search-autocomplete#search keydown.enter->search-autocomplete#submitForm">
           </div>
           <div data-search-autocomplete-target="results"
-               class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-stone-200 overflow-hidden hidden z-50 text-left max-h-[60vh] overflow-y-auto">
+               class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-stone-200 overflow-hidden hidden z-50 text-left max-h-[60vh] overflow-y-auto">
           </div>
         <% end %>
       </div>
 
       <!-- Category Pills -->
-      <div class="mt-5 sm:mt-8 -mx-4 sm:mx-0">
+      <div class="mt-6 sm:mt-10 -mx-4 sm:mx-0">
         <div class="flex md:flex-wrap md:justify-center gap-2 sm:gap-2.5 overflow-x-auto md:overflow-x-visible hide-scrollbar px-4 sm:px-0 pb-2 md:pb-0">
           <% Category.storefront_hero_categories.each do |category| %>
             <%= link_to category.name, category_path(category.slug),
-                class: 'px-3.5 sm:px-4 py-1.5 sm:py-2 bg-white text-stone-600 text-xs sm:text-sm rounded-full border border-stone-200 hover:border-rose-300 hover:text-rose-800 hover:bg-rose-50 transition-all shadow-sm whitespace-nowrap flex-shrink-0' %>
+                class: 'px-4 sm:px-5 py-2 sm:py-2.5 bg-amber-500/[0.06] text-stone-300 text-xs sm:text-sm rounded-full border border-amber-500/[0.15] hover:bg-amber-500/[0.12] hover:text-amber-200 hover:border-amber-400/30 transition-all whitespace-nowrap flex-shrink-0' %>
           <% end %>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Bottom fade to page bg -->
+  <div class="h-8 sm:h-12 bg-gradient-to-b from-[#211a14] to-stone-50"></div>
 </section>
 
-<!-- Banner Carousel -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- BANNER CAROUSEL                                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <% if @banners.any? %>
-<section class="py-3 sm:py-4 md:py-6" data-controller="carousel">
+<section class="py-4 sm:py-6 md:py-8 bg-stone-50" data-controller="carousel">
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-    <div class="relative rounded-xl sm:rounded-2xl overflow-hidden">
+    <div class="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg shadow-stone-300/50">
       <% @banners.each_with_index do |banner, index| %>
-        <div class="relative h-40 sm:h-56 md:h-64 lg:h-80 <%= index > 0 ? 'hidden' : '' %>" data-carousel-target="slide">
+        <div class="relative h-44 sm:h-60 md:h-72 lg:h-96 <%= index > 0 ? 'hidden' : '' %>" data-carousel-target="slide">
           <% if banner.image.attached? %>
             <%= image_tag banner.image, class: 'w-full h-full object-cover' %>
           <% else %>
             <%= image_tag asset_path('storefront/home/discount-banner.png'), class: 'w-full h-full object-cover' %>
-            <%# <div class="w-full h-full bg-gradient-to-r from-rose-100 to-amber-50"></div> %>
           <% end %>
-          <div class="absolute inset-0 bg-gradient-to-r from-stone-900/60 via-stone-900/30 to-transparent flex items-center">
-            <div class="px-4 sm:px-8 md:px-12 lg:px-16">
-              <h2 class="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-serif font-semibold text-white mb-1.5 sm:mb-2"><%= banner.title %></h2>
+          <div class="absolute inset-0 bg-gradient-to-r from-stone-900/70 via-stone-900/30 to-transparent flex items-center">
+            <div class="px-5 sm:px-10 md:px-14 lg:px-20 max-w-lg">
+              <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-semibold text-white mb-1.5 sm:mb-3 leading-tight"><%= banner.title %></h2>
               <% if banner.subtitle.present? %>
-                <p class="text-xs sm:text-sm md:text-base text-white/90 mb-3 sm:mb-4 max-w-md"><%= banner.subtitle %></p>
+                <p class="text-xs sm:text-sm md:text-base text-white/80 mb-3 sm:mb-5 leading-relaxed"><%= banner.subtitle %></p>
               <% end %>
               <% if banner.link_url.present? %>
-                <%= link_to 'Shop Now', banner.link_url, class: 'inline-block px-4 sm:px-6 py-2 sm:py-2.5 bg-white text-stone-900 text-xs sm:text-sm font-medium rounded-full hover:bg-rose-50 transition' %>
+                <%= link_to banner.link_url, class: 'inline-flex items-center gap-2 px-5 sm:px-7 py-2 sm:py-3 bg-white text-stone-900 text-xs sm:text-sm font-medium rounded-full hover:bg-amber-50 transition group' do %>
+                  Shop Now
+                  <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                <% end %>
               <% end %>
             </div>
           </div>
@@ -264,35 +243,52 @@
 </section>
 <% end %>
 
-<!-- Homepage Collections -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HOMEPAGE COLLECTIONS (Admin-managed)                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <% @homepage_collections.each do |collection| %>
   <% if collection.items.any? %>
     <%= render 'home/homepage_collection', collection: collection %>
   <% end %>
 <% end %>
 
-<!-- Section: Artisan Collection -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ARTISAN COLLECTION                                         -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <% if @homepage_settings&.artisan_section_enabled? %>
   <%= render "home/sections/artisan" %>
 <% end %>
 
-<!-- Section: Flash Sale - Urgency -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FLASH SALE                                                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <% if @homepage_settings&.flash_sale_enabled? %>
   <%= render "home/sections/flash_sale" %>
 <% end %>
 
-<!-- Bestsellers -->
-<section class="py-6 sm:py-8 md:py-12 bg-white">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- BESTSELLERS                                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section class="py-8 sm:py-12 md:py-16 bg-white">
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between mb-4 sm:mb-6">
+    <!-- Section Header -->
+    <div class="flex items-end justify-between mb-6 sm:mb-8">
       <div>
-        <h2 class="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-stone-900">Bestsellers</h2>
-        <p class="text-xs sm:text-sm text-stone-500 mt-0.5 sm:mt-1 hidden sm:block">Most loved by our customers</p>
+        <p class="text-amber-700 text-[10px] sm:text-xs font-medium tracking-[0.15em] uppercase mb-1">Customer Favourites</p>
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-serif font-semibold text-stone-900">Bestsellers</h2>
       </div>
-      <%= link_to 'View All', products_path, class: 'text-rose-700 hover:text-rose-900 text-xs sm:text-sm font-medium' %>
+      <%= link_to products_path, class: 'group flex items-center gap-1.5 text-rose-800 hover:text-rose-900 text-xs sm:text-sm font-medium transition' do %>
+        View All
+        <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      <% end %>
     </div>
-    
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
+    <div class="w-16 h-px gold-divider mb-6 sm:mb-8"></div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
       <% @featured_products.each do |product| %>
         <%= render 'shared/product_card', product: product %>
       <% end %>
@@ -300,50 +296,76 @@
   </div>
 </section>
 
-<!-- Section: Gifts & Celebrations -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- GIFTS & CELEBRATIONS                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <% if @homepage_settings&.gifts_section_enabled? %>
   <%= render "home/sections/gifts" %>
 <% end %>
 
-<!-- Section: Trending Now - Hot Items -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TRENDING NOW                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <%= render "home/sections/trending" %>
 
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PROMOTIONAL BANNER                                         -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <% if @homepage_settings&.promo_banner_enabled? %>
-<!-- Promotional Banner -->
-<section class="py-6 sm:py-8 md:py-12">
+<section class="py-6 sm:py-10 md:py-14">
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-    <div class="bg-gradient-to-r from-rose-800 to-rose-900 rounded-xl sm:rounded-2xl p-5 sm:p-8 md:p-10 text-center sm:text-left relative overflow-hidden">
-      <!-- Decorative -->
-      <div class="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full -translate-y-1/2 translate-x-1/4"></div>
-      
-      <div class="relative sm:flex items-center justify-between">
-        <div class="mb-4 sm:mb-0">
-          <p class="text-rose-200 text-xs sm:text-sm font-medium mb-1"><%= @homepage_settings.promo_banner_title %></p>
-          <h3 class="text-xl sm:text-2xl md:text-3xl font-serif font-semibold text-white mb-2"><%= @homepage_settings.promo_banner_heading %></h3>
-          <% if @homepage_settings.promo_code_display.present? %>
-            <p class="text-rose-100 text-xs sm:text-sm">Use code <span class="font-mono bg-white/20 px-2 py-0.5 rounded text-white font-semibold"><%= @homepage_settings.promo_banner_code %></span></p>
-          <% end %>
+    <div class="relative rounded-2xl sm:rounded-3xl overflow-hidden">
+      <!-- Dark luxury background -->
+      <div class="absolute inset-0 bg-gradient-to-br from-stone-900 via-rose-950 to-stone-900"></div>
+      <!-- Subtle pattern -->
+      <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+      <!-- Gold accent -->
+      <div class="absolute top-0 right-0 w-64 h-64 bg-amber-500/[0.06] rounded-full -translate-y-1/2 translate-x-1/4 blur-2xl"></div>
+      <div class="absolute bottom-0 left-0 w-48 h-48 bg-rose-500/[0.06] rounded-full translate-y-1/2 -translate-x-1/4 blur-2xl"></div>
+
+      <div class="relative px-6 py-8 sm:px-10 sm:py-12 md:px-14 md:py-14">
+        <div class="sm:flex items-center justify-between gap-8">
+          <div class="mb-6 sm:mb-0 text-center sm:text-left">
+            <p class="text-amber-400/80 text-xs sm:text-sm font-medium tracking-wider uppercase mb-2"><%= @homepage_settings.promo_banner_title %></p>
+            <h3 class="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold text-white mb-3 leading-tight"><%= @homepage_settings.promo_banner_heading %></h3>
+            <% if @homepage_settings.promo_code_display.present? %>
+              <p class="text-stone-400 text-xs sm:text-sm">
+                Use code
+                <span class="inline-block ml-1.5 font-mono bg-amber-500/15 border border-amber-500/30 px-3 py-1 rounded-md text-amber-300 font-semibold tracking-wider"><%= @homepage_settings.promo_banner_code %></span>
+              </p>
+            <% end %>
+          </div>
+          <%= link_to @homepage_settings.promo_banner_cta_text, @homepage_settings.promo_banner_cta_link, class: 'inline-flex items-center gap-2 px-7 sm:px-8 py-3 sm:py-3.5 bg-white text-stone-900 text-sm sm:text-base font-medium rounded-full hover:bg-amber-50 transition shadow-lg' %>
         </div>
-        <%= link_to @homepage_settings.promo_banner_cta_text, @homepage_settings.promo_banner_cta_link, class: 'inline-block px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-rose-900 text-sm sm:text-base font-medium rounded-full hover:bg-rose-50 transition' %>
       </div>
     </div>
   </div>
 </section>
 <% end %>
 
-<!-- New Arrivals -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- NEW ARRIVALS                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <% if @new_arrivals.any? %>
-<section class="py-6 sm:py-8 md:py-12 bg-white">
+<section class="py-8 sm:py-12 md:py-16 bg-stone-50">
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between mb-4 sm:mb-6">
+    <div class="flex items-end justify-between mb-6 sm:mb-8">
       <div>
-        <h2 class="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-stone-900">New Arrivals</h2>
-        <p class="text-xs sm:text-sm text-stone-500 mt-0.5 sm:mt-1 hidden sm:block">Fresh designs just for you</p>
+        <p class="text-amber-700 text-[10px] sm:text-xs font-medium tracking-[0.15em] uppercase mb-1">Just Dropped</p>
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-serif font-semibold text-stone-900">New Arrivals</h2>
       </div>
-      <%= link_to 'View All', products_path(sort: 'newest'), class: 'text-rose-700 hover:text-rose-900 text-xs sm:text-sm font-medium' %>
+      <%= link_to products_path(sort: 'newest'), class: 'group flex items-center gap-1.5 text-rose-800 hover:text-rose-900 text-xs sm:text-sm font-medium transition' do %>
+        View All
+        <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      <% end %>
     </div>
-    
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
+    <div class="w-16 h-px gold-divider mb-6 sm:mb-8"></div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
       <% @new_arrivals.each do |product| %>
         <%= render 'shared/product_card', product: product %>
       <% end %>
@@ -352,53 +374,70 @@
 </section>
 <% end %>
 
-<!-- Section: Ethnic Wear Collection -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ETHNIC WEAR COLLECTION                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <% if @homepage_settings&.ethnic_section_enabled? %>
   <%= render "home/sections/ethnic" %>
 <% end %>
 
-<!-- Section: Our Promise -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- OUR PROMISE / TRUST SECTION                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <%= render "home/sections/promise" %>
 
-<!-- Why Choose Us -->
-<section class="py-8 sm:py-10 md:py-14 bg-stone-100">
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TRUST BADGES (compact strip)                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section class="py-8 sm:py-10 bg-white border-t border-stone-100">
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-      <div class="text-center">
-        <div class="w-12 sm:w-14 h-12 sm:h-14 mx-auto mb-3 sm:mb-4 bg-white rounded-full flex items-center justify-center shadow-sm">
-          <svg class="w-6 sm:w-7 h-6 sm:h-7 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+      <div class="flex items-center gap-3 sm:gap-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-stone-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
         </div>
-        <h3 class="font-medium text-stone-900 text-xs sm:text-sm mb-0.5 sm:mb-1">Quality Assured</h3>
-        <p class="text-stone-500 text-[10px] sm:text-xs">Carefully crafted pieces</p>
+        <div>
+          <p class="font-medium text-stone-900 text-xs sm:text-sm">Quality Assured</p>
+          <p class="text-stone-500 text-[10px] sm:text-xs">Checked before dispatch</p>
+        </div>
       </div>
-      <div class="text-center">
-        <div class="w-12 sm:w-14 h-12 sm:h-14 mx-auto mb-3 sm:mb-4 bg-white rounded-full flex items-center justify-center shadow-sm">
-          <svg class="w-6 sm:w-7 h-6 sm:h-7 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      <div class="flex items-center gap-3 sm:gap-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-stone-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
         </div>
-        <h3 class="font-medium text-stone-900 text-xs sm:text-sm mb-0.5 sm:mb-1">7-Day Exchange</h3>
-        <p class="text-stone-500 text-[10px] sm:text-xs">7 days exchange</p>
+        <div>
+          <p class="font-medium text-stone-900 text-xs sm:text-sm">7-Day Exchange</p>
+          <p class="text-stone-500 text-[10px] sm:text-xs">Hassle-free returns</p>
+        </div>
       </div>
-      <div class="text-center">
-        <div class="w-12 sm:w-14 h-12 sm:h-14 mx-auto mb-3 sm:mb-4 bg-white rounded-full flex items-center justify-center shadow-sm">
-          <svg class="w-6 sm:w-7 h-6 sm:h-7 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+      <div class="flex items-center gap-3 sm:gap-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-stone-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
           </svg>
         </div>
-        <h3 class="font-medium text-stone-900 text-xs sm:text-sm mb-0.5 sm:mb-1">Free Shipping</h3>
-        <p class="text-stone-500 text-[10px] sm:text-xs">On orders above <%= format_price(free_delivery_threshold) %></p>
+        <div>
+          <p class="font-medium text-stone-900 text-xs sm:text-sm">Free Shipping</p>
+          <p class="text-stone-500 text-[10px] sm:text-xs">Above <%= format_price(free_delivery_threshold) %></p>
+        </div>
       </div>
-      <div class="text-center">
-        <div class="w-12 sm:w-14 h-12 sm:h-14 mx-auto mb-3 sm:mb-4 bg-white rounded-full flex items-center justify-center shadow-sm">
-          <svg class="w-6 sm:w-7 h-6 sm:h-7 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      <div class="flex items-center gap-3 sm:gap-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-stone-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
         </div>
-        <h3 class="font-medium text-stone-900 text-xs sm:text-sm mb-0.5 sm:mb-1">Easy Refund</h3>
-        <p class="text-stone-500 text-[10px] sm:text-xs">Quick refund process</p>
+        <div>
+          <p class="font-medium text-stone-900 text-xs sm:text-sm">Easy Refund</p>
+          <p class="text-stone-500 text-[10px] sm:text-xs">Quick refund process</p>
+        </div>
       </div>
     </div>
   </div>
