@@ -8,6 +8,11 @@
   <%= turbo_stream.update "product-cart-controls-#{@variant.id}" do %>
     <%= render 'products/cart_controls', variant: @variant, cart_item: @cart_item %>
   <% end %>
+
+  <%# Update mobile sticky bar to reflect cart state %>
+  <%= turbo_stream.update "mobile-sticky-bar-#{@variant.id}" do %>
+    <%= render 'products/mobile_sticky_bar', variant: @variant, cart_item: @cart_item %>
+  <% end %>
 <% end %>
 
 <%= turbo_stream.update "cart-count" do %>

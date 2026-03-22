@@ -1,10 +1,15 @@
 module Admin
   class ProductVariantsController < BaseController
     before_action :set_product
-    before_action :set_variant, only: [ :edit, :update, :destroy, :toggle_status, :update_stock ]
+    before_action :set_variant, only: [ :show, :edit, :update, :destroy, :toggle_status, :update_stock ]
 
     def index
       @variants = @product.variants.ordered
+    end
+
+    def show
+      @other_variants = @product.variants.where.not(id: @variant.id).ordered
+      @stock_adjustments = @variant.stock_adjustments.order(created_at: :desc).limit(10)
     end
 
     def new
@@ -15,7 +20,7 @@ module Admin
       @variant = @product.variants.build(variant_params)
 
       if @variant.save
-        redirect_to admin_product_path(@product), notice: "Variant created successfully"
+        redirect_to admin_product_variant_path(@product, @variant), notice: "Variant created successfully"
       else
         render :new, status: :unprocessable_entity
       end
@@ -26,7 +31,7 @@ module Admin
 
     def update
       if @variant.update(variant_params)
-        redirect_to admin_product_path(@product), notice: "Variant updated successfully"
+        redirect_to admin_product_variant_path(@product, @variant), notice: "Variant updated successfully"
       else
         render :edit, status: :unprocessable_entity
       end
@@ -39,15 +44,19 @@ module Admin
 
     def toggle_status
       @variant.update(active: !@variant.active?)
-      redirect_to admin_product_path(@product), notice: "Variant #{@variant.active? ? 'enabled' : 'disabled'}"
+      redirect_to admin_product_variant_path(@product, @variant), notice: "Variant #{@variant.active? ? 'enabled' : 'disabled'}"
     end
 
     def update_stock
-      stock = params[:stock_quantity].to_i
-      if @variant.update(stock_quantity: stock)
-        redirect_to admin_product_path(@product), notice: "Stock updated"
-      else
-        redirect_to admin_product_path(@product), alert: "Failed to update stock"
+      quantity_change = params[:quantity_change].to_i
+      reason = params[:reason].presence || "correction"
+      notes = params[:notes].presence
+
+      begin
+        @variant.adjust_stock!(quantity_change, reason: reason, notes: notes, adjusted_by: current_admin)
+        redirect_to admin_product_variant_path(@product, @variant), notice: "Stock updated successfully"
+      rescue => e
+        redirect_to admin_product_variant_path(@product, @variant), alert: e.message
       end
     end
 

@@ -12,7 +12,10 @@ class SupportTicketsController < ApplicationController
   end
 
   def new
-    @ticket = current_customer.support_tickets.build
+    @ticket = current_customer.support_tickets.build(
+      order_id: params[:order_id],
+      subject: params[:subject]
+    )
     @orders = current_customer.orders.placed.recent
   end
 

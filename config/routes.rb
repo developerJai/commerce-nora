@@ -30,6 +30,9 @@ Rails.application.routes.draw do
       collection do
         get :attribute_fields
       end
+      member do
+        post :generate_reviews
+      end
       resources :variants, controller: "product_variants" do
         member do
           patch :toggle_status

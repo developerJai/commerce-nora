@@ -14,7 +14,7 @@
         </div>
         <div>
           <h2 class="text-xl font-serif font-semibold text-stone-900 mb-2">Free Shipping</h2>
-          <p class="text-stone-600">We offer free standard shipping on all orders above ₹999. Orders below this amount will incur a flat shipping charge of ₹99.</p>
+          <p class="text-stone-600">We offer free standard shipping on all orders above <%= format_price(free_delivery_threshold) %>. Orders below this amount will incur a flat shipping charge of <%= format_price(delivery_charge) %>.</p>
         </div>
       </div>
     </section>

@@ -83,4 +83,22 @@ class StoreSetting < ApplicationRecord
   def coupons_enabled?
     enable_coupons.nil? ? true : enable_coupons
   end
+
+  # Delivery settings
+  def effective_free_delivery_min_amount
+    free_delivery_min_amount.presence || 499.0
+  end
+
+  def effective_delivery_charge_amount
+    delivery_charge_amount.presence || 99.0
+  end
+
+  # Class-level convenience for use in views/models without fetching full instance
+  def self.free_delivery_threshold
+    instance.effective_free_delivery_min_amount.to_f
+  end
+
+  def self.flat_delivery_charge
+    instance.effective_delivery_charge_amount.to_f
+  end
 end

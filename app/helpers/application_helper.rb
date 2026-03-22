@@ -11,7 +11,7 @@ module ApplicationHelper
   end
 
   def meta_description(description = nil)
-    description || "Shop exquisite artificial jewellery, ethnic wear, and thoughtful gifts at Noralooks. Premium quality, affordable prices, free shipping on orders above ₹999. 7-day easy returns."
+    description || "Shop exquisite artificial jewellery, ethnic wear, and thoughtful gifts at Noralooks. Premium quality, affordable prices, free shipping on orders above #{format_price(free_delivery_threshold)}. Quality checked before dispatch."
   end
 
   def meta_keywords(keywords = [])
@@ -66,6 +66,14 @@ module ApplicationHelper
     is_android = request.user_agent&.include?("NoraLooks/Android")
     Rails.logger.info "User Agent: #{request.user_agent}=====#{is_android}"
     is_android
+  end
+
+  def free_delivery_threshold
+    StoreSetting.free_delivery_threshold
+  end
+
+  def delivery_charge
+    StoreSetting.flat_delivery_charge
   end
 
   private

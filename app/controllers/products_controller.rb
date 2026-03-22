@@ -108,6 +108,16 @@ class ProductsController < ApplicationController
     end
 
     @cart_item = @selected_variant ? current_cart.cart_items.find_by(product_variant: @selected_variant) : nil
+
+    # Available offers for display
+    @available_coupons = Coupon.available.limit(3)
+
+    # Rating distribution for review section
+    if @product.ratings_count > 0
+      @rating_distribution = @product.approved_reviews.group(:rating).count
+    else
+      @rating_distribution = {}
+    end
   end
 
   private

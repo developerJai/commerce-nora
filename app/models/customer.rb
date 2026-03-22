@@ -19,6 +19,7 @@ class Customer < ApplicationRecord
   before_save :downcase_email
 
   scope :active, -> { where(active: true) }
+  scope :bots, -> { where(is_bot: true) }
 
   def self.authenticate(email, password)
     customer = active.find_by(email: email.downcase)

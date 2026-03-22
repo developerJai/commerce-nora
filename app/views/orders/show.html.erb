@@ -57,9 +57,27 @@
                   </svg>
                   Need Help?
                 <% end %>
-                
+
+                <% if @order.delivered? && @order_items.any? { |item| item.exchange_in_days.to_i > 0 } %>
+                  <%= link_to new_support_ticket_path(order_id: @order.id, subject: "Exchange Request for #{@order.order_number}"), class: 'flex items-center gap-2 px-4 py-2.5 text-xs text-blue-700 hover:bg-blue-50 transition' do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Request Exchange
+                  <% end %>
+                <% end %>
+
+                <% if @order.delivered? && @order_items.any? { |item| item.return_in_days.to_i > 0 } %>
+                  <%= link_to new_support_ticket_path(order_id: @order.id, subject: "Return Request for #{@order.order_number}"), class: 'flex items-center gap-2 px-4 py-2.5 text-xs text-emerald-700 hover:bg-emerald-50 transition' do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/>
+                    </svg>
+                    Request Return
+                  <% end %>
+                <% end %>
+
                 <% if @order.can_cancel? %>
-                  <button type="button" id="cancel-order-btn" class="w-full flex items-center gap-2 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 transition text-left">
+                  <button type="button" data-cancel-order class="w-full flex items-center gap-2 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 transition text-left">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -70,7 +88,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Desktop: Inline layout with actions next to heading -->
         <div class="hidden lg:flex items-start justify-between gap-4">
           <div class="flex-1">
@@ -85,7 +103,7 @@
               <p class="text-xs text-stone-500">Placed on <%= @order.placed_at&.strftime('%b %d, %Y at %I:%M %p') %></p>
             </div>
           </div>
-          
+
           <!-- Desktop action buttons inline -->
           <div class="flex items-center gap-2">
             <%= link_to orders_path, class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition whitespace-nowrap' do %>
@@ -100,17 +118,17 @@
               </svg>
               Invoice
             <% end %>
-            
+
             <!-- More Actions Dropdown -->
             <div class="relative" data-controller="dropdown">
-              <button type="button" data-action="click->dropdown#toggle click@window->dropdown#hide" 
+              <button type="button" data-action="click->dropdown#toggle click@window->dropdown#hide"
                       class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 text-sm font-medium rounded-lg transition-colors">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
                 </svg>
                 <span>More</span>
               </button>
-              
+
               <!-- Dropdown Menu -->
               <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-stone-200 py-1 z-50">
                 <%= link_to new_support_ticket_path(order_id: @order.id), class: 'flex items-center gap-2 px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 transition' do %>
@@ -119,9 +137,27 @@
                   </svg>
                   Need Help?
                 <% end %>
-                
+
+                <% if @order.delivered? && @order_items.any? { |item| item.exchange_in_days.to_i > 0 } %>
+                  <%= link_to new_support_ticket_path(order_id: @order.id, subject: "Exchange Request for #{@order.order_number}"), class: 'flex items-center gap-2 px-4 py-2.5 text-sm text-blue-700 hover:bg-blue-50 transition' do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Request Exchange
+                  <% end %>
+                <% end %>
+
+                <% if @order.delivered? && @order_items.any? { |item| item.return_in_days.to_i > 0 } %>
+                  <%= link_to new_support_ticket_path(order_id: @order.id, subject: "Return Request for #{@order.order_number}"), class: 'flex items-center gap-2 px-4 py-2.5 text-sm text-emerald-700 hover:bg-emerald-50 transition' do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/>
+                    </svg>
+                    Request Return
+                  <% end %>
+                <% end %>
+
                 <% if @order.can_cancel? %>
-                  <button type="button" id="cancel-order-btn" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition text-left">
+                  <button type="button" data-cancel-order class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition text-left">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -151,7 +187,7 @@
             <% end %>
             
             <% statuses.each_with_index do |status, index| %>
-              <div class="flex flex-col items-center z-10" style="width: <%= 100.0 / statuses.length %>%;">
+              <div class="flex flex-col items-center relative z-[1]" style="width: <%= 100.0 / statuses.length %>%;">
                 <!-- Step Circle - Mobile optimized -->
                 <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold transition-all duration-300 <%= index <= current_index ? 'bg-rose-800 text-white ring-2 sm:ring-4 ring-rose-100' : 'bg-stone-200 text-stone-500' %>">
                   <% if index < current_index %>
@@ -642,26 +678,31 @@
       }
 
       // Cancel modal
-      const cancelBtn = document.getElementById('cancel-order-btn');
+      const cancelBtns = document.querySelectorAll('[data-cancel-order]');
       const cancelModal = document.getElementById('cancel-modal');
       const closeCancelModal = document.getElementById('close-cancel-modal');
       const cancelModalBtn = document.getElementById('cancel-modal-cancel');
 
-      if (cancelBtn && cancelModal) {
-        cancelBtn.addEventListener('click', function() {
-          cancelModal.classList.remove('hidden');
-        });
-      }
+      cancelBtns.forEach(function(btn) {
+        if (cancelModal) {
+          btn.addEventListener('click', function() {
+            cancelModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+          });
+        }
+      });
 
       if (closeCancelModal && cancelModal) {
         closeCancelModal.addEventListener('click', function() {
           cancelModal.classList.add('hidden');
+          document.body.style.overflow = '';
         });
       }
 
       if (cancelModalBtn && cancelModal) {
         cancelModalBtn.addEventListener('click', function() {
           cancelModal.classList.add('hidden');
+          document.body.style.overflow = '';
         });
       }
 
@@ -670,6 +711,7 @@
         cancelModal.addEventListener('click', function(e) {
           if (e.target === cancelModal) {
             cancelModal.classList.add('hidden');
+            document.body.style.overflow = '';
           }
         });
       }

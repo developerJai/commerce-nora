@@ -7,12 +7,13 @@
   in_stock_filter_active = local_assigns.fetch(:in_stock_filter, false)
   
   # Determine which variant to display
+  # Use cheapest_variant so displayed price matches MIN(price) sort order
   variant = if explicit_variant.present?
     explicit_variant
   elsif in_stock_filter_active
-    product.first_in_stock_variant || product.default_variant
+    product.first_in_stock_variant || product.cheapest_variant
   else
-    product.default_variant
+    product.cheapest_variant
   end
   
   cart_item = current_cart.cart_items.find_by(product_variant_id: variant&.id) if variant
@@ -111,7 +112,7 @@
           <span class="text-[10px] sm:text-xs text-stone-400 line-through"><%= format_price(variant.compare_at_price) %></span>
         </div>
       <% else %>
-        <span class="text-sm sm:text-base font-semibold text-stone-900"><%= format_price(product.min_price) %></span>
+        <span class="text-sm sm:text-base font-semibold text-stone-900"><%= format_price(variant&.price || product.min_price) %></span>
       <% end %>
     </div>
 

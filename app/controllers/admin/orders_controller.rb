@@ -9,10 +9,19 @@ module Admin
       @status = params[:status]
       @not_shipped = params[:not_shipped]
       @vendor_id = params[:vendor_id]
+      @search = params[:search].to_s.strip
 
       base_orders = vendor_scoped(Order).placed
       if admin_role? && !vendor_context? && @vendor_id.present?
         base_orders = base_orders.where(vendor_id: @vendor_id)
+      end
+
+      if @search.present?
+        base_orders = base_orders.left_joins(:customer)
+                                 .where(
+                                   "orders.order_number ILIKE :q OR customers.first_name ILIKE :q OR customers.last_name ILIKE :q OR customers.email ILIKE :q OR customers.phone ILIKE :q OR CONCAT(customers.first_name, ' ', customers.last_name) ILIKE :q",
+                                   q: "%#{@search}%"
+                                 )
       end
 
       @order_counts = {
