@@ -24,11 +24,13 @@ class HomeController < ApplicationController
       hero_parts << "Gifts"
     end
 
-    @hero_heading = if hero_parts.length > 1
-                       "Discover #{hero_parts[0..-2].join(', ')} & #{hero_parts.last}"
+    @hero_heading_highlight = if hero_parts.length > 1
+                                "#{hero_parts[0..-2].join(', ')} & #{hero_parts.last}"
     else
-                       "Discover Exquisite Jewellery"
+                                "Exquisite Jewellery"
     end
+
+    @hero_heading = "Discover #{@hero_heading_highlight}"
 
     # Dynamic search placeholder
     @search_placeholder = "Search #{hero_parts.join(', ')}..."
