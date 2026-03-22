@@ -93,12 +93,13 @@
   </div>
 
   <!-- Header -->
-  <header class="sticky top-0 z-50 bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-      <div class="flex items-center h-14 sm:h-16 gap-3 sm:gap-6">
+  <header class="sticky top-0 z-50 shadow-md relative" style="background-image: url('<%= asset_path('storefront/header-bg.png') %>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="absolute inset-x-0 top-0 h-12 sm:h-16 bg-black/40 pointer-events-none"></div>
+    <div class="max-w-7xl sm:mx-auto sm:px-6 lg:px-8 relative z-10">
+      <div class="flex items-center h-12 sm:h-16 gap-3 sm:gap-6 px-3 sm:px-0">
         <!-- Logo -->
         <%= link_to root_path, class: 'flex-shrink-0' do %>
-          <span class="text-xl sm:text-2xl font-serif font-semibold text-rose-900">Noralooks</span>
+          <span class="text-xl sm:text-2xl font-serif font-semibold text-white">Noralooks</span>
         <% end %>
 
         <!-- Search -->
@@ -153,7 +154,7 @@
         <div class="hidden sm:flex items-center gap-1">
           <!-- Account -->
          <div class="relative" data-controller="dropdown">
-            <button class="flex items-center gap-1.5 px-2 sm:px-3 py-2 text-stone-700 hover:text-rose-800 transition" data-action="mouseenter->dropdown#open mouseleave->dropdown#close">
+            <button class="flex items-center gap-1.5 px-2 sm:px-3 py-2 text-white hover:text-amber-200 transition" data-action="mouseenter->dropdown#open mouseleave->dropdown#close">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
               </svg>
@@ -189,7 +190,7 @@
           </div>
 
           <!-- Wishlist -->
-          <%= link_to wishlists_path, class: 'flex items-center gap-1.5 px-2 sm:px-3 py-2 text-stone-700 hover:text-rose-800 transition' do %>
+          <%= link_to wishlists_path, class: 'flex items-center gap-1.5 px-2 sm:px-3 py-2 text-white hover:text-amber-200 transition' do %>
             <div class="relative" data-wishlist-icon-wrapper>
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
@@ -202,7 +203,7 @@
           <% end %>
 
           <!-- Cart -->
-          <%= link_to cart_path, class: 'flex items-center gap-1.5 px-2 sm:px-3 py-2 text-stone-700 hover:text-rose-800 transition' do %>
+          <%= link_to cart_path, class: 'flex items-center gap-1.5 px-2 sm:px-3 py-2 text-white hover:text-amber-200 transition' do %>
             <div class="relative" data-cart-icon-wrapper>
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -218,7 +219,7 @@
     </div>
 
     <!-- Mobile Search -->
-    <div id="mobile-search" class="sm:hidden border-t border-stone-100 px-3 py-2 hidden">
+    <div id="mobile-search" class="sm:hidden border-t border-white/20 px-3 py-2 hidden relative z-10">
       <%= form_with url: products_path, method: :get, class: 'relative', data: { turbo_frame: '_top' } do |f| %>
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -231,7 +232,7 @@
 
     <!-- Categories Nav with Subcategory Dropdowns -->
     <% unless controller_name == 'products' && action_name == 'index' %>
-      <nav class="hidden sm:block border-t border-stone-100">
+      <nav class="hidden sm:block border-t border-stone-200 bg-white">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div class="overflow-x-auto overflow-y-visible scrollbar-hide">
             <div class="flex items-center gap-1 sm:gap-4 h-10 min-w-max">
@@ -261,7 +262,7 @@
                       <div class="bg-white border border-stone-200 rounded-lg shadow-lg py-2 min-w-[180px]">
                         <% visible_children.each do |child| %>
                           <% child_active = selected_category_ids.include?(child.id.to_s) %>
-                          <%= link_to child.name, category_path(child.slug), class: "block px-4 py-2 text-sm transition #{child_active ? 'text-rose-700 font-medium bg-rose-50' : 'text-stone-600 hover:text-rose-800 hover:bg-rose-50'}" %>
+                          <%= link_to child.name, category_path(child.slug), class: "block px-4 py-2 text-sm transition #{child_active ? 'text-amber-600 font-medium bg-amber-50' : 'text-stone-600 hover:text-amber-700 hover:bg-amber-50'}" %>
                         <% end %>
                       </div>
                     </div>
