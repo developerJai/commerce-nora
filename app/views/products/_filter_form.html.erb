@@ -286,12 +286,7 @@
   <% end %>
 
   <% if mobile %>
-    <div class="sticky bottom-0 bg-white border-t border-stone-200 pt-3 pb-2 mt-3 -mx-4 px-4">
-      <div class="flex gap-3">
-        <%= link_to 'Clear All', products_path, class: 'flex-1 py-2.5 text-center text-sm font-medium text-stone-600 bg-stone-100 rounded-lg hover:bg-stone-200 transition' %>
-        <%= f.submit 'Apply Filters', class: 'flex-1 py-2.5 text-center text-sm font-semibold text-white bg-rose-800 rounded-lg hover:bg-rose-900 transition cursor-pointer' %>
-      </div>
-    </div>
+    <%= f.submit 'Apply Filters', class: 'hidden', data: { filter_form_submit: true } %>
   <% else %>
     <%= f.submit 'Apply Filters', class: 'hidden' %>
   <% end %>
