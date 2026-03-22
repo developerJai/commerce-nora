@@ -1,4 +1,9 @@
 <% content_for(:title) { @product.name } %>
+<% content_for(:meta_description) { truncate(@product.description.to_s, length: 155).presence || "Buy #{@product.name} at Noralooks. Premium quality artificial jewellery with free shipping above ₹999. Lifetime exchange policy available." } %>
+<% content_for(:meta_keywords) { [@product.category&.name, "artificial jewellery", "buy #{@product.name.downcase}"].compact } %>
+<% if @product.images.attached? || @selected_variant&.image&.attached? %>
+  <% content_for(:og_image) { url_for(@selected_variant&.image || @product.images.first) } %>
+<% end %>
 <% default_variant = @selected_variant %>
 
 <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6" data-controller="product-gallery product-variant product-page">
