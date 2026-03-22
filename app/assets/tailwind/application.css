@@ -78,7 +78,7 @@ input:focus, select:focus, textarea:focus {
 
 /* Safe area padding for mobile bottom nav */
 .safe-area-pb {
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
 /* Dual-range price slider */
