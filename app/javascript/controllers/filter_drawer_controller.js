@@ -65,6 +65,14 @@ export default class extends Controller {
     }
   }
 
+  submitFilters() {
+    const submitBtn = this.drawerTarget.querySelector('[data-filter-form-submit]')
+    if (submitBtn) {
+      submitBtn.click()
+    }
+    this.close()
+  }
+
   // ── Swipe handling ──
 
   attachSwipe(drawer) {
