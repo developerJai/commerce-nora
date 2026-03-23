@@ -155,6 +155,18 @@
   .gold-divider {
     background: linear-gradient(90deg, transparent, #d4a853, transparent);
   }
+  @keyframes wave-flow-1 {
+    0%   { transform: translateX(0); }
+    50%  { transform: translateX(-16%); }
+    100% { transform: translateX(0); }
+  }
+  @keyframes wave-flow-2 {
+    0%   { transform: translateX(0); }
+    50%  { transform: translateX(12%); }
+    100% { transform: translateX(0); }
+  }
+  .wave-1 { animation: wave-flow-1 10s ease-in-out infinite; }
+  .wave-2 { animation: wave-flow-2 14s ease-in-out infinite; }
 </style>
 
 
@@ -164,14 +176,16 @@
 <section class="relative overflow-hidden bg-gradient-to-b from-[#1a1410] via-[#1c1612] to-[#211a14]">
   <!-- Subtle texture overlay -->
   <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 1px 1px, #d4a853 1px, transparent 0); background-size: 40px 40px;"></div>
-  <!-- Gold ambient glow - top center -->
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-amber-600/[0.07] rounded-full blur-3xl"></div>
+  <!-- Gold ambient glow - top center, responsive for mobile -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] sm:w-[800px] md:w-[1000px] h-[420px] sm:h-[500px] md:h-[600px] bg-amber-600/[0.10] rounded-full blur-3xl"></div>
+  <!-- Content-area warm halo - centered on logo + text block, responsive -->
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[55%] w-[350px] sm:w-[600px] md:w-[750px] h-[300px] sm:h-[420px] md:h-[480px] bg-amber-400/[0.06] rounded-full blur-[90px]"></div>
   <!-- Rose accent glow - bottom right -->
   <div class="absolute bottom-0 right-0 w-[400px] h-[200px] bg-rose-800/[0.05] rounded-full blur-3xl"></div>
   <!-- Warm glow - left -->
   <div class="absolute top-1/2 left-0 w-[300px] h-[300px] bg-amber-700/[0.04] rounded-full blur-3xl"></div>
 
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6 sm:pt-14 sm:pb-10 md:pt-20 md:pb-14">
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4 sm:pt-10 sm:pb-8 md:pt-14 md:pb-10">
     <div class="text-center max-w-3xl mx-auto">
       <!-- Logo Mark -->
       <div class="mb-5 sm:mb-7">
@@ -252,9 +266,17 @@
     </div>
   </div>
 
-  <!-- Bottom fade to page bg -->
-  <div class="h-16 sm:h-20 bg-gradient-to-b from-[#211a14] via-[#211a14]/60 to-stone-50"></div>
 </section>
+<!-- Hero wave transition: dark bg with wavy light edge at bottom -->
+<div class="relative h-20 sm:h-28 md:h-36 bg-[#211a14] overflow-hidden">
+  <!-- Animated wavy bottom edge -->
+  <svg class="absolute bottom-0 left-0 w-[200%] h-full wave-1" viewBox="0 0 2880 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#fafaf9" d="M0,60 C240,30 480,80 720,50 C960,20 1200,70 1440,45 C1680,20 1920,75 2160,48 C2400,21 2640,68 2880,40 L2880,120 L0,120 Z"/>
+  </svg>
+  <svg class="absolute bottom-0 left-0 w-[200%] h-full wave-2 opacity-50" viewBox="0 0 2880 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#fafaf9" d="M0,70 C300,40 540,85 780,55 C1020,25 1260,78 1500,50 C1740,22 1980,72 2220,45 C2460,18 2700,65 2880,50 L2880,120 L0,120 Z"/>
+  </svg>
+</div>
 
 
 <!-- ═══════════════════════════════════════════════════════════ -->
