@@ -248,6 +248,10 @@ Rails.application.routes.draw do
   get "search", to: "search#index"
   get "search/suggestions", to: "search#suggestions"
 
+  # PWA
+  get "manifest.json", to: "pwa#manifest", defaults: { format: :json }
+  get "service-worker.js", to: "pwa#service_worker", defaults: { format: :js }
+
   # Sitemap
   get "sitemap.xml", to: "sitemaps#show", defaults: { format: :xml }
 

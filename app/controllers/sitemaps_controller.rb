@@ -14,7 +14,7 @@ class SitemapsController < ApplicationController
     ]
 
     @categories = Category.active.includes(:parent)
-    @products = Product.active.includes(:variants)
+    @products = Product.active.includes(:variants, :category, images_attachments: :blob)
 
     respond_to do |format|
       format.xml

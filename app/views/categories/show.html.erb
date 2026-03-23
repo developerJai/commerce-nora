@@ -1,4 +1,47 @@
-<% content_for(:title) { @category.name } %>
+<% content_for(:title) { "Buy #{@category.name} Online at Best Prices" } %>
+<% content_for(:meta_description) { "Shop #{@category.name.downcase} online at Noralooks. Browse #{@pagy.count}+ products with best prices, free shipping above #{format_price(free_delivery_threshold)}. #{@category.description.present? ? truncate(@category.description, length: 100) : "Quality checked before dispatch. Buy #{@category.name.downcase} now!"}" } %>
+<% content_for(:meta_keywords) { ["buy #{@category.name.downcase} online", "#{@category.name.downcase} online India", "#{@category.name.downcase} price", "#{@category.name.downcase} shopping", "best #{@category.name.downcase}", "cheap #{@category.name.downcase} online", "#{@category.name.downcase} collection"] } %>
+
+<% content_for(:head) do %>
+  <!-- BreadcrumbList Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "<%= root_url %>"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Jewellery",
+        "item": "<%= products_url %>"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "<%= j @category.name %>"
+      }
+    ]
+  }
+  </script>
+
+  <!-- CollectionPage Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "<%= j @category.name %> - Buy Online at Noralooks",
+    "description": "Buy <%= @category.name.downcase %> online at best prices at Noralooks",
+    "url": "<%= request.original_url.split('?').first %>",
+    "numberOfItems": <%= @pagy.count %>
+  }
+  </script>
+<% end %>
 
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
   <!-- Breadcrumb -->
@@ -97,7 +140,7 @@
 
       <!-- Products Grid -->
       <% if @products.any? %>
-        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
           <% @products.each do |product| %>
             <%= render 'shared/product_card', product: product %>
           <% end %>

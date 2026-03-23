@@ -9,35 +9,48 @@ export default class extends Controller {
       window._infiniteScrollConnectCount = 0
       window._infiniteScrollFirstConnect = Date.now()
     }
-    
+
     window._infiniteScrollConnectCount++
     const elapsed = Date.now() - window._infiniteScrollFirstConnect
-    
+
     // If more than 5 connects in 2 seconds, something is wrong - STOP
     if (window._infiniteScrollConnectCount > 5 && elapsed < 2000) {
       return
     }
-    
+
     // Reset counter after 3 seconds
     if (elapsed > 3000) {
       window._infiniteScrollConnectCount = 1
       window._infiniteScrollFirstConnect = Date.now()
     }
-    
+
     // Prevent multiple rapid connections
     if (this.connectTimeout) {
       clearTimeout(this.connectTimeout)
     }
-    
+
     this.isLoading = false
-    this.lastUpdated = null
-    
-    // Preserve loaded pages across reconnections
+
+    // Detect if this is a Turbo restoration visit (back/forward).
+    // On restoration the snapshot already contains all previously-loaded
+    // products, so we only need to resume observing from the correct page.
+    this.isRestoration = document.documentElement.hasAttribute("data-turbo-preview")
+
+    // Preserve loaded pages across reconnections so we never re-fetch a
+    // page that was already appended to the grid.
     if (!window._infiniteScrollLoadedPages) {
       window._infiniteScrollLoadedPages = new Set()
     }
     this.loadedPages = window._infiniteScrollLoadedPages
-    
+
+    // Remember the last pagination timestamp we handled so we don't
+    // re-trigger setupObserver on Turbo restoration when the target
+    // reconnects with the same data-updated value.
+    if (!window._infiniteScrollLastUpdated) {
+      window._infiniteScrollLastUpdated = null
+    }
+    this.lastUpdated = window._infiniteScrollLastUpdated
+
     // Small delay to ensure DOM is ready
     this.connectTimeout = setTimeout(() => {
       this.setupObserver()
@@ -48,16 +61,18 @@ export default class extends Controller {
     if (this.connectTimeout) {
       clearTimeout(this.connectTimeout)
     }
-    
+
     this.cleanup()
   }
 
   paginationTargetConnected() {
     const updated = this.paginationTarget.dataset.updated
-    
-    // Only reset if this is a new update
+
+    // Only reset if this is genuinely new pagination data (not a
+    // Turbo restoration replaying the same snapshot).
     if (updated && updated !== this.lastUpdated) {
       this.lastUpdated = updated
+      window._infiniteScrollLastUpdated = updated
       this.cleanup()
       setTimeout(() => this.setupObserver(), 100)
     }
@@ -75,7 +90,7 @@ export default class extends Controller {
     if (!this.hasPaginationTarget) {
       return { nextUrl: '', hasNext: false }
     }
-    
+
     return {
       nextUrl: this.paginationTarget.dataset.nextUrl || '',
       hasNext: this.paginationTarget.dataset.hasNext === 'true'
@@ -84,7 +99,7 @@ export default class extends Controller {
 
   setupObserver() {
     const { nextUrl, hasNext } = this.getPaginationData()
-    
+
     // Show no more message if no next page
     if (!hasNext) {
       this.showNoMoreMessage()
@@ -114,14 +129,14 @@ export default class extends Controller {
 
     this.observer = new IntersectionObserver((entries) => {
       const entry = entries[0]
-      
+
       if (entry.isIntersecting && !this.isLoading) {
         // Immediately stop observing
         if (this.observer) {
           this.observer.disconnect()
           this.observer = null
         }
-        
+
         this.loadNextPage(nextUrl)
       }
     }, {
@@ -147,7 +162,7 @@ export default class extends Controller {
     if (!this.element.parentNode) {
       return
     }
-    
+
     this.element.parentNode.insertBefore(this.sentinel, this.element.nextSibling)
   }
 
@@ -164,7 +179,7 @@ export default class extends Controller {
     if (!url) {
       return
     }
-    
+
     // Mark as loading immediately
     this.isLoading = true
     this.loadedPages.add(url)
@@ -190,7 +205,7 @@ export default class extends Controller {
       }
 
       const html = await response.text()
-      
+
       if (html && html.trim().length > 0) {
         Turbo.renderStreamMessage(html)
       }
@@ -198,7 +213,7 @@ export default class extends Controller {
     } catch (error) {
       // Remove from loaded pages so it can be retried
       this.loadedPages.delete(url)
-      
+
       let errorMessage = 'Failed to load more products.'
       if (error.name === 'AbortError') {
         errorMessage = 'Request timed out.'
@@ -305,7 +320,7 @@ export default class extends Controller {
       }
       this.sentinel = null
     }
-    
+
     // Also remove any orphaned sentinels
     const orphans = document.querySelectorAll('[data-sentinel="true"]')
     orphans.forEach(el => el.remove())

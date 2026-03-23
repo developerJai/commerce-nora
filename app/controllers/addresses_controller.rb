@@ -10,7 +10,7 @@ class AddressesController < ApplicationController
   end
 
   def new
-    @address = current_customer.addresses.build(country: 'India')
+    @address = current_customer.addresses.build(country: 'India', state: 'Uttar Pradesh')
     @redirect_to = params[:redirect_to]
   end
 

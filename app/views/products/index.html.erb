@@ -1,6 +1,33 @@
-<% content_for(:title) { "Jewellery Collection" } %>
-<% content_for(:meta_description) { "Explore our exquisite collection of artificial jewellery, ethnic wear, and traditional accessories. Shop necklaces, earrings, bangles & more with free shipping above #{format_price(free_delivery_threshold)}." } %>
-<% content_for(:meta_keywords) { ["artificial jewellery", "fashion jewellery online", "ethnic wear", "traditional jewellery", "jewellery collection"] } %>
+<% content_for(:title) { "Buy Artificial Jewellery Online - Necklaces, Earrings, Bangles & More" } %>
+<% content_for(:meta_description) { "Browse & buy artificial jewellery online at best prices. Shop necklaces, earrings, bangles, jhumkas, kundan sets, oxidized jewellery, ethnic wear & gifts. Free shipping above #{format_price(free_delivery_threshold)}. #{@pagy.count}+ products available. Shop now at Noralooks!" } %>
+<% content_for(:meta_keywords) { ["buy artificial jewellery online", "fashion jewellery online shopping", "artificial jewellery collection", "necklace set online", "earrings online shopping", "bangles online India", "jhumka earrings buy online", "kundan jewellery set", "oxidized jewellery online", "ethnic wear collection", "traditional jewellery online India", "jewellery under 500", "cheap jewellery online India", "best artificial jewellery website"] } %>
+
+<% content_for(:head) do %>
+  <!-- CollectionPage + ItemList Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Artificial Jewellery, Ethnic Wear & Gifts Collection - Noralooks",
+    "description": "Browse and buy artificial jewellery, ethnic wear and gifts online at Noralooks",
+    "url": "<%= request.original_url.split('?').first %>",
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": "<%= @pagy.count %>",
+      "itemListElement": [
+        <% @products.first(10).each_with_index do |product, idx| %>
+        {
+          "@type": "ListItem",
+          "position": <%= idx + 1 %>,
+          "url": "<%= product_url(product.slug) %>",
+          "name": "<%= j product.name %>"
+        }<%= ',' unless idx == [@products.first(10).length - 1, @products.length - 1].min %>
+        <% end %>
+      ]
+    }
+  }
+  </script>
+<% end %>
 
 <%# ── Helper to build "remove this filter" URL ── %>
 <% remove_filter_url = ->(param, value) {

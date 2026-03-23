@@ -1,0 +1,24 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1410"/>
+      <stop offset="100%" style="stop-color:#2d1f18"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4a853"/>
+      <stop offset="50%" style="stop-color:#f0d48a"/>
+      <stop offset="100%" style="stop-color:#c49a3c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Full-bleed background (no rounded corners, no gaps) -->
+  <rect x="0" y="0" width="100" height="100" fill="url(#bg)"/>
+
+  <!-- Gold "N" lettermark (within 80% safe zone: 10-90) -->
+  <path d="M 28 28 L 28 72 L 34 72 L 34 42 L 60 72 L 66 72 L 66 28 L 60 28 L 60 58 L 34 28 Z"
+        fill="url(#gold)"/>
+
+  <!-- Gold diamond accent -->
+  <path d="M 72 32 L 77 38 L 72 44 L 67 38 Z"
+        fill="url(#gold)" opacity="0.85"/>
+</svg>

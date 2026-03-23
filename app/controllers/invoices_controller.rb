@@ -37,7 +37,7 @@ class InvoicesController < ApplicationController
     send_data pdf.render,
               filename: filename,
               type: "application/pdf",
-              disposition: "inline"
+              disposition: "attachment"
   end
 
   private

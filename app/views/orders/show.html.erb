@@ -1,9 +1,9 @@
 <% content_for(:title) { "Order #{@order.order_number}" } %>
 
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-  <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
-    <!-- Sidebar - Hidden on mobile, shown on desktop -->
-    <div class="hidden lg:block w-64 flex-shrink-0">
+  <div class="flex flex-col md:flex-row gap-4 md:gap-6">
+    <!-- Sidebar - Hidden on mobile, shown on tablet+ -->
+    <div class="hidden md:block w-64 flex-shrink-0">
       <%= render 'shared/account_sidebar', active_page: 'orders' %>
     </div>
 
@@ -11,15 +11,15 @@
       <!-- Header with inline actions on desktop -->
       <div class="mb-4 sm:mb-6">
         <!-- Mobile: Stacked layout -->
-        <div class="lg:hidden">
+        <div class="md:hidden">
           <div class="flex items-center justify-between mb-2">
             <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Order Details</h1>
-            <%= link_to orders_path, class: 'inline-flex items-center gap-1.5 px-3 py-2 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 text-xs sm:text-sm font-medium rounded-lg transition-colors' do %>
+            <a href="<%= orders_path %>" onclick="if (window.history.length > 1) { window.history.back(); return false; }" class="inline-flex items-center gap-1.5 px-3 py-2 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 text-xs sm:text-sm font-medium rounded-lg transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
               <span>Back</span>
-            <% end %>
+            </a>
           </div>
           <div class="flex flex-col gap-2 mb-4">
             <div class="flex items-center gap-2">
@@ -33,7 +33,7 @@
           
           <!-- Mobile action buttons -->
           <div class="flex gap-2">
-            <%= link_to invoice_path(@order.order_number), target: '_blank', rel: 'noopener', class: 'flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 active:bg-rose-950 text-white text-xs font-medium rounded-lg transition-colors whitespace-nowrap' do %>
+            <%= link_to invoice_path(@order.order_number, format: :pdf), download: "Invoice_#{@order.order_number}.pdf", class: 'flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 active:bg-rose-950 text-white text-xs font-medium rounded-lg transition-colors whitespace-nowrap' do %>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>
@@ -90,7 +90,7 @@
         </div>
 
         <!-- Desktop: Inline layout with actions next to heading -->
-        <div class="hidden lg:flex items-start justify-between gap-4">
+        <div class="hidden md:flex items-start justify-between gap-4">
           <div class="flex-1">
             <h1 class="text-2xl font-serif font-semibold text-stone-900">Order Details</h1>
             <div class="flex items-center gap-3 mt-2">
@@ -106,13 +106,13 @@
 
           <!-- Desktop action buttons inline -->
           <div class="flex items-center gap-2">
-            <%= link_to orders_path, class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition whitespace-nowrap' do %>
+            <a href="<%= orders_path %>" onclick="if (window.history.length > 1) { window.history.back(); return false; }" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition whitespace-nowrap">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
               Back
-            <% end %>
-            <%= link_to invoice_path(@order.order_number), target: '_blank', rel: 'noopener', class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap' do %>
+            </a>
+            <%= link_to invoice_path(@order.order_number, format: :pdf), download: "Invoice_#{@order.order_number}.pdf", class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap' do %>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>

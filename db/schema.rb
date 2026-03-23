@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_22_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_23_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -536,11 +536,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_22_160000) do
     t.datetime "created_at", null: false
     t.decimal "delivery_charge_amount", precision: 10, scale: 2, default: "99.0", null: false
     t.boolean "enable_coupons", default: true
+    t.string "facebook_url"
     t.jsonb "filter_config", default: {}, null: false
     t.decimal "free_delivery_min_amount", precision: 10, scale: 2, default: "499.0", null: false
     t.string "gst_number"
+    t.string "instagram_url"
     t.jsonb "payment_config", default: {}
+    t.string "twitter_url"
     t.datetime "updated_at", null: false
+    t.string "youtube_url"
   end
 
   create_table "support_tickets", force: :cascade do |t|

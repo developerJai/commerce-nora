@@ -1,11 +1,115 @@
-<% content_for(:title) { @product.name } %>
-<% content_for(:meta_description) { truncate(@product.description.to_s, length: 155).presence || "Buy #{@product.name} at Noralooks. Premium quality artificial jewellery with free shipping above #{format_price(free_delivery_threshold)}. #{@product.exchange_in_days.to_i > 0 ? "#{@product.exchange_in_days}-day exchange available." : 'Quality checked before dispatch.'}" } %>
-<% content_for(:meta_keywords) { [@product.category&.name, "artificial jewellery", "buy #{@product.name.downcase}"].compact } %>
+<% content_for(:title) { "Buy #{@product.name} Online at Best Price" } %>
+<% content_for(:meta_description) { truncate(@product.description.to_s, length: 120).presence&.+(". ").to_s + "Buy #{@product.name} online at Noralooks starting #{format_price(@product.min_price)}. #{@product.exchange_in_days.to_i > 0 ? "#{@product.exchange_in_days}-day exchange." : ''} Free shipping above #{format_price(free_delivery_threshold)}. Quality checked. Shop now!" } %>
+<% content_for(:meta_keywords) { [@product.category&.name, "buy #{@product.name.downcase}", "#{@product.name.downcase} online", "#{@product.name.downcase} price", "#{@product.category&.name&.downcase} online", "artificial jewellery", "buy #{@product.category&.name&.downcase} online India"].compact } %>
+<% content_for(:og_type) { 'product' } %>
 <% og_image = @selected_variant&.image&.attached? ? @selected_variant.image : (@product.images.attached? ? @product.images.first : nil) %>
 <% content_for(:og_image) { url_for(og_image) } if og_image %>
 <% default_variant = @selected_variant %>
 
+<% content_for(:head) do %>
+  <!-- Product Schema - JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "<%= j @product.name %>",
+    "description": "<%= j truncate(@product.description.to_s, length: 500) %>",
+    <% if og_image %>"image": "<%= url_for(og_image) %>",<% end %>
+    "sku": "<%= default_variant&.sku.presence || @product.sku.presence || '' %>",
+    "brand": {
+      "@type": "Brand",
+      "name": "Noralooks"
+    },
+    "category": "<%= j @product.category&.name.to_s %>",
+    "url": "<%= request.original_url.split('?').first %>",
+    <% if @product.average_rating > 0 %>
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "<%= @product.average_rating.round(1) %>",
+      "reviewCount": "<%= @product.ratings_count %>",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    <% end %>
+    <% if @reviews.any? %>
+    "review": [
+      <% @reviews.first(5).each_with_index do |review, idx| %>
+      {
+        "@type": "Review",
+        "author": { "@type": "Person", "name": "<%= j review.customer_name %>" },
+        "datePublished": "<%= review.created_at.iso8601 %>",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "<%= review.rating %>",
+          "bestRating": "5"
+        }<%= ", \"reviewBody\": \"#{j truncate(review.body.to_s, length: 200)}\"" if review.body.present? %>
+      }<%= ',' unless idx == [@reviews.first(5).size - 1, @reviews.size - 1].min %>
+      <% end %>
+    ],
+    <% end %>
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "INR",
+      "lowPrice": "<%= @variants.map(&:price).compact.min %>",
+      "highPrice": "<%= @variants.map(&:price).compact.max %>",
+      "offerCount": "<%= @variants.count %>",
+      "availability": "<%= @product.in_stock? ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' %>",
+      "seller": {
+        "@type": "Organization",
+        "name": "Noralooks"
+      },
+      "url": "<%= request.original_url.split('?').first %>"
+    }
+  }
+  </script>
+
+  <!-- BreadcrumbList Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "<%= root_url %>"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Jewellery",
+        "item": "<%= products_url %>"
+      }<%= raw(",") if @product.category %>
+      <% if @product.category %>
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "<%= j @product.category.name %>",
+        "item": "<%= category_url(@product.category.slug) %>"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "<%= j @product.name %>"
+      }
+      <% end %>
+    ]
+  }
+  </script>
+<% end %>
+
 <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 pb-24 sm:pb-6" data-controller="product-gallery product-variant product-page">
+  <!-- Mobile Back Button -->
+  <div class="sm:hidden mb-2">
+    <a href="<%= products_path %>" onclick="if (window.history.length > 1) { window.history.back(); return false; }" class="inline-flex items-center gap-1.5 text-stone-600 active:text-stone-800">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      <span class="text-sm font-medium">Back</span>
+    </a>
+  </div>
+
   <!-- Breadcrumb -->
   <nav class="mb-2 sm:mb-4 md:mb-6 overflow-x-auto hide-scrollbar" aria-label="Breadcrumb">
     <ol class="flex items-center gap-2 text-[10px] sm:text-xs md:text-sm whitespace-nowrap">
@@ -21,9 +125,9 @@
     </ol>
   </nav>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8 lg:gap-10 items-start">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 md:gap-8 lg:gap-10 items-start">
     <!-- Product Images -->
-    <div class="lg:col-span-6">
+    <div class="md:col-span-6">
       <div>
         <div class="flex flex-row gap-3">
           <% variant_image = default_variant&.image&.attached? ? default_variant.image : nil %>
@@ -54,7 +158,7 @@
               <% if gallery_images.any? %>
                 <% gallery_images.each_with_index do |image, index| %>
                   <div class="absolute inset-0 transition-opacity duration-300 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>" data-product-gallery-target="slide">
-                    <%= image_tag image, class: 'w-full h-full object-cover transition-transform duration-200', data: { product_gallery_target: 'zoomImage' } %>
+                    <%= image_tag image, alt: "#{@product.name} - #{@product.category&.name || 'Artificial Jewellery'} | Noralooks#{index > 0 ? " - Image #{index + 1}" : ''}", class: 'w-full h-full object-cover transition-transform duration-200', data: { product_gallery_target: 'zoomImage' } %>
                   </div>
                 <% end %>
               <% else %>
@@ -96,7 +200,7 @@
     </div>
 
     <!-- Product Info -->
-    <div class="lg:col-span-6">
+    <div class="md:col-span-6">
       <div class="bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6">
         <!-- Title & Share -->
         <div class="flex items-start justify-between gap-3">
@@ -588,7 +692,7 @@
   <% if @related_products.any? %>
     <section class="mt-4 sm:mt-6 md:mt-8 bg-white rounded-none sm:rounded-xl md:rounded-2xl border-0 sm:border border-stone-200 p-4 sm:p-5 md:p-6">
       <h2 class="text-base sm:text-lg md:text-xl font-serif font-semibold text-stone-900 mb-4 sm:mb-6">You May Also Like</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
         <% @related_products.each do |product| %>
           <%= render 'shared/product_card', product: product %>
         <% end %>

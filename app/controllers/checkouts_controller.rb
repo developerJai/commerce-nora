@@ -228,7 +228,7 @@ class CheckoutsController < ApplicationController
             prefill: {
               name: current_customer&.full_name,
               email: current_customer&.email,
-              contact: current_customer&.phone || @address.phone
+              contact: current_customer&.phone.presence || @address&.full_phone
             },
             notes: {
               internal_order_ids: orders.map(&:id).join(","),

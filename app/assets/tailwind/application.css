@@ -76,6 +76,20 @@ input:focus, select:focus, textarea:focus {
   display: none;
 }
 
+/* Remove default tap highlight on mobile (iOS/Android) */
+a, button, [role="button"], summary, input[type="button"], input[type="submit"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tap animation for mobile nav items */
+.tap-target {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.tap-target:active {
+  transform: scale(0.9);
+  opacity: 0.7;
+}
+
 /* Safe area padding for mobile bottom nav */
 .safe-area-pb {
   padding-bottom: max(0px, env(safe-area-inset-bottom));

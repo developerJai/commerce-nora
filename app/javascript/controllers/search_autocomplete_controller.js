@@ -72,7 +72,7 @@ export default class extends Controller {
       `
       categories.forEach(cat => {
         html += `
-          <a href="/categories/${cat.slug}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition">
+          <a href="/categories/${cat.slug}" data-turbo-frame="_top" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition">
             <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
@@ -95,12 +95,12 @@ export default class extends Controller {
         </div>
       `
       products.forEach(product => {
-        const stockBadge = product.in_stock 
+        const stockBadge = product.in_stock
           ? '<span class="text-emerald-600 text-xs">In Stock</span>'
           : '<span class="text-red-600 text-xs">Out of Stock</span>'
-        
+
         html += `
-          <a href="/products/${product.slug}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition">
+          <a href="/products/${product.slug}" data-turbo-frame="_top" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition">
             <div class="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
               ${product.image 
                 ? `<img src="${product.image}" class="w-full h-full object-cover" alt="">`
@@ -142,7 +142,7 @@ export default class extends Controller {
         }
         
         html += `
-          <a href="/products/${variant.product_slug}?variant=${variant.slug}" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition" data-turbo="false">
+          <a href="/products/${variant.product_slug}?variant=${variant.variant_param}" data-turbo-frame="_top" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition">
             <div class="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
               ${variant.image 
                 ? `<img src="${variant.image}" class="w-full h-full object-cover" alt="">`
@@ -168,7 +168,7 @@ export default class extends Controller {
     
     // View all results link
     html += `
-      <a href="/search?q=${encodeURIComponent(query)}" 
+      <a href="/products?q=${encodeURIComponent(query)}" data-turbo-frame="_top"
          class="block px-4 py-3 bg-indigo-50 text-center text-sm font-medium text-indigo-600 hover:bg-indigo-100 transition">
         View all results for "${this.escapeHtml(query)}" →
       </a>

@@ -93,6 +93,20 @@ class StoreSetting < ApplicationRecord
     delivery_charge_amount.presence || 99.0
   end
 
+  # Social media URLs
+  def social_media_links
+    {
+      youtube: youtube_url,
+      instagram: instagram_url,
+      facebook: facebook_url,
+      twitter: twitter_url
+    }.compact_blank
+  end
+
+  def has_social_links?
+    social_media_links.any?
+  end
+
   # Class-level convenience for use in views/models without fetching full instance
   def self.free_delivery_threshold
     instance.effective_free_delivery_min_amount.to_f

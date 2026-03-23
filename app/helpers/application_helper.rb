@@ -6,26 +6,30 @@ module ApplicationHelper
 
   # SEO Meta Tags
   def meta_title(title = nil)
-    base_title = "Noralooks - Artificial Jewellery, Gifts & Traditional Wear"
+    base_title = "Noralooks - Buy Artificial Jewellery, Gifts & Ethnic Wear Online India"
     title.present? ? "#{title} | #{base_title}" : base_title
   end
 
   def meta_description(description = nil)
-    description || "Shop exquisite artificial jewellery, ethnic wear, and thoughtful gifts at Noralooks. Premium quality, affordable prices, free shipping on orders above #{format_price(free_delivery_threshold)}. Quality checked before dispatch."
+    description || "Shop artificial jewellery, fashion jewellery, ethnic wear, traditional clothes & unique gifts online at Noralooks. Best prices, free shipping above #{format_price(free_delivery_threshold)}, quality checked before dispatch. Buy necklaces, earrings, bangles, rings, anklets, bracelets & more."
   end
 
   def meta_keywords(keywords = [])
     base_keywords = [
-      "artificial jewellery",
-      "fashion jewellery",
-      "ethnic wear",
-      "traditional wear",
-      "gifts",
-      "online jewellery shopping",
-      "Noralooks",
-      "imitation jewellery",
-      "costume jewellery",
-      "Indian jewellery"
+      "artificial jewellery", "fashion jewellery", "imitation jewellery", "costume jewellery",
+      "artificial jewellery online", "buy artificial jewellery", "artificial jewellery India",
+      "fashion jewellery online India", "women jewellery online",
+      "necklace set online", "earrings online", "bangles online", "rings online",
+      "anklets online", "bracelets online", "jhumka earrings", "kundan jewellery",
+      "oxidized jewellery", "temple jewellery", "pearl jewellery", "stone jewellery",
+      "ethnic wear", "traditional wear", "ethnic wear online", "traditional clothes online",
+      "Indian ethnic wear", "saree", "kurti online", "salwar suit online",
+      "gifts online", "gift shopping online India", "unique gifts", "gifts for women",
+      "gifts for her", "birthday gifts", "anniversary gifts", "wedding gifts",
+      "Noralooks", "affordable jewellery", "cheap jewellery online",
+      "jewellery under 500", "jewellery under 1000",
+      "online jewellery shopping", "Indian jewellery online shopping",
+      "jewellery store India", "best artificial jewellery website"
     ]
     (base_keywords + keywords).uniq.join(", ")
   end

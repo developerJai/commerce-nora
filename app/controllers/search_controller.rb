@@ -3,16 +3,8 @@ class SearchController < ApplicationController
     @q = params[:q]
 
     if @q.present?
-      # Find matching categories to redirect to products page with filters
-      matching_categories = Category.active.root.where("name ILIKE ?", "%#{@q}%")
-      category_ids = matching_categories.pluck(:id)
-
-      if category_ids.any?
-        redirect_to products_path(category_ids: category_ids)
-      else
-        # No matching categories, redirect to products with search as keyword
-        redirect_to products_path(q: @q)
-      end
+      # Always redirect to products with search query to keep consistent behavior
+      redirect_to products_path(q: @q)
     else
       redirect_to products_path
     end
@@ -33,7 +25,6 @@ class SearchController < ApplicationController
                         .limit(3)
                         .map do |cat|
 
-                          puts categories.inspect
       {
         id: cat.id,
         name: cat.name,
@@ -71,6 +62,7 @@ class SearchController < ApplicationController
         id: variant.id,
         name: variant.name,
         slug: variant.slug,
+        variant_param: variant.name.parameterize,
         sku: variant.sku,
         product_name: variant.product.name,
         product_slug: variant.product.slug,

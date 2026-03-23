@@ -1,10 +1,11 @@
-<% content_for(:title) { "Home" } %>
-<% content_for(:meta_description) { "Discover exquisite artificial jewellery, traditional ethnic wear, and thoughtful gifts at Noralooks. Shop premium quality fashion jewellery online with free shipping on orders above #{format_price(free_delivery_threshold)}. Quality checked before dispatch & 24-hour shipping." } %>
-<% content_for(:meta_keywords) { ["buy artificial jewellery online", "fashion jewellery India", "ethnic wear online", "traditional wear shopping", "imitation jewellery", "costume jewellery", "online gift shopping", "jewellery store India", "affordable jewellery", "women's jewellery"] } %>
+<% content_for(:title) { "Buy Artificial Jewellery, Gifts & Ethnic Wear Online" } %>
+<% content_for(:meta_description) { "Buy artificial jewellery, fashion jewellery, ethnic wear, traditional clothes & gifts online at Noralooks. Best prices on necklaces, earrings, bangles, jhumkas, kundan sets & more. Free shipping above #{format_price(free_delivery_threshold)}, quality checked, 24-hour dispatch. Shop now!" } %>
+<% content_for(:meta_keywords) { ["buy artificial jewellery online", "buy fashion jewellery online India", "artificial jewellery shop", "ethnic wear online shopping", "traditional wear shopping", "imitation jewellery online", "costume jewellery India", "online gift shopping India", "jewellery store India", "affordable jewellery online", "women's jewellery online", "necklace set online India", "earrings online shopping", "bangles online", "jhumka earrings online", "kundan jewellery online", "oxidized jewellery online", "gifts for women online", "ethnic clothes online", "traditional Indian clothes", "saree online", "kurti online shopping"] } %>
 <% content_for(:hide_header_search) { true } %>
 
 <% content_for(:head) do %>
   <!-- Structured Data - Organization Schema -->
+  <% home_store_setting = StoreSetting.instance %>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -12,7 +13,7 @@
     "name": "Noralooks",
     "url": "<%= root_url %>",
     "logo": "<%= og_image_url %>",
-    "description": "Premium artificial jewellery, ethnic wear, and gifts online store",
+    "description": "Buy artificial jewellery, fashion jewellery, ethnic wear, traditional clothes and gifts online at best prices in India",
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "IN"
@@ -22,7 +23,7 @@
       "contactType": "Customer Service",
       "availableLanguage": ["English", "Hindi"]
     },
-    "sameAs": []
+    "sameAs": [<%= home_store_setting.social_media_links.values.map { |url| "\"#{j url}\"" }.join(", ") %>]
   }
   </script>
 
@@ -51,30 +52,78 @@
     "@type": "Store",
     "name": "Noralooks",
     "image": "<%= og_image_url %>",
-    "description": "Shop exquisite artificial jewellery, ethnic wear, and thoughtful gifts",
+    "description": "Buy artificial jewellery, fashion jewellery, ethnic wear, traditional clothes and gifts online at best prices in India. Free shipping, quality checked, 24-hour dispatch.",
     "priceRange": "₹₹",
     "url": "<%= root_url %>",
+    "telephone": "",
+    "currenciesAccepted": "INR",
+    "paymentAccepted": "UPI, Credit Card, Debit Card, Net Banking, COD",
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
-      "name": "Jewellery & Fashion",
+      "name": "Artificial Jewellery, Ethnic Wear & Gifts",
       "itemListElement": [
         {
           "@type": "OfferCatalog",
           "name": "Artificial Jewellery",
+          "description": "Buy necklaces, earrings, bangles, jhumkas, kundan sets, oxidized jewellery online",
           "itemListElement": []
         },
         {
           "@type": "OfferCatalog",
-          "name": "Traditional Wear",
+          "name": "Ethnic Wear & Traditional Clothes",
+          "description": "Shop sarees, kurtis, salwar suits and traditional Indian wear online",
           "itemListElement": []
         },
         {
           "@type": "OfferCatalog",
           "name": "Gifts",
+          "description": "Unique gifts for women, birthday gifts, anniversary gifts, wedding gifts online",
           "itemListElement": []
         }
       ]
     }
+  }
+  </script>
+
+  <!-- FAQPage Schema for common search queries -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Where can I buy artificial jewellery online in India?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can buy artificial jewellery online at Noralooks (www.noralooks.com). We offer a wide collection of necklaces, earrings, bangles, jhumkas, kundan sets, oxidized jewellery and more at affordable prices with free shipping above ₹499."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the jewellery quality checked before shipping?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, every product at Noralooks is quality checked and inspected before dispatch. We ensure 100% certified quality with all orders dispatched within 24 hours."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you offer free shipping on artificial jewellery?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Noralooks offers free shipping on all orders above ₹499. Orders are dispatched within 24 hours and delivered in 3-5 business days across India."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I exchange or return jewellery purchased online?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Noralooks offers easy exchange and return policies on most products. Check the individual product page for specific exchange and return days available."
+        }
+      }
+    ]
   }
   </script>
 <% end %>
@@ -180,7 +229,7 @@
             </svg>
             <input type="search" name="q" value="<%= params[:q] %>"
                    placeholder="Search jewellery, gifts..."
-                   class="w-full h-11 pl-10 pr-4 text-stone-800 bg-white/95 rounded-full border border-white/20 shadow-lg shadow-black/25 focus:bg-white focus:ring-2 focus:ring-amber-400/50 placeholder:text-stone-400 text-sm"
+                   class="w-full h-11 pl-10 pr-4 text-stone-800 bg-white/95 rounded-full border border-white/20 shadow-lg shadow-black/25 focus:bg-white focus:ring-2 focus:ring-amber-400/50 placeholder:text-stone-400 text-base"
                    autocomplete="off"
                    data-search-autocomplete-target="input"
                    data-action="input->search-autocomplete#search focus->search-autocomplete#search keydown.enter->search-autocomplete#submitForm">
@@ -204,7 +253,7 @@
   </div>
 
   <!-- Bottom fade to page bg -->
-  <div class="h-8 sm:h-12 bg-gradient-to-b from-[#211a14] to-stone-50"></div>
+  <div class="h-16 sm:h-20 bg-gradient-to-b from-[#211a14] via-[#211a14]/60 to-stone-50"></div>
 </section>
 
 
@@ -288,7 +337,7 @@
     </div>
     <div class="w-16 h-px gold-divider mb-6 sm:mb-8"></div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
       <% @featured_products.each do |product| %>
         <%= render 'shared/product_card', product: product %>
       <% end %>
@@ -365,7 +414,7 @@
     </div>
     <div class="w-16 h-px gold-divider mb-6 sm:mb-8"></div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
       <% @new_arrivals.each do |product| %>
         <%= render 'shared/product_card', product: product %>
       <% end %>
