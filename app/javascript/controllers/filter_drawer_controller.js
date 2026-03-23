@@ -15,13 +15,30 @@ export default class extends Controller {
     this._boundMove = this.handleTouchMove.bind(this)
     this._boundEnd = this.handleTouchEnd.bind(this)
     this._boundWheel = this.handleWheel.bind(this)
+    this._savedScrollY = 0
+  }
+
+  lockBodyScroll() {
+    this._savedScrollY = window.scrollY
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${this._savedScrollY}px`
+    document.body.style.left = '0'
+    document.body.style.right = '0'
+  }
+
+  unlockBodyScroll() {
+    document.body.style.position = ''
+    document.body.style.top = ''
+    document.body.style.left = ''
+    document.body.style.right = ''
+    window.scrollTo(0, this._savedScrollY)
   }
 
   open() {
     this.isFilterOpen = true
     this.drawerTarget.classList.remove("translate-y-full")
     this.overlayTarget.classList.remove("hidden")
-    document.body.classList.add("overflow-hidden")
+    this.lockBodyScroll()
     this.attachSwipe(this.drawerTarget)
   }
 
@@ -32,7 +49,7 @@ export default class extends Controller {
     this.isFilterOpen = false
     this.drawerTarget.classList.add("translate-y-full")
     this.overlayTarget.classList.add("hidden")
-    document.body.classList.remove("overflow-hidden")
+    this.unlockBodyScroll()
     this.resetDrawerPosition(this.drawerTarget)
     this.detachSwipe(this.drawerTarget)
   }
@@ -41,7 +58,7 @@ export default class extends Controller {
     this.isSortOpen = true
     this.sortDrawerTarget.classList.remove("translate-y-full")
     this.overlayTarget.classList.remove("hidden")
-    document.body.classList.add("overflow-hidden")
+    this.lockBodyScroll()
     this.attachSwipe(this.sortDrawerTarget)
   }
 
@@ -52,7 +69,7 @@ export default class extends Controller {
     this.isSortOpen = false
     this.sortDrawerTarget.classList.add("translate-y-full")
     this.overlayTarget.classList.add("hidden")
-    document.body.classList.remove("overflow-hidden")
+    this.unlockBodyScroll()
     this.resetDrawerPosition(this.sortDrawerTarget)
     this.detachSwipe(this.sortDrawerTarget)
   }

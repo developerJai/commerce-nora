@@ -75,16 +75,18 @@
     </div>
     
     <!-- ═══════════════ Mobile Sort Drawer (Bottom Sheet) ═══════════════ -->
-    <div data-filter-drawer-target="sortDrawer" class="fixed left-0 right-0 bottom-0 max-h-[80vh] bg-white z-50 shadow-2xl transform translate-y-full transition-transform duration-300 ease-out lg:hidden rounded-t-3xl pb-[max(env(safe-area-inset-bottom),16px)]">
-      <div class="px-4 py-3">
+    <div data-filter-drawer-target="sortDrawer" class="fixed left-0 right-0 bottom-0 max-h-[80vh] bg-white z-50 shadow-2xl transform translate-y-full transition-transform duration-300 ease-out lg:hidden overflow-hidden rounded-t-3xl flex flex-col pb-[max(env(safe-area-inset-bottom),16px)]">
+      <div class="flex-shrink-0 px-4 py-3">
         <div class="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-3"></div>
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between">
           <h2 class="font-serif font-semibold text-stone-900 text-lg">Sort By</h2>
           <button type="button" data-action="click->filter-drawer#closeSort" class="p-2 text-stone-400 hover:text-stone-600">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
-        <div class="space-y-2 pb-4 overflow-y-auto overscroll-contain" style="max-height: calc(80vh - 150px); touch-action: pan-y;">
+      </div>
+      <div class="flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
+        <div class="space-y-2">
           <% tabs = [
             ['Popularity', 'rating'],
             ['Price: Low to High', 'price_low'],

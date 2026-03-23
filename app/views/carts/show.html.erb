@@ -31,7 +31,7 @@
     <% else %>
       <div class="md:flex md:gap-6 xl:gap-8">
         <!-- Cart Items -->
-        <div class="md:flex-1 pb-[280px] md:pb-0">
+        <div class="md:flex-1 pb-[220px] md:pb-0">
           <div id="cart-items">
             <% if @multi_vendor %>
               <%= render 'items_by_vendor', items_by_vendor: @items_by_vendor %>
@@ -42,8 +42,8 @@
         </div>
 
         <!-- Order Summary -->
-        <div class="<%= is_android_app ? 'bottom-14 left-0 right-0 md:relative md:w-80 md:mt-0 z-[45] md:bottom-auto md:pb-0' : 'fixed md:static md:w-80 md:mt-0 z-[45] bottom-14 left-0 right-0 md:bottom-auto md:z-auto overflow-y-auto md:pb-0' %>">
-          <div class="bg-white border-t-2 border-stone-200 md:border md:border-t md:rounded-xl shadow-[0_-2px_12px_rgba(0,0,0,0.08)] md:shadow-sm p-3.5 md:p-5 md:sticky md:top-24">
+        <div class="<%= is_android_app ? 'bottom-0 left-0 right-0 md:relative md:w-80 md:mt-0 z-[45] md:bottom-auto md:pb-0' : 'fixed md:static md:w-80 md:mt-0 z-[45] bottom-0 left-0 right-0 md:bottom-auto md:z-auto overflow-y-auto md:pb-0' %>">
+          <div class="bg-white border-t-2 border-stone-200 md:border md:border-t md:rounded-xl shadow-[0_-2px_12px_rgba(0,0,0,0.08)] md:shadow-sm p-3.5 pb-6 md:p-5 md:sticky md:top-24">
             <h2 class="hidden md:block text-sm sm:text-base font-serif font-semibold text-stone-900 mb-3 sm:mb-4">Order Summary</h2>
 
             <!-- Coupon Section -->
@@ -94,9 +94,12 @@
 
             <!-- Checkout -->
             <% unless @cart.empty? %>
-              <%= link_to checkout_path, class: 'w-full block py-3 md:py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-center text-base font-semibold rounded-xl md:rounded-lg transition shadow-lg md:shadow-none' do %>
+              <%= link_to checkout_path, class: 'w-full block py-3.5 md:py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-center text-base font-semibold rounded-xl md:rounded-lg transition shadow-lg md:shadow-none' do %>
                 Proceed to Checkout
               <% end %>
+              <div class="md:hidden flex justify-center mt-3">
+                <div class="w-16 h-1 rounded-full bg-stone-300"></div>
+              </div>
             <% end %>
 
             <div class="hidden md:block mt-2.5 sm:mt-3 text-center">
