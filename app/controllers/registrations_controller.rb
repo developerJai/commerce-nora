@@ -10,14 +10,19 @@ class RegistrationsController < ApplicationController
   end
 
   def send_otp
-    phone = params[:customer][:phone].to_s.strip
+    phone = params[:customer][:phone].to_s.gsub(/\s+/, "")
+    country_code = params[:customer][:country_code] || "+91"
     email = params[:customer][:email].to_s.strip.downcase
     otp_type = params[:type] || "sms"
 
     email = nil if email.blank?
 
+    full_phone = "#{country_code}#{phone}"
+
+    Rails.logger.debug "FULL PHONE: #{full_phone}"
+
     # ❌ PHONE EXISTS
-    if Customer.exists?(phone: phone)
+    if Customer.exists?(phone: full_phone)
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
@@ -50,18 +55,18 @@ class RegistrationsController < ApplicationController
       return
     end
 
-    # ✅ OTP FLOW
-    record = OtpVerification.find_or_initialize_by(phone: phone)
-
+    # ✅ CREATE OTP
     otp = rand(100000..999999).to_s
 
-    record.update(
-      phone: phone,
+    OtpVerification.create!(
+      phone: full_phone,
       otp: otp,
       expires_at: 5.minutes.from_now
     )
 
+    # ✅ SESSION STORE
     session[:signup_phone] = phone
+    session[:country_code] = country_code
     session[:signup_data]  = customer_params
     session[:otp_type]     = otp_type
     session[:otp_sent_at]  = Time.current.to_i
@@ -69,9 +74,9 @@ class RegistrationsController < ApplicationController
     redirect_to signup_verify_path
   end
 
-
   def verify
     @phone = session[:signup_phone]
+    @country_code = session[:country_code] || "+91"
     @otp_type = session[:otp_type] || "sms"
 
     if session[:otp_sent_at].present?
@@ -83,15 +88,33 @@ class RegistrationsController < ApplicationController
   end
   
   def confirm_otp
-    phone = session[:signup_phone]
-    record = OtpVerification.where(phone: phone).order(created_at: :desc).first
+    phone = session[:signup_phone].to_s.gsub(/\s+/, "")
+    country_code = session[:country_code] || "+91"
+    full_phone = "#{country_code}#{phone}"
+
+    Rails.logger.debug "PHONE: #{full_phone}"
+
+    record = OtpVerification.where(phone: full_phone).order(created_at: :desc).first
 
     if record.nil?
-      redirect_to signup_path, alert: "Session expired"
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "otp_error",
+            partial: "shared/otp_error",
+            locals: { message: "Session expired. Please try again." }
+          )
+        end
+        format.html do
+          redirect_to signup_path, alert: "Session expired"
+        end
+      end
       return
     end
 
     if record.expired?
+      record.destroy
+
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
@@ -100,54 +123,68 @@ class RegistrationsController < ApplicationController
             locals: { message: "OTP expired. Please request a new OTP." }
           )
         end
-
         format.html do
-          flash[:alert] = "OTP expired"
-          redirect_to signup_verify_path
+          redirect_to signup_verify_path, alert: "OTP expired"
         end
       end
       return
     end
 
-    # ✅ CORRECT OTP
-    if params[:otp].to_s == record.otp.to_s
-
-      data = session[:signup_data].symbolize_keys
-
-      if data[:first_name].present?
-        names = data[:first_name].strip.split(" ")
-        data[:first_name] = names.first
-        data[:last_name]  = names[1..].join(" ")
-        data[:last_name]  = "" if data[:last_name].blank?
-      end
-
-      @customer = Customer.new(data)
-
-      if @customer.save
-        session[:customer_id] = @customer.id
-
-        record.destroy
-        session.delete(:signup_phone)
-        session.delete(:signup_data)
-
-        redirect_to root_path, notice: "Welcome!"
-      else
-        render :verify
-      end
-
-    else
-      # ❌ WRONG OTP (IMPORTANT PART)
+    unless ActiveSupport::SecurityUtils.secure_compare(
+      params[:otp].to_s,
+      record.otp.to_s
+    )
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "otp_error",
             partial: "shared/otp_error",
-            locals: { message: "Invalid OTP. Please check and try again." }
+            locals: { message: "Invalid OTP. Please try again." }
           )
         end
-
         format.html do
-          flash.now[:alert] = "Invalid OTP"
+          redirect_to signup_verify_path, alert: "Invalid OTP"
+        end
+      end
+      return
+    end
+
+    data = session[:signup_data]&.symbolize_keys || {}
+    data[:phone] = full_phone
+
+    if data[:first_name].present?
+      names = data[:first_name].strip.split(" ")
+      data[:first_name] = names.first
+      data[:last_name]  = names[1..].join(" ").presence || ""
+    end
+
+    @customer = Customer.new(data)
+
+    if @customer.save
+      session[:customer_id] = @customer.id
+
+      record.destroy
+      session.delete(:signup_phone)
+      session.delete(:signup_data)
+      session.delete(:country_code)
+
+      respond_to do |format|
+        format.html do
+          redirect_to root_path, notice: "Welcome!"
+        end
+      end
+    else
+      Rails.logger.debug @customer.errors.full_messages
+
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "otp_error",
+            partial: "shared/otp_error",
+            locals: { message: @customer.errors.full_messages.join(", ") }
+          )
+        end
+        format.html do
           render :verify
         end
       end

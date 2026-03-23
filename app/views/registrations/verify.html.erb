@@ -16,7 +16,7 @@
       <!-- Phone -->
       <div class="text-sm mb-4">
          <span class="font-medium">
-         <%= session[:signup_phone] %>
+         <%= @country_code %> <%= @phone %>
          </span>
          <%= link_to "Change", signup_path,
             class:"text-blue-600 ml-2 hover:underline" %>
