@@ -11,11 +11,10 @@ class Customer < ApplicationRecord
   has_many :wishlist_items, dependent: :destroy, class_name: 'Wishlist'
   has_many :wished_products, through: :wishlist_items, source: :product
 
-  validates :email, presence: true, uniqueness: { case_sensitive: false },
-            format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :first_name, :last_name, presence: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
+  validates :first_name, presence: true
   validates :password, length: { minimum: 6 }, if: -> { new_record? || password.present? }
-  validates :phone, format: { with: /\A\+[\d\s\-\(\)]+\z/, message: "must be a valid international phone number" }, allow_blank: true
+  validates :phone, format: { with: /\A\+[\d\s\-\(\)]+\z/, message: "must be a valid international phone number" }, allow_blank: false,presence: true
 
   before_save :downcase_email
 
@@ -65,6 +64,6 @@ class Customer < ApplicationRecord
   private
 
   def downcase_email
-    self.email = email.downcase
+    self.email = email.to_s.downcase.presence
   end
 end

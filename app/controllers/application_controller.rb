@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
       # Store the full URL to redirect back after login
       session[:return_to] = request.fullpath
       flash[:alert] = "Please login to continue"
-      redirect_to login_path
+      redirect_to signin_path
     end
   end
 

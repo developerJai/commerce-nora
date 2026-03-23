@@ -1,0 +1,83 @@
+<div class="min-h-[60vh] flex items-center justify-center px-4 py-12">
+   <div class="w-full max-w-md bg-white border border-gray-300 rounded-lg p-6">
+      <!-- Heading -->
+      <% if @otp_type == "whatsapp" %>
+      <h1 class="text-2xl font-semibold text-gray-900 mb-2">
+         Verify with WhatsApp
+      </h1>
+      <%else%>
+      <h1 class="text-2xl font-semibold text-gray-900 mb-2">
+         Verify mobile number
+      </h1>
+      <%end%>
+      <p class="text-sm text-gray-700 mb-4">
+         Enter the OTP (one time password) we sent you.
+      </p>
+      <!-- Phone -->
+      <div class="text-sm mb-4">
+         <span class="font-medium">
+         <%= @country_code %> <%= @phone %>
+         </span>
+         <%= link_to "Change", signup_path,
+            class:"text-blue-600 ml-2 hover:underline" %>
+      </div>
+      <!-- OTP FORM -->
+      <%= form_with url: signup_confirm_otp_path, method: :post, data: { turbo: true } do %>
+      <label class="block text-sm font-semibold mb-1">
+      Enter OTP
+      </label>
+      <input
+         type="text"
+         name="otp"
+         maxlength="6"
+         required
+         class="w-full border border-gray-400 rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+      <div id="otp_error"></div>
+      <button
+         class="w-full bg-rose-800 text-white text-base font-medium hover:bg-rose-900 font-semibold py-2 rounded-full">
+      Create your Amazon account
+      </button>
+      <% end %>
+      <!-- Terms -->
+      <p class="text-xs text-gray-600 mt-4">
+         By creating an account or logging in, you agree to Amazon's
+         <a href="#" class="text-blue-600 hover:underline">Conditions of Use</a>
+         and
+         <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>.
+      </p>
+      <!-- Resend -->
+      <div data-controller="otp"
+           data-otp-time-value="<%= @remaining_time %>">
+
+        <span data-otp-target="timerText" class="text-gray-500 text-sm">
+          Resend OTP in
+          <span data-otp-target="countdown"><%= @remaining_time %></span>s
+        </span>
+
+        <%= button_to "Resend OTP",
+            signup_resend_otp_path,
+            method: :post,
+            class: "text-blue-600 text-sm bg-transparent border-0 hover:underline hidden",
+            data: { otp_target: "resendBtn" } %>
+      </div>
+      <!-- Divider -->
+      <div class="flex items-center my-5">
+         <div class="flex-grow border-t border-gray-300"></div>
+         <span class="px-3 text-gray-500 text-sm">or</span>
+         <div class="flex-grow border-t border-gray-300"></div>
+      </div>
+      <% if @otp_type == "whatsapp" %>
+      <%= button_to "Send OTP via SMS",
+         signup_resend_otp_path,
+         method: :post,
+         params: { type: "sms" },
+         class: "block w-full text-center py-2 mb-3 border border-stone-400 rounded-full hover:bg-stone-50" %>
+      <% else %>
+      <%= button_to "Send OTP via WhatsApp",
+         signup_resend_otp_path,
+         method: :post,
+         params: { type: "whatsapp" },
+         class: "block w-full text-center py-2 mb-3 border border-stone-400 rounded-full hover:bg-stone-50" %>
+      <% end %>
+   </div>
+</div>
