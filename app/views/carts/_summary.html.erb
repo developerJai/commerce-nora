@@ -18,8 +18,8 @@ end %>
   
   <% if discount > 0 %>
     <div class="flex justify-between text-emerald-600">
-      <span>Discount</span>
-      <span>-<%= format_price(discount) %></span>
+      <span>Coupon (<%= coupon.code %>)</span>
+      <span class="font-medium">-<%= format_price(discount) %></span>
     </div>
   <% end %>
   

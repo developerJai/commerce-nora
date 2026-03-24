@@ -1,7 +1,7 @@
 <% content_for(:title) { "Edit Profile" } %>
 
 <% content_for(:head) do %>
-  <%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css", "data-turbo-temporary": true %>
 <% end %>
 
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -22,7 +22,7 @@
         <span class="text-stone-900">Edit Profile</span>
       </nav>
 
-      <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900 mb-4 sm:mb-6">Edit Profile</h1>
+      <h1 class="text-xl sm:text-2xl font-sans font-semibold text-stone-900 mb-4 sm:mb-6">Edit Profile</h1>
 
       <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-4 sm:p-6">
         <%= form_with(model: @customer, url: account_path, method: :patch, class: 'space-y-4 sm:space-y-6',

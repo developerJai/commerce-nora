@@ -1,12 +1,12 @@
 <% unless @cart.empty? %>
   <div class="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
     <div class="flex items-center gap-2">
-      <%= link_to :back, class: 'sm:hidden inline-flex items-center justify-center w-8 h-8 -ml-1 rounded-full hover:bg-stone-100 transition text-stone-700' do %>
+      <%= link_to products_path, class: 'sm:hidden inline-flex items-center justify-center w-8 h-8 -ml-1 rounded-full hover:bg-stone-100 transition text-stone-700' do %>
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
         </svg>
       <% end %>
-      <h1 class="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-stone-900">
+      <h1 class="text-lg sm:text-xl md:text-2xl font-sans font-semibold text-stone-900">
         Shopping Bag
         <span class="text-stone-400 font-sans font-normal text-sm sm:text-base">(<span id="cart-item-count"><%= @cart.item_count %></span>)</span>
       </h1>

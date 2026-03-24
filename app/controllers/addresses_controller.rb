@@ -22,9 +22,9 @@ class AddressesController < ApplicationController
       # Set as selected address for checkout if coming from checkout
       if @redirect_to == 'checkout'
         session[:checkout_address_id] = @address.id
-        redirect_to checkout_path, notice: "Address added successfully"
+        redirect_to checkout_path
       else
-        redirect_to addresses_path, notice: "Address added successfully"
+        redirect_to addresses_path
       end
     else
       render :new, status: :unprocessable_entity

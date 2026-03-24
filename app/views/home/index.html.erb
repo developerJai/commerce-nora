@@ -173,17 +173,20 @@
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- HERO SECTION                                               -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<section class="relative overflow-x-hidden bg-gradient-to-b from-[#1a1410] via-[#1c1612] to-[#211a14]">
-  <!-- Subtle texture overlay -->
-  <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 1px 1px, #d4a853 1px, transparent 0); background-size: 40px 40px;"></div>
-  <!-- Gold ambient glow - top center, responsive for mobile -->
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] sm:w-[800px] md:w-[1000px] h-[420px] sm:h-[500px] md:h-[600px] bg-amber-600/[0.10] rounded-full blur-3xl"></div>
-  <!-- Content-area warm halo - centered on logo + text block, responsive -->
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[55%] w-[350px] sm:w-[600px] md:w-[750px] h-[300px] sm:h-[420px] md:h-[480px] bg-amber-400/[0.06] rounded-full blur-[90px]"></div>
-  <!-- Rose accent glow - bottom right -->
-  <div class="absolute bottom-0 right-0 w-[400px] h-[200px] bg-rose-800/[0.05] rounded-full blur-3xl"></div>
-  <!-- Warm glow - left -->
-  <div class="absolute top-1/2 left-0 w-[300px] h-[300px] bg-amber-700/[0.04] rounded-full blur-3xl"></div>
+<section class="relative bg-gradient-to-b from-[#1a1410] via-[#1c1612] to-[#211a14]">
+  <!-- Decorative overlays (clipped to section bounds) -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <!-- Subtle texture overlay -->
+    <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 1px 1px, #d4a853 1px, transparent 0); background-size: 40px 40px;"></div>
+    <!-- Gold ambient glow - top center, responsive for mobile -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] sm:w-[800px] md:w-[1000px] h-[420px] sm:h-[500px] md:h-[600px] bg-amber-600/[0.10] rounded-full blur-3xl"></div>
+    <!-- Content-area warm halo - centered on logo + text block, responsive -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[55%] w-[350px] sm:w-[600px] md:w-[750px] h-[300px] sm:h-[420px] md:h-[480px] bg-amber-400/[0.06] rounded-full blur-[90px]"></div>
+    <!-- Rose accent glow - bottom right -->
+    <div class="absolute bottom-0 right-0 w-[400px] h-[200px] bg-rose-800/[0.05] rounded-full blur-3xl"></div>
+    <!-- Warm glow - left -->
+    <div class="absolute top-1/2 left-0 w-[300px] h-[300px] bg-amber-700/[0.04] rounded-full blur-3xl"></div>
+  </div>
 
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4 sm:pt-10 sm:pb-8 md:pt-14 md:pb-10">
     <div class="text-center max-w-3xl mx-auto">
@@ -238,7 +241,7 @@
       </div>
 
       <!-- Search Bar - Mobile -->
-      <div class="sm:hidden mx-auto relative z-50" data-controller="search-autocomplete">
+      <div class="sm:hidden mx-auto relative z-10" data-controller="search-autocomplete" data-search-autocomplete-mobile-value="true">
         <%= form_with url: products_path, method: :get, class: 'relative', data: { turbo_frame: '_top' } do |f| %>
           <div class="relative">
             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

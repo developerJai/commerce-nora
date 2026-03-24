@@ -18,7 +18,7 @@
                   <%= @ticket.status.titleize %>
                 </span>
               </div>
-              <h1 class="text-xl lg:text-2xl font-serif font-semibold text-stone-900 mb-2"><%= @ticket.subject %></h1>
+              <h1 class="text-xl lg:text-2xl font-sans font-semibold text-stone-900 mb-2"><%= @ticket.subject %></h1>
               <% if @ticket.order %>
                 <p class="text-sm text-stone-600">
                   Related to order: <%= link_to @ticket.order.order_number, order_path(@ticket.order), class: 'text-rose-700 hover:text-rose-900 font-semibold' %>

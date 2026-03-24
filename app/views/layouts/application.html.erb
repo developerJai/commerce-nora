@@ -102,7 +102,7 @@
   <!-- Header -->
   <header class="sticky top-0 z-50 shadow-md relative" style="background-image: url('<%= asset_path('storefront/header-bg.png') %>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
     <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/30 pointer-events-none"></div>
-    <div class="max-w-7xl sm:mx-auto sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-7xl sm:mx-auto sm:px-6 lg:px-8 relative z-20">
       <div class="flex items-center h-12 sm:h-16 gap-3 sm:gap-6 px-3 sm:px-0">
         <!-- Logo -->
         <%= link_to root_path, class: 'flex-shrink-0' do %>
@@ -136,7 +136,7 @@
         <% end %>
 
         <!-- Mobile search -->
-        <div class="sm:hidden flex-1" data-controller="search-autocomplete">
+        <div class="sm:hidden flex-1" data-controller="search-autocomplete" data-search-autocomplete-mobile-value="true">
           <%= form_with url: products_path, method: :get, class: 'relative', data: { turbo_frame: '_top' } do |f| %>
             <div class="relative">
               <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -307,11 +307,11 @@
   </main>
 
   <!-- Footer -->
-  <% no_footer_pages = %w[products accounts orders addresses wishlists support_tickets account_passwords order_reviews carts checkouts callbacks] %>
+  <% no_footer_pages = %w[products accounts orders addresses wishlists support_tickets account_passwords order_reviews carts checkouts callbacks sessions registrations] %>
   <% hide_footer_completely = no_footer_pages.include?(controller_name) %>
   <!-- Mobile-only compact footer with social links -->
   <% unless hide_footer_completely %>
-    <div class="sm:hidden bg-stone-900 mt-auto py-6 px-4">
+    <div class="sm:hidden bg-stone-900 mt-auto pt-6 pb-20 px-4">
       <% mobile_footer_store_setting = StoreSetting.instance %>
       <% if mobile_footer_store_setting.has_social_links? %>
         <p class="text-stone-400 text-xs text-center mb-3">Follow us</p>

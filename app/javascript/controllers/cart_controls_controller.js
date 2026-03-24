@@ -82,7 +82,7 @@ export default class extends Controller {
     .then(html => {
       // Turbo stream will replace this controller's DOM entirely,
       // so a fresh controller instance with correct data takes over.
-      Turbo.renderStreamMessage(html)
+      window.Turbo.renderStreamMessage(html)
       this.animateCartIcon()
     })
     .catch(error => {

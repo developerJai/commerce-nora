@@ -18,7 +18,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </a>
-            <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Order Details</h1>
+            <h1 class="text-xl sm:text-2xl font-sans font-semibold text-stone-900">Order Details</h1>
           </div>
           <div class="flex flex-col gap-2 mb-4">
             <div class="flex items-center gap-2">
@@ -91,7 +91,7 @@
         <!-- Desktop: Inline layout with actions next to heading -->
         <div class="hidden md:flex items-start justify-between gap-4">
           <div class="flex-1">
-            <h1 class="text-2xl font-serif font-semibold text-stone-900">Order Details</h1>
+            <h1 class="text-2xl font-sans font-semibold text-stone-900">Order Details</h1>
             <div class="flex items-center gap-3 mt-2">
               <p class="text-sm text-stone-600 font-medium"><%= @order.order_number %></p>
               <span class="text-stone-300">•</span>
@@ -172,7 +172,7 @@
       <!-- Order Timeline - Mobile Optimized -->
       <% unless @order.cancelled? %>
         <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-4 sm:p-5 lg:p-6 mb-4 sm:mb-6">
-          <h2 class="text-sm sm:text-base font-serif font-semibold text-stone-900 mb-4 sm:mb-5">Order Status</h2>
+          <h2 class="text-sm sm:text-base font-sans font-semibold text-stone-900 mb-4 sm:mb-5">Order Status</h2>
           <div class="relative flex items-start justify-between">
             <% statuses = ['confirmed', 'processing', 'shipped', 'delivered'] %>
             <% current_index = statuses.index(@order.status) || -1 %>
@@ -212,13 +212,30 @@
         </div>
       <% else %>
         <!-- Cancelled Order Status -->
-        <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-4 sm:p-5 lg:p-6 mb-4 sm:mb-6">
-          <div class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-stone-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-            <p class="text-sm sm:text-base text-stone-600">This order has been <span class="font-medium text-stone-900">cancelled</span> and will not be processed.</p>
-          </div>
+        <div class="mb-4 sm:mb-6 space-y-1">
+          <p class="text-xs text-red-600">This order has been cancelled and will not be processed.</p>
+          <% if @order.payment_status == 'paid' || @order.refund_status != 'not_refunded' %>
+            <p class="text-xs text-stone-500">
+              Refund:
+              <% case @order.refund_status %>
+              <% when 'not_refunded' %>
+                <span class="text-amber-600 font-medium">Pending</span>
+              <% when 'initiated' %>
+                <span class="text-blue-600 font-medium">Processing</span>
+                <% if @order.refund_initiated_at.present? %>
+                  <span class="text-stone-400">&middot; Initiated <%= time_ago_in_words(@order.refund_initiated_at) %> ago</span>
+                <% end %>
+              <% when 'paid' %>
+                <span class="text-emerald-600 font-medium">Refunded <%= format_price(@order.refund_amount) %></span>
+                <% if @order.refund_paid_at.present? %>
+                  <span class="text-stone-400">&middot; <%= @order.refund_paid_at.strftime('%b %d, %Y') %></span>
+                <% end %>
+              <% when 'failed' %>
+                <span class="text-red-600 font-medium">Failed</span>
+                <span class="text-stone-400">&middot; Please contact support</span>
+              <% end %>
+            </p>
+          <% end %>
         </div>
       <% end %>
 
@@ -226,7 +243,7 @@
         <div class="lg:col-span-2 space-y-4 sm:space-y-6">
           <!-- Order Items - Mobile Optimized -->
           <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-4 sm:p-5 lg:p-6">
-            <h2 class="text-sm sm:text-base font-serif font-semibold text-stone-900 mb-3 sm:mb-4">Order Items</h2>
+            <h2 class="text-sm sm:text-base font-sans font-semibold text-stone-900 mb-3 sm:mb-4">Order Items</h2>
             <ul class="divide-y divide-stone-100">
               <% @order_items.each do |item|
                 tax_rate = item.product_variant&.product&.hsn_code&.gst_rate || 3.0
@@ -268,7 +285,7 @@
 
           <!-- Shipping Address - Mobile Optimized -->
           <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-4 sm:p-5 lg:p-6">
-            <h2 class="text-sm sm:text-base font-serif font-semibold text-stone-900 mb-3 sm:mb-4">Shipping Address</h2>
+            <h2 class="text-sm sm:text-base font-sans font-semibold text-stone-900 mb-3 sm:mb-4">Shipping Address</h2>
             <% if @order.shipping_address %>
               <p class="font-medium text-xs sm:text-sm lg:text-base text-stone-900"><%= @order.shipping_address.full_name %></p>
               <p class="text-stone-600 text-xs sm:text-sm mt-1 leading-relaxed"><%= @order.shipping_address.full_address %></p>
@@ -282,7 +299,7 @@
         <div class="lg:col-span-1">
           <!-- Order Summary - Mobile Optimized with sticky on mobile -->
           <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-4 sm:p-5 lg:p-6 lg:sticky lg:top-24">
-            <h2 class="text-sm sm:text-base font-serif font-semibold text-stone-900 mb-3 sm:mb-4">Order Summary</h2>
+            <h2 class="text-sm sm:text-base font-sans font-semibold text-stone-900 mb-3 sm:mb-4">Order Summary</h2>
 
             <!-- Vendor Information - Mobile Optimized -->
             <% if @order.vendor.present? %>

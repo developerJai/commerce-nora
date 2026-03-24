@@ -65,8 +65,8 @@ class CartsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to cart_path }
       format.turbo_stream do
-        @cart = current_cart
-        @cart_items = @cart.cart_items.includes(product_variant: [ :product, image_attachment: :blob ])
+        @cart = current_cart.reload
+        @cart_items = @cart.cart_items.reload.includes(product_variant: [ { product: :vendor }, image_attachment: :blob ])
 
         # Check if cart has multiple vendors (same logic as show action)
         vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
@@ -124,7 +124,7 @@ class CartsController < ApplicationController
 
   def remove
     @variant = @cart_item.product_variant
-    @cart_item.destroy
+    @cart_item.destroy!
 
     # Clear memoized cart so item_count/subtotal return fresh data
     @current_cart = nil
@@ -132,8 +132,8 @@ class CartsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to cart_path, notice: "Item removed from cart" }
       format.turbo_stream do
-        @cart = current_cart
-        @cart_items = @cart.cart_items.includes(product_variant: [ { product: :vendor }, image_attachment: :blob ])
+        @cart = current_cart.reload
+        @cart_items = @cart.cart_items.reload.includes(product_variant: [ { product: :vendor }, image_attachment: :blob ])
 
         # Check if cart has multiple vendors (same logic as show action)
         vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
@@ -154,11 +154,11 @@ class CartsController < ApplicationController
             locals: { variant: @variant, cart_item: nil }),
           turbo_stream.update("cart-count", partial: "shared/cart_count_badge"),
           turbo_stream.update("mobile-cart-count", partial: "shared/mobile_cart_count_badge"),
-          turbo_stream.update("cart-item-count", current_cart.item_count.to_s)
+          turbo_stream.update("cart-item-count", @cart.item_count.to_s)
         ]
 
         # Update cart content based on whether cart is empty or not
-        if current_cart.empty?
+        if @cart.empty?
           streams << turbo_stream.replace("cart-content",
             partial: "carts/empty_cart")
           streams << turbo_stream.update("cart-header",
@@ -201,13 +201,13 @@ class CartsController < ApplicationController
       redirect_to cart_path, alert: "Minimum order amount of #{helpers.format_price(coupon.minimum_order_amount)} required"
     else
       session[:coupon_id] = coupon.id
-      redirect_to cart_path, notice: "Coupon applied! #{coupon.display_value} off"
+      redirect_to cart_path
     end
   end
 
   def remove_coupon
     session.delete(:coupon_id)
-    redirect_to cart_path, notice: "Coupon removed"
+    redirect_to cart_path
   end
 
   private

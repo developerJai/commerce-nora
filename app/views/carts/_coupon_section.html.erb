@@ -1,0 +1,43 @@
+<% if coupons_enabled && !multi_vendor %>
+  <div class="mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-stone-100">
+    <% if session[:coupon_id] %>
+      <% coupon = Coupon.find_by(id: session[:coupon_id]) %>
+      <% if coupon %>
+        <div class="p-2.5 sm:p-3 bg-emerald-50 rounded-lg border border-dashed border-emerald-300">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs sm:text-sm font-bold text-emerald-800 tracking-wide"><%= coupon.code %></span>
+                  <span class="text-[10px] sm:text-xs text-emerald-600">applied</span>
+                </div>
+                <p class="text-[10px] sm:text-xs text-emerald-600 mt-0.5"><%= coupon.display_value %> off</p>
+              </div>
+            </div>
+            <%= button_to remove_coupon_cart_path, method: :delete, class: 'flex items-center gap-1 text-[10px] sm:text-xs text-red-500 hover:text-red-700 font-medium transition flex-shrink-0' do %>
+              <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              Remove
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+        <p class="text-[10px] sm:text-xs text-stone-500">Have a coupon?</p>
+        <%= link_to 'See available coupons', coupons_cart_path,
+            data: { turbo_frame: 'coupon_modal' },
+            class: 'text-xs text-rose-700 hover:text-rose-900 font-medium' %>
+      </div>
+      <%= form_with url: apply_coupon_cart_path, method: :post, class: 'flex gap-1.5 sm:gap-2' do |f| %>
+        <%= f.text_field :coupon_code, placeholder: 'Coupon code',
+            class: 'flex-1 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent uppercase' %>
+        <%= f.submit 'Apply', class: 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-stone-900 text-white font-medium rounded-lg hover:bg-stone-800 cursor-pointer' %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

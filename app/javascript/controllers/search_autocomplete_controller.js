@@ -2,18 +2,26 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["input", "results", "clearButton"]
+  static values = { mobile: { type: Boolean, default: false } }
 
   connect() {
     this.timeout = null
     this.boundClickOutside = this.clickOutside.bind(this)
     document.addEventListener('click', this.boundClickOutside)
     this.updateClearButton()
+
+    // On mobile, convert results dropdown to fixed full-width
+    if (this.mobileValue && this.hasResultsTarget) {
+      this.resultsTarget.classList.remove('absolute', 'top-full', 'left-0', 'right-0', 'mt-2', 'rounded-xl', 'rounded-lg', 'shadow-2xl', 'shadow-xl', 'border', 'border-stone-200')
+      this.resultsTarget.classList.add('fixed', 'left-0', 'right-0', 'rounded-none', 'shadow-lg', 'bg-white')
+      this.resultsTarget.style.zIndex = '9999'
+      this.resultsTarget.style.overscrollBehavior = 'contain'
+    }
   }
 
   disconnect() {
     document.removeEventListener('click', this.boundClickOutside)
     if (this.timeout) clearTimeout(this.timeout)
-    this.unlockBodyScroll()
   }
 
   search() {
@@ -27,7 +35,6 @@ export default class extends Controller {
       return
     }
 
-    // Debounce search
     this.timeout = setTimeout(() => {
       this.fetchSuggestions(query)
     }, 200)
@@ -50,22 +57,8 @@ export default class extends Controller {
     }
   }
 
-  lockBodyScroll() {
-    this._savedScrollY = window.scrollY
-    document.body.style.position = 'fixed'
-    document.body.style.top = `-${this._savedScrollY}px`
-    document.body.style.left = '0'
-    document.body.style.right = '0'
-  }
-
-  unlockBodyScroll() {
-    if (document.body.style.position === 'fixed') {
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.left = ''
-      document.body.style.right = ''
-      window.scrollTo(0, this._savedScrollY || 0)
-    }
+  close() {
+    this.hideResults()
   }
 
   async fetchSuggestions(query) {
@@ -90,7 +83,7 @@ export default class extends Controller {
     const { categories, products, variants } = data
 
     if (categories.length === 0 && products.length === 0 && variants.length === 0) {
-      this.resultsTarget.innerHTML = `
+      this.resultsTarget.innerHTML = this.closeButtonHtml() + `
         <div class="p-4 text-center text-gray-500 text-sm">
           No results found for "${this.escapeHtml(query)}"
         </div>
@@ -99,9 +92,8 @@ export default class extends Controller {
       return
     }
 
-    let html = ''
+    let html = this.closeButtonHtml()
 
-    // Categories
     if (categories.length > 0) {
       html += `
         <div class="px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -125,7 +117,6 @@ export default class extends Controller {
       })
     }
 
-    // Products
     if (products.length > 0) {
       html += `
         <div class="px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider border-t">
@@ -161,7 +152,6 @@ export default class extends Controller {
       })
     }
 
-    // Variants
     if (variants.length > 0) {
       html += `
         <div class="px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider border-t">
@@ -204,7 +194,6 @@ export default class extends Controller {
       })
     }
 
-    // View all results link
     html += `
       <a href="/products?q=${encodeURIComponent(query)}" data-turbo-frame="_top"
          class="block px-4 py-3 bg-rose-50 text-center text-sm font-medium text-rose-700 hover:bg-rose-100 transition">
@@ -216,25 +205,42 @@ export default class extends Controller {
     this.showResults()
   }
 
+  closeButtonHtml() {
+    return `
+      <div class="flex items-center justify-between px-3 py-2 bg-white border-b border-gray-100 sticky top-0">
+        <span class="text-xs font-medium text-gray-500">Suggestions</span>
+        <button type="button" data-action="click->search-autocomplete#close" class="p-1 text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    `
+  }
+
   showResults() {
+    if (this.mobileValue) {
+      const inputRect = this.inputTarget.getBoundingClientRect()
+      // Account for fixed bottom nav bar (h-14 = 56px + safe area)
+      const bottomNavHeight = 64
+      this.resultsTarget.style.top = `${inputRect.bottom + 4}px`
+      this.resultsTarget.style.maxHeight = `${window.innerHeight - inputRect.bottom - bottomNavHeight}px`
+      this.resultsTarget.style.overflowY = 'auto'
+    }
     this.resultsTarget.classList.remove('hidden')
-    this.lockBodyScroll()
   }
 
   hideResults() {
     this.resultsTarget.classList.add('hidden')
-    this.unlockBodyScroll()
   }
 
   clickOutside(event) {
-    if (!this.element.contains(event.target)) {
+    if (!this.element.contains(event.target) && !this.resultsTarget.contains(event.target)) {
       this.hideResults()
     }
   }
 
   submitForm(event) {
-    // Let the form submit naturally when Enter is pressed
-    // The keydown.enter action will trigger form submission
     this.hideResults()
   }
 
