@@ -37,17 +37,22 @@ class SearchController < ApplicationController
     # which filters by active vendor, active category, and active product
     products = Product.active
                      .search(query)
-                     .includes(:variants, images_attachments: :blob)
+                     .includes(variants: { image_attachment: :blob }, images_attachments: :blob)
                      .limit(5)
                      .map do |product|
       variant = product.default_variant
+      image = if variant&.image&.attached?
+                url_for(variant.image)
+              elsif product.images.attached?
+                url_for(product.images.first)
+              end
       {
         id: product.id,
         name: product.name,
         slug: product.slug,
         price: helpers.format_price(product.min_price),
         in_stock: product.in_stock?,
-        image: product.images.attached? ? url_for(product.images.first.variant(resize_to_fill: [ 80, 80 ])) : nil
+        image: image
       }
     end
 
@@ -71,7 +76,7 @@ class SearchController < ApplicationController
         product_slug: variant.product.slug,
         price: helpers.format_price(variant.price),
         stock_quantity: variant.stock_quantity,
-        image: variant.image.attached? ? url_for(variant.image.variant(resize_to_fill: [ 80, 80 ])) : nil
+        image: variant.image.attached? ? url_for(variant.image) : nil
       }
     end
 
