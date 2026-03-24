@@ -23,6 +23,8 @@ import CollectionItemPreviewController from "controllers/collection_item_preview
 import CaptchaController from "controllers/captcha_controller"
 import PriceValidationController from "controllers/price_validation_controller"
 import ProductPageController from "controllers/product_page_controller"
+import SmartAppBannerController from "controllers/smart_app_banner_controller"
+import MobileAppSectionController from "controllers/mobile_app_section_controller"
 
 application.register("sidebar", SidebarController)
 application.register("dropdown", DropdownController)
@@ -43,3 +45,5 @@ application.register("multi-image-preview", MultiImagePreviewController)
 application.register("collection-item-preview", CollectionItemPreviewController)
 application.register("captcha", CaptchaController)
 application.register("price-validation", PriceValidationController)
+application.register("smart-app-banner", SmartAppBannerController)
+application.register("mobile-app-section", MobileAppSectionController)

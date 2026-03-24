@@ -106,7 +106,8 @@
             <p class="text-xs text-slate-500 uppercase tracking-wider">Store</p>
           </div>
           <%= render 'admin/shared/sidebar_link', path: admin_store_settings_path, icon: 'store_settings', label: 'Storefront', active: controller_name == 'store_settings' %>
-          
+          <%= render 'admin/shared/sidebar_link', path: admin_mobile_app_settings_path, icon: 'mobile_apps', label: 'Mobile Apps', active: controller_name == 'mobile_app_settings' %>
+
           <div class="px-3 py-1 mt-2">
             <p class="text-xs text-slate-500 uppercase tracking-wider">Platform</p>
           </div>

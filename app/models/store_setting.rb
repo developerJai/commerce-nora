@@ -126,6 +126,23 @@ class StoreSetting < ApplicationRecord
     social_media_links.any?
   end
 
+  # Mobile app settings
+  def mobile_apps_enabled?
+    mobile_apps_enabled
+  end
+
+  def has_mobile_apps?
+    mobile_apps_enabled? && (ios_app_url.present? || android_app_url.present?)
+  end
+
+  def effective_mobile_app_section_title
+    mobile_app_section_title.presence || "Shop on the Go"
+  end
+
+  def effective_mobile_app_section_subtitle
+    mobile_app_section_subtitle.presence || "Download our app for exclusive deals, faster checkout, and a personalised shopping experience"
+  end
+
   # Class-level convenience for use in views/models without fetching full instance
   def self.free_delivery_threshold
     instance.effective_free_delivery_min_amount.to_f

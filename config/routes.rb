@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
     resource :settings, only: [ :show, :update ]
     resource :store_settings, only: [ :show, :update ]
+    resource :mobile_app_settings, only: [ :show, :update ]
     resource :password, only: [ :edit, :update ]
 
     resources :customers do

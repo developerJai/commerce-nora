@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_175640) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_195049) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -531,6 +531,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_175640) do
   end
 
   create_table "store_settings", force: :cascade do |t|
+    t.string "android_app_url"
     t.string "banner_accent_color", default: "#D4AF37"
     t.string "banner_bg_color", default: "#0F0F0F"
     t.string "banner_text_color", default: "#F5F5F5"
@@ -544,6 +545,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_175640) do
     t.decimal "free_delivery_min_amount", precision: 10, scale: 2, default: "499.0", null: false
     t.string "gst_number"
     t.string "instagram_url"
+    t.string "ios_app_url"
+    t.string "mobile_app_section_subtitle", default: "Download our app for exclusive deals, faster checkout, and a personalised shopping experience"
+    t.string "mobile_app_section_title", default: "Shop on the Go"
+    t.boolean "mobile_apps_enabled", default: false, null: false
     t.jsonb "payment_config", default: {}
     t.string "twitter_url"
     t.datetime "updated_at", null: false

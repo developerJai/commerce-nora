@@ -438,6 +438,54 @@
     </div>
   </footer>
 
+  <!-- Smart App Banner (mobile only) -->
+  <% app_banner_setting = StoreSetting.instance %>
+  <% if app_banner_setting.has_mobile_apps? %>
+    <div data-controller="smart-app-banner"
+         data-smart-app-banner-ios-url-value="<%= app_banner_setting.ios_app_url %>"
+         data-smart-app-banner-android-url-value="<%= app_banner_setting.android_app_url %>">
+      <div data-smart-app-banner-target="banner"
+           class="hidden fixed bottom-16 left-3 right-3 z-50 sm:hidden translate-y-full opacity-0 transition-all duration-300 ease-out">
+        <div class="bg-white rounded-2xl shadow-2xl shadow-black/20 border border-stone-200 p-3 flex items-center gap-3">
+          <!-- App icon -->
+          <div class="w-12 h-12 bg-stone-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+            <span class="text-white font-serif font-bold text-lg">N</span>
+          </div>
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-stone-900 leading-tight">Noralooks</p>
+            <p class="text-xs text-stone-500 leading-tight mt-0.5">Shop jewellery, gifts & more</p>
+            <p class="text-[10px] text-stone-400 mt-0.5">Free on the <span data-smart-app-banner-target="storeName">App Store</span></p>
+          </div>
+          <!-- CTA -->
+          <a href="#" data-smart-app-banner-target="ctaButton" class="px-4 py-2 rounded-full text-xs font-semibold text-white flex-shrink-0 transition" style="background-color: #B8962E;">
+            OPEN
+          </a>
+          <!-- Close button -->
+          <button data-action="click->smart-app-banner#dismiss" class="absolute -top-2 -right-2 w-6 h-6 bg-stone-100 hover:bg-stone-200 rounded-full flex items-center justify-center shadow-sm border border-stone-200 transition">
+            <svg class="w-3 h-3 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sticky app icon (shown after dismiss, ~70% from top, right side) -->
+      <div data-smart-app-banner-target="fab"
+           class="hidden fixed right-3 z-50 sm:hidden scale-0 opacity-0 transition-all duration-300" style="top: 70%;">
+        <button data-action="click->smart-app-banner#openFromFab"
+                class="relative w-12 h-12 bg-stone-900 rounded-xl shadow-xl shadow-black/25 border border-stone-700/50 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
+          <!-- Pulse dot -->
+          <span class="absolute -top-1 -right-1 flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  <% end %>
+
   <% hide_mobile_nav = (controller_name == 'products' && action_name == 'show') || controller_name == 'carts' || controller_name == 'checkout' %>
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-40 safe-area-pb <%= 'hidden' if hide_mobile_nav %>">
     <div class="flex items-center justify-around h-14">
