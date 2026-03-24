@@ -95,7 +95,8 @@ Rails.application.configure do
   config.session_store :cookie_store,
     key: "_noralooks_session",
     same_site: :lax,
-    secure: false
+    secure: false,
+    expire_after: 30.days
 
   config.hosts << "www.noralooks.com"
 end

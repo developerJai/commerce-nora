@@ -35,11 +35,18 @@
 
       <!-- Category pills -->
       <div class="mt-8 sm:mt-10 flex flex-wrap justify-center gap-2">
-        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Sarees</span>
-        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Kurtis</span>
-        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Lehengas</span>
-        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Suits</span>
-        <span class="px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1]">Fusion Wear</span>
+        <% ethnic_parent = Category.active.find_by(name: 'Traditional Wear') || Category.active.find_by("name ILIKE ?", '%ethnic%') %>
+        <% if ethnic_parent %>
+          <% ethnic_parent.children.active.ordered.each do |child| %>
+            <%= link_to child.name, category_path(child.slug), class: 'px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1] hover:bg-white/[0.12] hover:text-white hover:border-white/[0.2] transition-all' %>
+          <% end %>
+        <% else %>
+          <%= link_to 'Sarees', products_path(q: 'sarees'), class: 'px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1] hover:bg-white/[0.12] hover:text-white hover:border-white/[0.2] transition-all' %>
+          <%= link_to 'Kurtis', products_path(q: 'kurtis'), class: 'px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1] hover:bg-white/[0.12] hover:text-white hover:border-white/[0.2] transition-all' %>
+          <%= link_to 'Lehengas', products_path(q: 'lehengas'), class: 'px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1] hover:bg-white/[0.12] hover:text-white hover:border-white/[0.2] transition-all' %>
+          <%= link_to 'Suits', products_path(q: 'suits'), class: 'px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1] hover:bg-white/[0.12] hover:text-white hover:border-white/[0.2] transition-all' %>
+          <%= link_to 'Fusion Wear', products_path(q: 'fusion wear'), class: 'px-4 py-2 bg-white/[0.06] text-white/70 text-xs sm:text-sm rounded-full border border-white/[0.1] hover:bg-white/[0.12] hover:text-white hover:border-white/[0.2] transition-all' %>
+        <% end %>
       </div>
     </div>
   </div>

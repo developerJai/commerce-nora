@@ -90,7 +90,8 @@ Rails.application.configure do
   config.session_store :cookie_store,
     key: "_noralooks_session",
     same_site: :lax,
-    secure: false
+    secure: false,
+    expire_after: 30.days
 
   # Add your staging server IP or hostname here
   config.hosts << "staging.noralooks.com"

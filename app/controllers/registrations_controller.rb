@@ -20,7 +20,7 @@ class RegistrationsController < ApplicationController
         end
       end
 
-      redirect_to root_path, notice: "Welcome to Auracraft!"
+      redirect_to session.delete(:return_to) || account_path
     else
       render :new, status: :unprocessable_entity
     end

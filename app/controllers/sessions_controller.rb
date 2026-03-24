@@ -22,8 +22,8 @@ class SessionsController < ApplicationController
         end
       end
 
-      # Redirect to stored location or root
-      redirect_to session.delete(:return_to) || root_path, notice: "Welcome back!"
+      # Redirect to stored location or account page
+      redirect_to session.delete(:return_to) || account_path
     else
       flash.now[:alert] = "Invalid email or password"
       @email = params[:email] # Preserve email for re-display

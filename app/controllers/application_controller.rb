@@ -20,7 +20,6 @@ class ApplicationController < ActionController::Base
     unless customer_logged_in?
       # Store the full URL to redirect back after login
       session[:return_to] = request.fullpath
-      flash[:alert] = "Please login to continue"
       redirect_to login_path
     end
   end

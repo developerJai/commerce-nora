@@ -71,6 +71,7 @@ class CartsController < ApplicationController
         # Check if cart has multiple vendors (same logic as show action)
         vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
         @multi_vendor = vendor_ids.size > 1
+        @coupons_enabled = StoreSetting.instance.coupons_enabled?
 
         # Group items by vendor if multi-vendor
         if @multi_vendor
@@ -81,7 +82,7 @@ class CartsController < ApplicationController
 
         # Update cart content based on whether cart is empty or not
         if current_cart.empty?
-          streams << turbo_stream.replace("cart-content", 
+          streams << turbo_stream.replace("cart-content",
             partial: "carts/empty_cart")
           streams << turbo_stream.update("cart-header",
             partial: "carts/header",
@@ -96,6 +97,9 @@ class CartsController < ApplicationController
           streams << turbo_stream.update("cart-summary-mobile",
             partial: "carts/summary_mobile",
             locals: { cart: @cart })
+          streams << turbo_stream.update("cart-coupon-section",
+            partial: "carts/coupon_section",
+            locals: { coupons_enabled: @coupons_enabled, multi_vendor: @multi_vendor })
         end
 
         # Update cart count badges
@@ -134,6 +138,7 @@ class CartsController < ApplicationController
         # Check if cart has multiple vendors (same logic as show action)
         vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
         @multi_vendor = vendor_ids.size > 1
+        @coupons_enabled = StoreSetting.instance.coupons_enabled?
 
         # Group items by vendor if multi-vendor
         if @multi_vendor
@@ -154,7 +159,7 @@ class CartsController < ApplicationController
 
         # Update cart content based on whether cart is empty or not
         if current_cart.empty?
-          streams << turbo_stream.replace("cart-content", 
+          streams << turbo_stream.replace("cart-content",
             partial: "carts/empty_cart")
           streams << turbo_stream.update("cart-header",
             partial: "carts/header",
@@ -169,6 +174,9 @@ class CartsController < ApplicationController
           streams << turbo_stream.update("cart-summary-mobile",
             partial: "carts/summary_mobile",
             locals: { cart: @cart })
+          streams << turbo_stream.update("cart-coupon-section",
+            partial: "carts/coupon_section",
+            locals: { coupons_enabled: @coupons_enabled, multi_vendor: @multi_vendor })
         end
 
         render turbo_stream: streams

@@ -48,8 +48,8 @@
 <!-- Add intl-tel-input CSS -->
 <%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css", "data-turbo-track": "reload" %>
 
-<div class="<%= request.user_agent&.include?('Hotwire') ? 'mobile-app min-h-screen' : 'sm:min-h-[60vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12' %>">
-  <div class="w-full max-w-md <%= request.user_agent&.include?('Hotwire') ? 'px-4 py-4' : '' %>">
+<div class="<%= request.user_agent&.include?('Hotwire') ? 'mobile-app flex items-end justify-center px-4 pb-8' : 'sm:min-h-[60vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12' %>">
+  <div class="w-full max-w-md <%= request.user_agent&.include?('Hotwire') ? '' : '' %>">
     <div class="bg-white <%= request.user_agent&.include?('Hotwire') ? '' : 'rounded-none sm:rounded-xl border-0 sm:border border-stone-200 p-5 sm:p-6 md:p-8' %>">
       <!-- Header -->
       <header class="text-center mb-6">

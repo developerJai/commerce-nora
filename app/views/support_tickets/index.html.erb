@@ -1,56 +1,54 @@
 <% content_for(:title) { "Support" } %>
 
 <div class="min-h-screen bg-stone-50">
-  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 lg:py-10">
-    <div class="flex flex-col md:flex-row gap-6 md:gap-8">
-      <div class="w-full md:w-72 flex-shrink-0">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-10">
+    <div class="flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8">
+      <div class="hidden md:block w-72 flex-shrink-0">
         <%= render 'shared/account_sidebar', active_page: 'support' %>
       </div>
 
-      <div class="flex-1 min-h-[600px]">
+      <div class="flex-1">
         <!-- Page Header -->
-        <div class="bg-white rounded-2xl border border-stone-200 p-5 lg:p-6 mb-6 shadow-sm">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-4 sm:p-5 lg:p-6 mb-4 sm:mb-6 shadow-sm">
+          <div class="flex items-center justify-between gap-3">
             <div>
-              <h1 class="text-2xl lg:text-3xl font-serif font-semibold text-stone-900 mb-1">Support Tickets</h1>
-              <p class="text-sm text-stone-600">Get help with your orders, payments, and deliveries</p>
+              <h1 class="text-xl sm:text-2xl lg:text-3xl font-serif font-semibold text-stone-900 mb-0.5 sm:mb-1">Support</h1>
+              <p class="text-xs sm:text-sm text-stone-600">Get help with your orders</p>
             </div>
-            <%= link_to new_support_ticket_path, class: 'inline-flex items-center justify-center gap-2 px-5 py-3 bg-rose-700 hover:bg-rose-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow-md transition-all' do %>
+            <%= link_to new_support_ticket_path, class: 'inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-rose-700 hover:bg-rose-800 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl shadow-sm transition-all' do %>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
               </svg>
-              New Ticket
+              <span class="hidden sm:inline">New Ticket</span>
+              <span class="sm:hidden">New</span>
             <% end %>
           </div>
         </div>
 
         <!-- Tickets List -->
         <% if @tickets.any? %>
-          <div class="space-y-3 lg:space-y-4">
+          <div class="space-y-2 sm:space-y-3 lg:space-y-4">
             <% @tickets.each do |ticket| %>
-              <%= link_to support_ticket_path(ticket), class: 'block bg-white rounded-xl border border-stone-200 hover:shadow-lg transition-all duration-200' do %>
-                <div class="p-4 lg:p-5">
-                  <div class="flex items-start justify-between gap-4 mb-3">
+              <%= link_to support_ticket_path(ticket), class: 'block bg-white rounded-xl border border-stone-200 hover:shadow-md transition-all duration-200' do %>
+                <div class="p-3.5 sm:p-4 lg:p-5">
+                  <div class="flex items-start justify-between gap-3">
                     <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-2 mb-2">
-                        <span class="text-xs font-mono text-stone-500 bg-stone-100 px-2 py-1 rounded"><%= ticket.ticket_number %></span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold <%= ticket_status_class(ticket.status) %>">
+                      <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 flex-wrap">
+                        <span class="text-[10px] sm:text-xs font-mono text-stone-500 bg-stone-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded"><%= ticket.ticket_number %></span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold <%= ticket_status_class(ticket.status) %>">
                           <%= ticket.status.titleize %>
                         </span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold <%= priority_class(ticket.priority) %>">
-                          <%= ticket.priority.titleize %>
-                        </span>
                       </div>
-                      <h3 class="text-base font-semibold text-stone-900 mb-1"><%= ticket.subject %></h3>
-                      <div class="flex items-center gap-3 text-sm text-stone-600">
+                      <h3 class="text-sm sm:text-base font-semibold text-stone-900 mb-1 line-clamp-2"><%= ticket.subject %></h3>
+                      <div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-stone-500">
                         <span><%= time_ago_in_words(ticket.created_at) %> ago</span>
                         <% if ticket.order %>
-                          <span class="text-stone-400">•</span>
-                          <span>Order: <%= ticket.order.order_number %></span>
+                          <span class="text-stone-300">•</span>
+                          <span class="truncate"><%= ticket.order.order_number %></span>
                         <% end %>
                       </div>
                     </div>
-                    <svg class="w-5 h-5 text-stone-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-stone-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
                   </div>

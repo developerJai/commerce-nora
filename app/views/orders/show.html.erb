@@ -12,14 +12,13 @@
       <div class="mb-4 sm:mb-6">
         <!-- Mobile: Stacked layout -->
         <div class="md:hidden">
-          <div class="flex items-center justify-between mb-2">
-            <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Order Details</h1>
-            <a href="<%= orders_path %>" onclick="if (window.history.length > 1) { window.history.back(); return false; }" class="inline-flex items-center gap-1.5 px-3 py-2 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 text-xs sm:text-sm font-medium rounded-lg transition-colors">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          <div class="flex items-center gap-2 mb-2">
+            <a href="<%= orders_path %>" onclick="if (window.history.length > 1) { window.history.back(); return false; }" class="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-stone-100 active:bg-stone-200 text-stone-600 transition-colors flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
-              <span>Back</span>
             </a>
+            <h1 class="text-xl sm:text-2xl font-serif font-semibold text-stone-900">Order Details</h1>
           </div>
           <div class="flex flex-col gap-2 mb-4">
             <div class="flex items-center gap-2">
@@ -33,7 +32,7 @@
           
           <!-- Mobile action buttons -->
           <div class="flex gap-2">
-            <%= link_to invoice_path(@order.order_number, format: :pdf), download: "Invoice_#{@order.order_number}.pdf", class: 'flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 active:bg-rose-950 text-white text-xs font-medium rounded-lg transition-colors whitespace-nowrap' do %>
+            <%= link_to invoice_path(@order.order_number, format: :pdf), target: (request.user_agent&.include?('Hotwire') ? '_blank' : nil), download: (request.user_agent&.include?('Hotwire') ? nil : "Invoice_#{@order.order_number}.pdf"), class: 'flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 active:bg-rose-950 text-white text-xs font-medium rounded-lg transition-colors whitespace-nowrap' do %>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>
@@ -212,18 +211,13 @@
           </div>
         </div>
       <% else %>
-        <!-- Cancelled Order Status - Mobile Optimized -->
-        <div class="bg-red-50 rounded-xl sm:rounded-2xl border border-red-200 p-4 sm:p-5 lg:p-6 mb-4 sm:mb-6">
-          <div class="flex items-start sm:items-center gap-3">
-            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-sm sm:text-base font-serif font-semibold text-red-900">Order Cancelled</h2>
-              <p class="text-xs sm:text-sm text-red-700 mt-0.5">This order has been cancelled and will not be processed.</p>
-            </div>
+        <!-- Cancelled Order Status -->
+        <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-200 p-4 sm:p-5 lg:p-6 mb-4 sm:mb-6">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-stone-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            <p class="text-sm sm:text-base text-stone-600">This order has been <span class="font-medium text-stone-900">cancelled</span> and will not be processed.</p>
           </div>
         </div>
       <% end %>

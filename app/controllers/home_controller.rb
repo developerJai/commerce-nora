@@ -4,6 +4,12 @@ class HomeController < ApplicationController
     @banners = Banner.visible.limit(5)
     @homepage_collections = HomepageCollection.visible.includes(items: { image_attachment: :blob })
     @featured_products = Product.active.featured.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).limit(10)
+    # Ensure minimum 6 bestseller listings
+    if @featured_products.length < 6
+      existing_ids = @featured_products.map(&:id)
+      filler = Product.active.where.not(id: existing_ids).includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).order(created_at: :desc).limit(6 - @featured_products.length)
+      @featured_products = @featured_products + filler
+    end
     @hot_selling_products = Product.active.hot_selling.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).limit(8)
     @new_arrivals = Product.active.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).order(created_at: :desc).limit(10)
     @categories = Category.active.root.ordered.includes(image_attachment: :blob).limit(8)
