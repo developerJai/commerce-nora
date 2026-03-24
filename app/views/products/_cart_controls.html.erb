@@ -8,11 +8,11 @@
        data-cart-controls-max-stock-value="<%= variant.stock_quantity %>">
     
     <!-- Quantity Selector -->
-    <div class="flex items-center border-2 border-rose-600 bg-rose-50 rounded-lg">
+    <div class="flex items-center border-2 border-[#D4AF37] bg-amber-50 rounded-lg">
       <!-- Decrease/Remove Button -->
-      <button type="button" 
+      <button type="button"
               data-action="click->cart-controls#decrement"
-              class="w-11 h-12 flex items-center justify-center text-rose-700 hover:bg-rose-100 transition"
+              class="w-11 h-12 flex items-center justify-center text-[#B8962E] hover:bg-amber-100 transition"
               title="<%= cart_item.quantity == 1 ? 'Remove from bag' : 'Decrease quantity' %>">
         <% if cart_item.quantity == 1 %>
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -25,21 +25,21 @@
       
       <!-- Quantity Display -->
       <div class="w-12 h-12 flex items-center justify-center">
-        <span class="text-base font-semibold text-rose-800"><%= cart_item.quantity %></span>
+        <span class="text-base font-semibold text-[#B8962E]"><%= cart_item.quantity %></span>
       </div>
       
       <!-- Increase Button -->
       <button type="button" 
               data-action="click->cart-controls#increment"
               <% if cart_item.quantity >= variant.stock_quantity %>disabled<% end %>
-              class="w-11 h-12 flex items-center justify-center text-rose-700 hover:bg-rose-100 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              class="w-11 h-12 flex items-center justify-center text-[#B8962E] hover:bg-amber-100 transition disabled:opacity-40 disabled:cursor-not-allowed"
               title="Increase quantity">
         <span class="text-xl font-light">+</span>
       </button>
     </div>
 
     <div class="flex-1 text-sm">
-      <p class="text-rose-700 font-medium">In your bag</p>
+      <p class="text-[#B8962E] font-medium">In your bag</p>
       <p class="text-stone-500 text-xs"><%= cart_item.quantity == 1 ? 'Click − to remove' : 'Update quantity or remove' %></p>
     </div>
   </div>
@@ -55,7 +55,7 @@
       <input type="hidden" name="from_product_page" value="1">
 
       <button type="submit"
-              class="w-full h-12 px-6 bg-rose-800 text-white font-medium rounded-lg hover:bg-rose-900 transition flex items-center justify-center gap-2">
+              class="w-full h-12 px-6 bg-[#B8962E] text-white font-medium rounded-lg hover:bg-[#A6872A] transition flex items-center justify-center gap-2">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
         </svg>
