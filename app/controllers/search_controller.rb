@@ -33,9 +33,10 @@ class SearchController < ApplicationController
       }
     end
 
-    # Search products
+    # Search products - use the same .active scope as the products list page
+    # which filters by active vendor, active category, and active product
     products = Product.active
-                     .where("products.name ILIKE ? OR products.description ILIKE ?", "%#{query}%", "%#{query}%")
+                     .search(query)
                      .includes(:variants, images_attachments: :blob)
                      .limit(5)
                      .map do |product|
@@ -50,10 +51,12 @@ class SearchController < ApplicationController
       }
     end
 
-    # Search variants by SKU or name
+    # Search variants - join through product's active scope to respect vendor/category filters
     variants = ProductVariant.active
-                            .joins(:product)
+                            .joins(product: [:vendor, :category])
                             .where(products: { active: true, deleted_at: nil })
+                            .where("vendors.active IS NULL OR vendors.active = ?", true)
+                            .where("categories.active IS NULL OR categories.active = ?", true)
                             .where("product_variants.name ILIKE ? OR product_variants.sku ILIKE ?", "%#{query}%", "%#{query}%")
                             .includes(:product, image_attachment: :blob)
                             .limit(5)
