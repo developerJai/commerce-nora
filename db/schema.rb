@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_23_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_175640) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -531,6 +531,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_100000) do
   end
 
   create_table "store_settings", force: :cascade do |t|
+    t.string "banner_accent_color", default: "#D4AF37"
+    t.string "banner_bg_color", default: "#0F0F0F"
+    t.string "banner_text_color", default: "#F5F5F5"
     t.text "company_address"
     t.string "company_phone"
     t.datetime "created_at", null: false

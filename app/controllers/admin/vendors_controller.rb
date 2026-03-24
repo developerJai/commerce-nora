@@ -1,7 +1,7 @@
 module Admin
   class VendorsController < BaseController
     before_action :require_admin_role!
-    before_action :set_vendor, only: [:show, :edit, :update, :destroy, :toggle_status, :act_as]
+    before_action :set_vendor, only: [:show, :edit, :update, :destroy, :toggle_status, :act_as, :reset_password]
 
     def index
       @q = params[:q]
@@ -95,6 +95,35 @@ module Admin
       respond_to do |format|
         format.html { redirect_to admin_vendors_path, notice: "Vendor #{@vendor.active? ? 'enabled' : 'disabled'}" }
         format.turbo_stream { render turbo_stream: turbo_stream.replace(@vendor) }
+      end
+    end
+
+    def reset_password
+      admin_user = @vendor.admin_users.first
+
+      unless admin_user
+        redirect_to admin_vendor_path(@vendor), alert: "No login account found for this vendor"
+        return
+      end
+
+      new_password = params[:vendor][:password]
+      password_confirmation = params[:vendor][:password_confirmation]
+
+      if new_password.blank?
+        redirect_to admin_vendor_path(@vendor), alert: "Password cannot be blank"
+        return
+      end
+
+      if new_password != password_confirmation
+        redirect_to admin_vendor_path(@vendor), alert: "Password and confirmation do not match"
+        return
+      end
+
+      if admin_user.update(password: new_password, password_confirmation: password_confirmation)
+        flash[:reset_password] = new_password
+        redirect_to admin_vendor_path(@vendor), notice: "Password reset successfully. Copy the password below and share it with the vendor."
+      else
+        redirect_to admin_vendor_path(@vendor), alert: admin_user.errors.full_messages.to_sentence
       end
     end
 

@@ -91,6 +91,67 @@
       </div>
     </div>
 
+    <!-- Banner Colors Section -->
+    <div class="mt-8">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">Announcement Banner Colors</h2>
+      <p class="text-sm text-gray-500 mb-4">Customize the colors of the top promotional banner (e.g., "Free Shipping" bar).</p>
+
+      <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <!-- Live Preview -->
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase mb-2">Preview</p>
+          <div id="banner-preview" class="text-center py-2 px-3 rounded-lg" style="background-color: <%= @store_setting.effective_banner_bg_color %>;">
+            <p class="text-sm" style="color: <%= @store_setting.effective_banner_text_color %>;">
+              <span class="font-medium" style="color: <%= @store_setting.effective_banner_accent_color %>;">Free Shipping</span> on orders above ₹499 | 24-Hour Dispatch
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <%= f.label :banner_bg_color, "Background Color", class: "block text-sm font-semibold text-gray-900 mb-1" %>
+            <div class="flex items-center gap-2">
+              <%= f.color_field :banner_bg_color,
+                  value: @store_setting.effective_banner_bg_color,
+                  class: "h-10 w-14 rounded border border-gray-300 cursor-pointer",
+                  data: { action: "input->banner-preview#update" } %>
+              <%= f.text_field :banner_bg_color,
+                  value: @store_setting.effective_banner_bg_color,
+                  class: "flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono uppercase",
+                  data: { banner_preview_target: "bgInput" } %>
+            </div>
+          </div>
+          <div>
+            <%= f.label :banner_text_color, "Text Color", class: "block text-sm font-semibold text-gray-900 mb-1" %>
+            <div class="flex items-center gap-2">
+              <%= f.color_field :banner_text_color,
+                  value: @store_setting.effective_banner_text_color,
+                  class: "h-10 w-14 rounded border border-gray-300 cursor-pointer",
+                  data: { action: "input->banner-preview#update" } %>
+              <%= f.text_field :banner_text_color,
+                  value: @store_setting.effective_banner_text_color,
+                  class: "flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono uppercase",
+                  data: { banner_preview_target: "textInput" } %>
+            </div>
+          </div>
+          <div>
+            <%= f.label :banner_accent_color, "Accent Color", class: "block text-sm font-semibold text-gray-900 mb-1" %>
+            <div class="flex items-center gap-2">
+              <%= f.color_field :banner_accent_color,
+                  value: @store_setting.effective_banner_accent_color,
+                  class: "h-10 w-14 rounded border border-gray-300 cursor-pointer",
+                  data: { action: "input->banner-preview#update" } %>
+              <%= f.text_field :banner_accent_color,
+                  value: @store_setting.effective_banner_accent_color,
+                  class: "flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono uppercase",
+                  data: { banner_preview_target: "accentInput" } %>
+            </div>
+          </div>
+        </div>
+        <p class="text-xs text-gray-400">Click the color swatch to pick a color, or type a hex code directly.</p>
+      </div>
+    </div>
+
     <!-- Delivery Settings Section -->
     <div class="mt-8">
       <h2 class="text-lg font-bold text-gray-900 mb-4">Delivery Settings</h2>

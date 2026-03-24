@@ -79,7 +79,7 @@
   <div class="p-2 sm:p-3 flex flex-col flex-1">
     <!-- Product Name -->
     <%= link_to product_path_url, data: { turbo_frame: '_top' }, class: 'block' do %>
-      <h3 class="text-xs sm:text-sm font-medium text-stone-800 group-hover:text-rose-800 line-clamp-2 h-[2.25rem] sm:h-[2.5rem] transition"><%= product.name %></h3>
+      <h3 class="text-xs sm:text-sm font-medium text-stone-800 group-hover:text-[#D4AF37] line-clamp-2 h-[2.25rem] sm:h-[2.5rem] transition"><%= product.name %></h3>
     <% end %>
     
     <!-- Variant Name (when showing from wishlist) -->
@@ -108,7 +108,7 @@
     <div class="mt-1.5 sm:mt-2">
       <% if variant&.on_sale? && variant.compare_at_price.present? %>
         <div class="flex items-baseline gap-1.5 sm:gap-2 flex-wrap">
-          <span class="text-sm sm:text-base font-semibold text-rose-800"><%= format_price(variant.price) %></span>
+          <span class="text-sm sm:text-base font-semibold text-[#B8962E]"><%= format_price(variant.price) %></span>
           <span class="text-[10px] sm:text-xs text-stone-400 line-through"><%= format_price(variant.compare_at_price) %></span>
         </div>
       <% else %>

@@ -93,6 +93,25 @@ class StoreSetting < ApplicationRecord
     delivery_charge_amount.presence || 99.0
   end
 
+  # Banner colors
+  BANNER_DEFAULTS = {
+    bg_color: "#7A0C14",
+    text_color: "#FFFFFF",
+    accent_color: "#FFD700"
+  }.freeze
+
+  def effective_banner_bg_color
+    banner_bg_color.presence || BANNER_DEFAULTS[:bg_color]
+  end
+
+  def effective_banner_text_color
+    banner_text_color.presence || BANNER_DEFAULTS[:text_color]
+  end
+
+  def effective_banner_accent_color
+    banner_accent_color.presence || BANNER_DEFAULTS[:accent_color]
+  end
+
   # Social media URLs
   def social_media_links
     {

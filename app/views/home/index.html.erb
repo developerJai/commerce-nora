@@ -173,7 +173,9 @@
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- HERO SECTION                                               -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<section class="relative bg-gradient-to-b from-[#1a1410] via-[#1c1612] to-[#211a14]">
+<section class="relative" style="background: linear-gradient(to bottom, #2B1B0E, #0F0F0F);">
+  <!-- Base overlay for contrast -->
+  <div class="absolute inset-0 pointer-events-none" style="background: rgba(15,15,15,0.75);"></div>
   <!-- Decorative overlays (clipped to section bounds) -->
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
     <!-- Subtle texture overlay -->
@@ -204,9 +206,9 @@
 
       <!-- Heading with gold highlight -->
       <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-semibold mb-4 sm:mb-6 leading-tight tracking-tight">
-        <span class="text-stone-200">Discover</span>
+        <span style="color: #F5F5F5;">Discover</span>
         <br class="sm:hidden">
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400"> <%= @hero_heading_highlight %></span>
+        <span style="color: #D4AF37;"> <%= @hero_heading_highlight %></span>
       </h1>
 
       <!-- Subtext - warmer tone -->
@@ -230,7 +232,7 @@
             <button type="button" data-search-autocomplete-target="clearButton" data-action="click->search-autocomplete#clearInput" class="hidden absolute right-28 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-600">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
-            <button type="submit" class="absolute right-1.5 top-1/2 -translate-y-1/2 h-11 px-6 bg-gradient-to-r from-rose-800 to-rose-900 hover:from-rose-700 hover:to-rose-800 text-white text-sm font-medium rounded-full transition shadow-lg shadow-rose-900/40">
+            <button type="submit" class="absolute right-1.5 top-1/2 -translate-y-1/2 h-11 px-6 text-white text-sm font-medium rounded-full transition shadow-lg" style="background-color: #B8962E;" onmouseover="this.style.backgroundColor='#A6872A'" onmouseout="this.style.backgroundColor='#B8962E'">
               Search
             </button>
           </div>
@@ -277,7 +279,7 @@
 
 </section>
 <!-- Hero wave transition: dark bg with wavy light edge at bottom -->
-<div class="relative h-20 sm:h-28 md:h-36 bg-[#211a14] overflow-hidden">
+<div class="relative h-20 sm:h-28 md:h-36 bg-[#0F0F0F] overflow-hidden">
   <!-- Animated wavy bottom edge -->
   <svg class="absolute bottom-0 left-0 w-[200%] h-full wave-1" viewBox="0 0 2880 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <path fill="#fafaf9" d="M0,60 C240,30 480,80 720,50 C960,20 1200,70 1440,45 C1680,20 1920,75 2160,48 C2400,21 2640,68 2880,40 L2880,120 L0,120 Z"/>
@@ -361,7 +363,7 @@
         <p class="text-amber-700 text-[10px] sm:text-xs font-medium tracking-[0.15em] uppercase mb-1">Customer Favourites</p>
         <h2 class="text-xl sm:text-2xl md:text-3xl font-serif font-semibold text-stone-900">Bestsellers</h2>
       </div>
-      <%= link_to products_path, class: 'group flex items-center gap-1.5 text-rose-800 hover:text-rose-900 text-xs sm:text-sm font-medium transition' do %>
+      <%= link_to products_path, class: 'group flex items-center gap-1.5 text-[#D4AF37] hover:text-[#B8962E] text-xs sm:text-sm font-medium transition' do %>
         View All
         <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
       <% end %>
@@ -401,7 +403,7 @@
   <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
     <div class="relative rounded-2xl sm:rounded-3xl overflow-hidden">
       <!-- Dark luxury background -->
-      <div class="absolute inset-0 bg-gradient-to-br from-stone-900 via-rose-950 to-stone-900"></div>
+      <div class="absolute inset-0" style="background: linear-gradient(135deg, #1A1A1A, #0F0F0F);"></div>
       <!-- Subtle pattern -->
       <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px;"></div>
       <!-- Gold accent -->
@@ -440,7 +442,7 @@
         <p class="text-amber-700 text-[10px] sm:text-xs font-medium tracking-[0.15em] uppercase mb-1">Just Dropped</p>
         <h2 class="text-xl sm:text-2xl md:text-3xl font-serif font-semibold text-stone-900">New Arrivals</h2>
       </div>
-      <%= link_to products_path(sort: 'newest'), class: 'group flex items-center gap-1.5 text-rose-800 hover:text-rose-900 text-xs sm:text-sm font-medium transition' do %>
+      <%= link_to products_path(sort: 'newest'), class: 'group flex items-center gap-1.5 text-[#D4AF37] hover:text-[#B8962E] text-xs sm:text-sm font-medium transition' do %>
         View All
         <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
       <% end %>

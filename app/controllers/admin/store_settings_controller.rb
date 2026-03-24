@@ -30,7 +30,7 @@ module Admin
       end
 
       # Company details, coupon, delivery, and social media — permit individually so missing keys are safely ignored
-      company_params = params.fetch(:store_setting, {}).permit(:gst_number, :company_address, :company_phone, :enable_coupons, :free_delivery_min_amount, :delivery_charge_amount, :youtube_url, :instagram_url, :facebook_url, :twitter_url)
+      company_params = params.fetch(:store_setting, {}).permit(:gst_number, :company_address, :company_phone, :enable_coupons, :free_delivery_min_amount, :delivery_charge_amount, :youtube_url, :instagram_url, :facebook_url, :twitter_url, :banner_bg_color, :banner_text_color, :banner_accent_color)
       updates.merge!(company_params)
 
       if @store_setting.update(**updates)

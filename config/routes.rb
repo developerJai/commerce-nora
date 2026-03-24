@@ -131,6 +131,7 @@ Rails.application.routes.draw do
       member do
         patch :toggle_status
         post :act_as
+        patch :reset_password
       end
     end
     delete "exit_vendor_mode", to: "vendors#exit_vendor_mode"
