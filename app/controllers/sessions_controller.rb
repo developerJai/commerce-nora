@@ -134,7 +134,7 @@ class SessionsController < ApplicationController
 
     record.update(
       otp: otp,
-      expires_at: 5.minutes.from_now
+      expires_at: 2.minutes.from_now
     )
 
     # ✅ ADD THIS
@@ -167,7 +167,7 @@ class SessionsController < ApplicationController
 
     record.update(
       otp: otp,
-      expires_at: 5.minutes.from_now
+      expires_at: 2.minutes.from_now
     )
 
     # ✅ RESET TIMER AGAIN

@@ -55,9 +55,13 @@
 
   <!-- FORM -->
   <%= form_with url: check_login_path,
-    method: :post,
-    data: { turbo_frame: "login_step", controller: "login-input" },
-    class: "space-y-5" do |f| %>
+  method: :post,
+  data: {
+    turbo_frame: "login_step",
+    controller: "login-input",
+    action: "submit->login-input#validate"
+  },
+  class: "space-y-5" do |f| %>
 
     <!-- LABEL -->
     <div>

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["firstName", "lastName", "email", "emailError", "phone", "phoneError", "password", "passwordConfirmation","passwordMatchError","passwordError", "form", "submitButton"]
+  static targets = ["firstName", "lastName", "email", "emailError", "phone", "phoneError", "countryCode", "password", "passwordConfirmation","passwordMatchError","passwordError", "form", "submitButton"]
   
   connect() {
     this.phoneInputInstance = null
@@ -38,14 +38,30 @@ export default class extends Controller {
         this.phoneInputInstance.destroy()
       }
 
+      // Get initial country from countryCode target or default to 'in'
+      let initialCountry = 'in' // Default to India
+      if (this.hasCountryCodeTarget) {
+        const countryCode = this.countryCodeTarget.value
+        if (countryCode === '+1') initialCountry = 'us'
+        else if (countryCode === '+44') initialCountry = 'gb'
+        else if (countryCode === '+91') initialCountry = 'in'
+        else if (countryCode === '+61') initialCountry = 'au'
+        else if (countryCode === '+1') initialCountry = 'ca'
+      }
+
       // Initialize intl-tel-input
       this.phoneInputInstance = window.intlTelInput(this.phoneTarget, {
-        initialCountry: 'us',
+        initialCountry: initialCountry,
         separateDialCode: true,
         utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js',
-        preferredCountries: ['us', 'gb', 'in', 'ca', 'au'],
+        preferredCountries: ['in', 'us', 'gb', 'ca', 'au'],
         customPlaceholder: () => 'Enter phone number',
         formatOnInit: true
+      })
+
+      // Update countryCode when country changes
+      this.phoneTarget.addEventListener('countrychange', () => {
+        this.updateCountryCode()
       })
     }
   }
@@ -104,12 +120,23 @@ export default class extends Controller {
             break
         }
 
-        // Special validation for India (10 digits)
+        // Country-specific validation
         const countryData = this.phoneInputInstance.getSelectedCountryData()
+        const phoneNumber = this.phoneTarget.value.replace(/\D/g, '')
+        
         if (countryData.iso2 === 'in') {
-          const phoneNumber = this.phoneTarget.value.replace(/\D/g, '')
           if (phoneNumber.length !== 10) {
             errorMessage = 'phone numbers must be exactly 10 digits'
+          } else if (!phoneNumber.match(/^[6-9]/)) {
+            errorMessage = 'mobile numbers must start with 6, 7, 8, or 9'
+          }
+        } else if (countryData.iso2 === 'us' || countryData.iso2 === 'ca') {
+          if (phoneNumber.length !== 10) {
+            errorMessage = 'US/Canada phone numbers must be exactly 10 digits'
+          }
+        } else if (countryData.iso2 === 'gb') {
+          if (phoneNumber.length < 10 || phoneNumber.length > 11) {
+            errorMessage = 'UK phone numbers must be 10-11 digits'
           }
         }
 
@@ -127,6 +154,14 @@ export default class extends Controller {
       this.phoneTarget.classList.remove('border-red-500')
       return true // Phone is optional
     }
+  }
+
+  updateCountryCode() {
+    if (!this.hasCountryCodeTarget || !this.phoneInputInstance) return
+
+    const countryData = this.phoneInputInstance.getSelectedCountryData()
+    const dialCode = '+' + countryData.dialCode
+    this.countryCodeTarget.value = dialCode
   }
 
   // Email Validation Helper
@@ -308,21 +343,31 @@ export default class extends Controller {
 
   // Form Submission
   submit(event) {
-    if (!this.validateForm()) {
+
+    let isValid = true
+
+    // 🔴 PHONE VALIDATION
+    if (!this.validatePhone()) {
+      isValid = false
+    }
+
+    // ❌ Agar invalid hai → STOP
+    if (!isValid) {
       event.preventDefault()
+
+      // 👉 scroll to error (UX 🔥)
+      this.phoneTarget.focus()
+
       return
     }
 
-    // Show loading state
-    this.showLoading()
+    // ✅ VALID → full number bhejo
+    const fullNumber = this.phoneInputInstance.getNumber()
 
-    // Format phone number with country code
-    if (this.hasPhoneTarget && this.phoneTarget.value.trim() && this.phoneInputInstance) {
-      const fullNumber = this.phoneInputInstance.getNumber()
-      this.phoneTarget.value = fullNumber
+    const hiddenInput = document.getElementById("full_phone")
+    if (hiddenInput) {
+      hiddenInput.value = fullNumber
     }
-
-    // Form will submit normally - don't prevent default
   }
 
   // showLoading() {

@@ -14,6 +14,21 @@ export default class extends Controller {
     "button"
   ]
 
+  connect() {
+    this.loadUtils()
+  }
+
+  // 🔥 LOAD GOOGLE LIBPHONENUMBER (via intl utils)
+  loadUtils() {
+    if (window.intlTelInputUtils) return
+
+    const script = document.createElement("script")
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js"
+    document.head.appendChild(script)
+  }
+
+  // ================= DROPDOWN =================
+
   toggle() {
     this.dropdownTarget.classList.toggle("hidden")
 
@@ -35,80 +50,90 @@ export default class extends Controller {
     const item = event.currentTarget
     const code = item.dataset.code
 
-    // ONLY CODE SHOW
     this.buttonTarget.textContent = code
-
-    // hidden input
     this.countryCodeTarget.value = code
 
     this.dropdownTarget.classList.add("hidden")
+
+    // 🔥 revalidate after change
+    this.validate()
   }
 
   // ================= VALIDATION =================
 
-  validate(){
-
+  validate() {
     const value = this.inputTarget.value.trim()
 
     // EMPTY
-    if(value === ""){
+    if (value === "") {
       this.countryWrapperTarget.classList.add("hidden")
-      this.errorTarget.classList.add("hidden")
-      this.submitTarget.disabled = true
+      this.disable("")
       return
     }
 
-    const isNumber = /^[0-9]+$/.test(value)
+    // EMAIL CHECK
+    if (this.isEmail(value)) {
+      this.countryWrapperTarget.classList.add("hidden")
+      this.dropdownTarget.classList.add("hidden")
+      this.enable()
+      return
+    }
 
-    if(isNumber){
+    // NUMBER CHECK
+    if (/^[0-9]+$/.test(value)) {
 
       this.countryWrapperTarget.classList.remove("hidden")
 
-      const countryCode = this.countryCodeTarget.value
+      const countryCode = this.countryCodeTarget.value.replace("+", "")
+      const fullNumber = "+" + countryCode + value
 
-      // INDIA
-      if(countryCode === "+91"){
-        if(value.length === 10 && /^[6-9]/.test(value)){
+      // 🔥 DYNAMIC VALIDATION (ALL COUNTRIES)
+      if (window.intlTelInputUtils) {
+
+        const isValid = window.intlTelInputUtils.isValidNumber(
+          fullNumber,
+          countryCode
+        )
+
+        if (isValid) {
           this.enable()
-        }else{
-          this.disable("Enter valid mobile number")
+        } else {
+          this.disable("Enter valid phone number")
         }
-        return
-      }
 
-      // OTHER COUNTRIES
-      if(value.length >= 6 && value.length <= 12){
-        this.enable()
-      }else{
-        this.disable("Invalid phone number")
+      } else {
+        // fallback (rare)
+        if (value.length >= 6) {
+          this.enable()
+        } else {
+          this.disable("Invalid phone number")
+        }
       }
 
       return
     }
 
-    // EMAIL
-    this.countryWrapperTarget.classList.add("hidden")
-    this.dropdownTarget.classList.add("hidden") // close dropdown
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-    if(emailRegex.test(value)){
-      this.enable()
-    }else{
-      this.disable("Enter valid email address")
-    }
-
+    // INVALID INPUT
+    this.disable("Enter valid email or phone number")
   }
 
-  enable(){
+  isEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+  }
+
+  enable() {
     this.submitTarget.disabled = false
     this.errorTarget.classList.add("hidden")
+    this.inputTarget.classList.remove("border-red-500")
   }
 
-  disable(message){
+  disable(message) {
     this.submitTarget.disabled = true
-    this.errorTarget.textContent = message
-    this.errorTarget.classList.remove("hidden")
-  }
 
+    if (message) {
+      this.errorTarget.textContent = message
+      this.errorTarget.classList.remove("hidden")
+      this.inputTarget.classList.add("border-red-500")
+    }
+  }
 }
