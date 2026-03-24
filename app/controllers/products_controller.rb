@@ -61,7 +61,8 @@ class ProductsController < ApplicationController
     # ── Sort and paginate ───────────────────────────────────────────
     products = build_sorted_products(final_product_ids, @sort, @in_stock)
 
-    @pagy, @products = pagy(products, limit: 16, count: final_product_ids.length)
+    per_page = helpers.mobile_request? ? 16 : 15
+    @pagy, @products = pagy(products, limit: per_page, count: final_product_ids.length)
     @category_tree = Category.grouped_for_filters
 
     # ── Filter visibility (admin-configurable) ───────────────────────

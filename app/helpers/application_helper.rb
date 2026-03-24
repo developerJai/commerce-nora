@@ -72,6 +72,10 @@ module ApplicationHelper
     is_android
   end
 
+  def mobile_request?
+    request.user_agent&.match?(/Mobile|Android|iPhone|iPad|iPod/i)
+  end
+
   def free_delivery_threshold
     StoreSetting.free_delivery_threshold
   end

@@ -230,12 +230,14 @@ export default class extends Controller {
     const grid = document.getElementById('products-grid')
     if (!grid || document.querySelector('.skeleton-loader')) return
 
+    const isMobile = window.innerWidth < 768
+    const cardCount = isMobile ? 4 : 6
+    const cards = Array(cardCount).fill(this.createSkeletonCard()).join('')
+
     const skeletonHTML = `
       <div class="skeleton-loader col-span-2 sm:col-span-2 md:col-span-3 mt-4">
         <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-          ${this.createSkeletonCard()}
-          ${this.createSkeletonCard()}
-          ${this.createSkeletonCard()}
+          ${cards}
         </div>
       </div>
     `

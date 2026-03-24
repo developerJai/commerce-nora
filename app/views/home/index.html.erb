@@ -365,9 +365,11 @@
     </div>
     <div class="w-16 h-px gold-divider mb-6 sm:mb-8"></div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
-      <% @featured_products.each do |product| %>
-        <%= render 'shared/product_card', product: product %>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
+      <% @featured_products.each_with_index do |product, index| %>
+        <div class="<%= 'md:hidden' if index == 5 %>">
+          <%= render 'shared/product_card', product: product %>
+        </div>
       <% end %>
     </div>
   </div>

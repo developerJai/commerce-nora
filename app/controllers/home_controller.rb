@@ -3,7 +3,7 @@ class HomeController < ApplicationController
     @homepage_settings = HomepageSetting.current
     @banners = Banner.visible.limit(5)
     @homepage_collections = HomepageCollection.visible.includes(items: { image_attachment: :blob })
-    @featured_products = Product.active.featured.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).limit(10)
+    @featured_products = Product.active.featured.includes({ variants: { image_attachment: :blob } }, images_attachments: :blob).limit(6)
     # Ensure minimum 6 bestseller listings
     if @featured_products.length < 6
       existing_ids = @featured_products.map(&:id)
