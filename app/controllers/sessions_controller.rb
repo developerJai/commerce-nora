@@ -107,14 +107,16 @@ class SessionsController < ApplicationController
     end
   end
 
-  # SEND OTP
-# SEND OTP
   def send_otp
     login = params[:login].to_s.strip
     country_code = params[:country_code]
     otp_type = params[:type] || "login"
 
+    otp = rand(100000..999999)
+    token = SecureRandom.uuid
+
     if login.include?("@")
+      # 🔥 EMAIL FLOW
       customer = Customer.find_by(email: login)
 
       unless customer
@@ -123,36 +125,62 @@ class SessionsController < ApplicationController
       end
 
       full_phone = customer.phone
+
+      record = OtpVerification.find_or_initialize_by(phone: full_phone)
+
+      if otp_type == "reset"
+        record.update(
+          otp: otp,
+          expires_at: 2.minutes.from_now,
+          reset_token: token,
+          reset_sent_at: Time.current
+        )
+
+        reset_link = "#{request.base_url}/password/request/email?token=#{token}&login=#{customer.email}"
+
+        # ✅ SEND EMAIL
+        UserMailer.reset_password_email(customer, otp, reset_link).deliver_now
+
+        redirect_to password_request_email_path(token: token, login: customer.email),
+                    notice: "OTP and reset link sent to your email"
+      else
+        record.update(
+          otp: otp,
+          expires_at: 2.minutes.from_now
+        )
+
+        redirect_to otp_path(token: token)
+      end
+
     else
+      # 📲 PHONE FLOW
       full_phone = login.start_with?("+") ? login : "#{country_code}#{login}"
+
+      record = OtpVerification.find_or_initialize_by(phone: full_phone)
+
+      record.update(
+        otp: otp,
+        expires_at: 2.minutes.from_now
+      )
+
+      # 👉 Yaha SMS API (Twilio etc)
+      puts "Send OTP SMS: #{otp}"
+
+      if otp_type == "reset"
+        redirect_to forgototp_path(token: token),
+                    notice: "OTP sent to your phone"
+      else
+        redirect_to otp_path(token: token)
+      end
     end
 
-    otp = rand(100000..999999)
-    token = SecureRandom.uuid
-
-    record = OtpVerification.find_or_initialize_by(phone: full_phone)
-
-    record.update(
-      otp: otp,
-      expires_at: 2.minutes.from_now
-    )
-
-    # ✅ ADD THIS
-    session[:otp_sent_at] = Time.current.to_i
-
+    # ✅ COMMON SESSION
     session[:otp_phone] = full_phone
     session[:otp_token] = token
     session[:otp_type] = otp_type
     session[:otp_sent_at] = Time.current.to_i
-
-    if otp_type == "reset"
-      redirect_to forgototp_path(token: token)
-    else
-      redirect_to otp_path(token: token)
-    end
   end
 
-  # RESEND OTP
   def resend_otp
     phone = session[:otp_phone]
 
@@ -193,7 +221,7 @@ class SessionsController < ApplicationController
 
     # ⏱ Expired OTP
     if record.expired?
-      record.destroy
+      record.update(reset_token: nil)
       session.delete(:otp_phone)
       session.delete(:otp_token)
       session.delete(:otp_type)
@@ -237,7 +265,7 @@ class SessionsController < ApplicationController
       end
 
       # 🧹 cleanup
-      record.destroy
+      record.update(reset_token: nil)
       session.delete(:otp_phone)
       session.delete(:otp_token)
       session.delete(:otp_type)
@@ -265,6 +293,7 @@ class SessionsController < ApplicationController
 
   def forgot_password
     @login = params[:login]
+    @is_phone = @login.match?(/\A\d{10,15}\z/)
     @country_code = params[:country_code]
   end
 
@@ -295,37 +324,69 @@ class SessionsController < ApplicationController
     end
   end
 
-  def password_update
-    @customer = Customer.find_by(id: session[:reset_customer_id])
+def password_update
+  @customer = Customer.find_by(id: session[:reset_customer_id])
 
-    unless @customer
-      redirect_to forgotpassword_path, alert: "Session expired"
-      return
-    end
+  unless @customer
+    redirect_to forgotpassword_path, alert: "Session expired"
+    return
+  end
 
-    if params[:password].blank? || params[:password_confirmation].blank?
-      flash.now[:alert] = "Password fields cannot be blank"
-      render :change_password and return
-    end
+  if params[:password].blank? || params[:password_confirmation].blank?
+    flash.now[:alert] = "Password fields cannot be blank"
+    render :change_password and return
+  end
 
-    if params[:password] != params[:password_confirmation]
-      flash.now[:alert] = "Passwords do not match"
-      render :change_password and return
-    end
+  if params[:password] != params[:password_confirmation]
+    flash.now[:alert] = "Passwords do not match"
+    render :change_password and return
+  end
 
-    if @customer.update(password: params[:password],
-                        password_confirmation: params[:password_confirmation])
+  if @customer.update(password: params[:password],
+                      password_confirmation: params[:password_confirmation])
+
     reset_session
     session[:customer_id] = @customer.id
 
-      # ✅ cleanup
-      session.delete(:reset_customer_id)
+    redirect_to root_path, notice: "Password updated successfully ✅"
 
-      redirect_to root_path, notice: "Password updated successfully"
-    else
-      flash.now[:alert] = @customer.errors.full_messages.join(", ")
-      render :change_password
+  else
+    # 🔥 DEBUG LINE
+    Rails.logger.info "ERRORS ===== #{@customer.errors.full_messages}"
+
+    flash.now[:alert] = @customer.errors.full_messages.join(", ")
+    render :change_password
+  end
+end
+
+  def password_request_email
+    token = params[:token]
+
+    record = OtpVerification.find_by(reset_token: token)
+
+    # ❌ PEHLE record check karo
+    if record.nil? || record.reset_sent_at < 10.minutes.ago
+      redirect_to signin_path, alert: "Link expired"
+      return
     end
+
+    # ✅ AB safe hai record use karna
+    customer = Customer.find_by(phone: record.phone)
+
+    if customer.nil?
+      redirect_to signin_path, alert: "User not found"
+      return
+    end
+
+    # ✅ SESSION SET
+    session[:otp_phone] = record.phone
+    session[:otp_token] = token
+    session[:otp_type] = "reset"
+
+    # ✅ VIEW DATA
+    @login = customer.email
+    @country_code = "+91"
+    @remaining_time = (record.expires_at - Time.current).to_i
   end
 
   private

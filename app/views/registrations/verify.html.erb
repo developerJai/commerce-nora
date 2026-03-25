@@ -46,7 +46,7 @@
          <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>.
       </p>
       <!-- Resend -->
-      <div data-controller="otp"
+      <div data-controller="otp" class="text-center mt-4"
            data-otp-time-value="<%= @remaining_time %>">
 
         <span data-otp-target="timerText" class="text-gray-500 text-sm">
@@ -67,7 +67,7 @@
          <div class="flex-grow border-t border-gray-300"></div>
       </div>
       <% if @otp_type == "whatsapp" %>
-      <%= button_to "Send OTP via SMS",
+      <%= button_to "Get an OTP on your phone",
          signup_resend_otp_path,
          method: :post,
          params: { type: "sms" },

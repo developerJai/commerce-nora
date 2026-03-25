@@ -202,6 +202,7 @@ Rails.application.routes.draw do
   get   "/forgototp", to: "sessions#forgot_otp"
   get   "/change/password", to: "sessions#change_password"
   post 'password_update', to: 'sessions#password_update'
+  get "/password/request/email", to: "sessions#password_request_email"
 
   # Account
   resource :account, only: [ :show, :edit, :update ] do

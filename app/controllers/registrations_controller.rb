@@ -217,12 +217,22 @@ class RegistrationsController < ApplicationController
       expires_at: 2.minutes.from_now
     )
 
-    session[:otp_type] = params[:type] if params[:type].present?
+    otp_type = params[:type] || session[:otp_type] || "sms"
+    session[:otp_type] = otp_type
 
     session[:otp_sent_at] = Time.current.to_i
 
+    notice_message =
+    if otp_type == "whatsapp"
+      "OTP has been sent to WhatsApp"
+    elsif otp_type == "sms"
+      "OTP has been sent to SMS"
+    else
+      "OTP resent successfully"
+    end
+
     redirect_back fallback_location: signup_verify_path,
-                  notice: "OTP resent successfully"
+                  notice: notice_message
   end
   
   # def create
