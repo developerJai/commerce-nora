@@ -117,6 +117,9 @@ class CartsController < ApplicationController
             locals: { variant: @variant, cart_item: @cart_item })
         end
 
+        # Notify native app of cart count change
+        streams << native_cart_count_stream
+
         render turbo_stream: streams
       end
     end
@@ -179,6 +182,9 @@ class CartsController < ApplicationController
             locals: { coupons_enabled: @coupons_enabled, multi_vendor: @multi_vendor })
         end
 
+        # Notify native app of cart count change
+        streams << native_cart_count_stream
+
         render turbo_stream: streams
       end
     end
@@ -218,5 +224,19 @@ class CartsController < ApplicationController
 
   def set_cart_item
     @cart_item = current_cart.cart_items.find_by!(product_variant_id: params[:variant_id])
+  end
+
+  def native_cart_count_stream
+    count = current_cart.item_count
+    turbo_stream.append("native-bridge") do
+      helpers.content_tag(:script, <<~JS.html_safe)
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.cartCount) {
+          window.webkit.messageHandlers.cartCount.postMessage(#{count});
+        }
+        if (window.NoralooksAndroid && window.NoralooksAndroid.updateCartCount) {
+          window.NoralooksAndroid.updateCartCount(#{count});
+        }
+      JS
+    end
   end
 end

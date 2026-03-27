@@ -1,0 +1,10 @@
+<%= turbo_stream.append "native-bridge" do %>
+  <script>
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.cartCount) {
+      window.webkit.messageHandlers.cartCount.postMessage(<%= current_cart.item_count %>);
+    }
+    if (window.NoralooksAndroid && window.NoralooksAndroid.updateCartCount) {
+      window.NoralooksAndroid.updateCartCount(<%= current_cart.item_count %>);
+    }
+  </script>
+<% end %>

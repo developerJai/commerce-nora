@@ -271,6 +271,12 @@ Rails.application.routes.draw do
     get "failure", to: "callbacks#failure"
   end
 
+  # Mobile app API
+  namespace :api do
+    get "mobile/navigation", to: "mobile#navigation"
+    get "mobile/cart_count", to: "mobile#cart_count"
+  end
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end

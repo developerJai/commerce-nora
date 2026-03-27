@@ -486,7 +486,7 @@
     </div>
   <% end %>
 
-  <% hide_mobile_nav = (controller_name == 'products' && action_name == 'show') || controller_name == 'carts' || controller_name == 'checkout' %>
+  <% hide_mobile_nav = request.user_agent&.include?("Hotwire") || (controller_name == 'products' && action_name == 'show') || controller_name == 'carts' || controller_name == 'checkout' %>
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-40 safe-area-pb <%= 'hidden' if hide_mobile_nav %>">
     <div class="flex items-center justify-around h-14">
       <%= link_to products_path, class: "tap-target flex flex-col items-center justify-center flex-1 py-2 #{current_page?(products_path) ? 'text-rose-800' : 'text-stone-400'}" do %>
@@ -522,5 +522,6 @@
     </div>
   </nav>
   <div class="sm:hidden h-14 <%= 'hidden' if hide_mobile_nav %>"></div>
+  <div id="native-bridge"></div>
 </body>
 </html>

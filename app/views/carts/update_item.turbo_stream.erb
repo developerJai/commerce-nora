@@ -34,3 +34,5 @@
 <%= turbo_stream.update "cart-summary-mobile" do %>
   <%= render 'carts/summary_mobile', cart: @cart %>
 <% end %>
+
+<%= render 'shared/native_cart_count_bridge' %>
