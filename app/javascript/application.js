@@ -2,6 +2,9 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 
+// Disable default Turbo progress bar — replaced by jewellery loader
+Turbo.setProgressBarDelay(Infinity)
+
 // Track the current visit action so turbo:load can decide whether to scroll
 let currentVisitAction = null
 
@@ -31,3 +34,76 @@ document.addEventListener("turbo:load", () => {
 document.addEventListener("turbo:before-cache", () => {
   document.querySelectorAll('.infinite-scroll-sentinel, [data-sentinel="true"], .skeleton-loader').forEach(el => el.remove())
 })
+
+// --- Jewellery page loader: show/hide on Turbo visits ---
+;(function () {
+  const DELAY = 200 // only show loader if navigation takes longer than this (ms)
+  let timer = null
+
+  function show() {
+    const el = document.getElementById("jewel-loader")
+    if (el) { el.classList.add("active"); el.setAttribute("aria-hidden", "false") }
+  }
+
+  function hide() {
+    clearTimeout(timer)
+    timer = null
+    const el = document.getElementById("jewel-loader")
+    if (el) { el.classList.remove("active"); el.setAttribute("aria-hidden", "true") }
+  }
+
+  document.addEventListener("turbo:before-fetch-request", () => {
+    if (!timer) timer = setTimeout(show, DELAY)
+  })
+
+  document.addEventListener("turbo:load", hide)
+  document.addEventListener("turbo:fetch-request-error", hide)
+})()
+
+// --- Mobile bottom nav: debounce rapid tab switches to prevent screen freeze ---
+// When users tap tabs faster than the page can load, overlapping Turbo visits
+// fight over the DOM and the WebView locks up. We block new nav taps until the
+// current visit settles, and debounce within a 300ms window.
+;(function () {
+  const DEBOUNCE_MS = 300
+  let lastNavTap = 0
+  let navigating = false
+
+  function isMobileNavLink(element) {
+    return element.closest("[data-mobile-nav]") !== null
+  }
+
+  // Intercept clicks on mobile nav links before Turbo processes them
+  document.addEventListener("turbo:click", (event) => {
+    if (!isMobileNavLink(event.target)) return
+
+    const now = Date.now()
+
+    // Block if a visit is already in-flight or tapped too recently
+    if (navigating || now - lastNavTap < DEBOUNCE_MS) {
+      event.preventDefault()
+      return
+    }
+
+    lastNavTap = now
+    navigating = true
+
+    // Dim the nav to give immediate visual feedback
+    const nav = document.querySelector("[data-mobile-nav]")
+    if (nav) nav.style.pointerEvents = "none"
+  })
+
+  // Re-enable nav once the page finishes loading
+  document.addEventListener("turbo:load", () => {
+    navigating = false
+    const nav = document.querySelector("[data-mobile-nav]")
+    if (nav) nav.style.pointerEvents = ""
+  })
+
+  // Also re-enable if the visit fails or is cancelled
+  document.addEventListener("turbo:fetch-request-error", () => {
+    navigating = false
+    const nav = document.querySelector("[data-mobile-nav]")
+    if (nav) nav.style.pointerEvents = ""
+  })
+})()
