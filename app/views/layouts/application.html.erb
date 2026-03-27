@@ -191,7 +191,7 @@
                 <% end %>
               <% else %>
                 <div class="px-4 py-3">
-                  <%= link_to 'Sign In', login_path, class: 'block w-full py-2 px-4 text-white text-center text-sm font-medium rounded-lg transition', style: 'background-color: #B8962E;' %>
+                  <%= link_to 'Sign In', signin_path, class: 'block w-full py-2 px-4 text-white text-center text-sm font-medium rounded-lg transition', style: 'background-color: #B8962E;' %>
                   <p class="mt-3 text-xs text-stone-500 text-center">
                     New here? <%= link_to 'Register', signup_path, class: 'text-rose-700 font-medium hover:underline' %>
                   </p>
@@ -513,7 +513,7 @@
         </svg>
         <span class="text-[10px] mt-0.5">Orders</span>
       <% end %>
-      <%= link_to (customer_logged_in? ? account_path : login_path), class: "tap-target flex flex-col items-center justify-center flex-1 py-2 #{current_page?(account_path) ? 'text-rose-800' : 'text-stone-400'}" do %>
+      <%= link_to (customer_logged_in? ? account_path : signin_path), class: "tap-target flex flex-col items-center justify-center flex-1 py-2 #{current_page?(account_path) ? 'text-rose-800' : 'text-stone-400'}" do %>
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>

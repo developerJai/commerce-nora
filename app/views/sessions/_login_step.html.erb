@@ -1,0 +1,152 @@
+<% content_for(:title) { "Sign In" } %>
+<% content_for(:meta_description) { "Sign in to your Noralooks account to shop artificial jewellery, track orders, manage wishlist, and enjoy exclusive benefits. Secure login for registered customers." } %>
+<% content_for(:meta_keywords) { ["sign in", "login", "customer login", "account login", "Noralooks login", "jewellery store login", "customer account", "secure login"] } %>
+<% content_for(:head) do %>
+<!-- Structured Data - WebPage Schema for Login -->
+<script type="application/ld+json">
+   {
+     "@context": "https://schema.org",
+     "@type": "WebPage",
+     "name": "Sign In - Noralooks",
+     "description": "Sign in to your Noralooks account",
+     "url": "<%= login_url %>",
+     "mainEntity": {
+       "@type": "WebApplication",
+       "name": "Noralooks Customer Login",
+       "applicationCategory": "E-commerce",
+       "operatingSystem": "Web Browser"
+     }
+   }
+</script>
+<% if request.user_agent&.include?("Hotwire") %>
+<!-- Mobile app specific styles -->
+<style>
+   /* Prevent zoom on iOS - minimum 16px font size */
+   input, select, textarea {
+   font-size: 16px !important;
+   }
+   /* Larger touch targets for mobile app */
+   .mobile-input {
+   min-height: 48px;
+   }
+   /* Hide decorative elements in mobile app */
+   .mobile-app .decorative-icon {
+   display: none;
+   }
+</style>
+<% end %>
+<% end %>
+<div class="bg-white <%= request.user_agent&.include?('Hotwire') ? '' : 'rounded-none sm:rounded-xl p-5 sm:p-6 md:p-8' %>">
+   <!-- Header -->
+   <header class="text-center mb-6">
+      <% unless request.user_agent&.include?("Hotwire") %>
+      <div class="w-12 h-12 mx-auto mb-3 bg-rose-50 rounded-full flex items-center justify-center">
+         <svg class="w-6 h-6 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 007-7z"/>
+         </svg>
+      </div>
+      <% end %>
+      <h1 class="text-xl font-semibold text-stone-900">Welcome Back</h1>
+      <p class="text-stone-500 mt-1.5 text-sm">Sign in to continue shopping</p>
+   </header>
+   <!-- FORM -->
+   <%= form_with url: check_login_path,
+      method: :post,
+      data: {
+        turbo_frame: "login_step",
+        controller: "login-input",
+        action: "submit->login-input#validate"
+      },
+      class: "space-y-5" do |f| %>
+   <!-- LABEL -->
+   <div>
+      <%= f.label :login, "Enter Mobile number or Email",
+         class: "block text-sm font-medium text-stone-700 mb-1" %>
+            <!-- INPUT GROUP -->
+      <div class="flex gap-2 items-start">
+
+        <!-- COUNTRY DROPDOWN -->
+        <div class="relative  hidden"
+             data-login-input-target="countryWrapper">
+
+          <!-- Selected -->
+          <button type="button"
+            class=" border border-stone-300 rounded-xl px-2 py-2 text-sm bg-white text-center"
+            data-action="click->login-input#toggle"
+            data-login-input-target="button">
+            +91
+          </button>
+
+          <!-- Dropdown (IMPORTANT CHANGE) -->
+          <div class="absolute z-50 bg-white border border-stone-300 rounded-xl mt-1 
+                      left-0 w-[calc(100%+theme(spacing.2)+100%)] 
+                      sm:w-[300px] hidden max-h-60 overflow-y-auto shadow-lg"
+            data-login-input-target="dropdown">
+
+            <!-- Search -->
+            <input type="text"
+              placeholder="Search country..."
+              class="w-full px-4 py-2 border-b outline-none text-sm"
+              data-action="input->login-input#filter"
+              data-login-input-target="search">
+
+            <!-- List -->
+            <ul data-login-input-target="list">
+              <% ISO3166::Country.all.sort_by(&:iso_short_name).each do |country| %>
+                <% if country.country_code.present? %>
+                  <li
+                    class="px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 flex gap-2 items-center"
+                    data-action="click->login-input#select"
+                    data-code="+<%= country.country_code %>">
+                    
+                    <span><%= country.emoji_flag %></span>
+                    <span>+<%= country.country_code %></span>
+                    <span class="truncate"><%= country.iso_short_name %></span>
+                  </li>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+
+          <!-- Hidden field -->
+          <input type="hidden" name="country_code" value="+91"
+            data-login-input-target="countryCode">
+        </div>
+
+        <!-- LOGIN INPUT -->
+        <%= f.text_field :login,
+          required: true,
+          autocomplete: "username",
+          placeholder: "Enter email or mobile",
+          class: "w-full flex-1 px-4 py-2 border border-stone-300 rounded-xl
+          focus:ring-2 focus:ring-rose-400 focus:border-rose-400 outline-none",
+          data: {
+            login_input_target: "input",
+            action: "input->login-input#validate"
+          } %>
+
+      </div>
+      <!-- ERROR -->
+      <p class="text-red-600 text-sm mt-1 hidden"
+         data-login-input-target="error"></p>
+   </div>
+   <!-- SUBMIT -->
+   <%= f.submit "Continue",
+      disabled: true,
+      class: "w-full py-2 bg-rose-800 text-white text-base font-medium rounded-xl 
+      hover:bg-rose-900 transition shadow-md disabled:opacity-50",
+      data: { login_input_target: "submit" } %>
+   <% end %>
+   <!-- FOOTER -->
+   <p class="text-xs text-stone-500 mt-6 text-center leading-relaxed">
+      By continuing, you agree to Noralooks
+      <a href="#" class="text-blue-600 underline hover:text-blue-800">
+      Conditions of Use
+      </a>
+      and
+      <a href="#" class="text-blue-600 underline hover:text-blue-800">
+      Privacy Policy
+      </a>.
+   </p>
+</div>

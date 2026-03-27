@@ -11,12 +11,11 @@ class Customer < ApplicationRecord
   has_many :wishlist_items, dependent: :destroy, class_name: 'Wishlist'
   has_many :wished_products, through: :wishlist_items, source: :product
 
-  validates :email, presence: true, uniqueness: { case_sensitive: false },
-            format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :first_name, :last_name, presence: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
+  validates :first_name, presence: true
   validates :password, length: { minimum: 6 }, if: -> { new_record? || password.present? }
-  validates :phone, format: { with: /\A\+[\d\s\-\(\)]+\z/, message: "must be a valid international phone number" }, allow_blank: true
-
+  #validates :phone, format: { with: /\A\+[\d\s\-\(\)]+\z/, message: "must be a valid international phone number" }, allow_blank: true
+  validates :phone, presence: true, on: :create
   before_save :downcase_email
 
   scope :active, -> { where(active: true) }
@@ -29,6 +28,10 @@ class Customer < ApplicationRecord
 
   def full_name
     "#{first_name} #{last_name}"
+  end
+
+  def full_phone_number
+    "#{country_code} #{phone}"
   end
 
   def active_cart

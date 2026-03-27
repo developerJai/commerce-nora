@@ -180,11 +180,28 @@ Rails.application.routes.draw do
   root to: "home#index"
 
   # Customer authentication
-  get "signup", to: "registrations#new"
-  post "signup", to: "registrations#create"
+  get  "signup", to: "registrations#new"
+  post "signup", to: "registrations#send_otp"
+  get  "signup/verify", to: "registrations#verify"
+  post "signup/confirm_otp", to: "registrations#confirm_otp"
+  post "signup/resend_otp", to: "registrations#resend_otp"
+
+
   get "login", to: "sessions#new"
-  post "login", to: "sessions#create"
+  post "signin", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
+  get "signin", to: "sessions#signin"
+  post "check_login", to: "sessions#check_login"
+  post "create_account", to: "sessions#create_account"
+  post "send_otp", to: "sessions#send_otp"
+  post "verify_otp", to: "sessions#verify_otp"
+  get "otp/:token", to: "sessions#otp", as: :otp
+  post "resend_otp", to: "sessions#resend_otp"
+  get   "/forgotpassword", to: "sessions#forgot_password"
+  get   "/forgototp", to: "sessions#forgot_otp"
+  get   "/change/password", to: "sessions#change_password"
+  post 'password_update', to: 'sessions#password_update'
+  get "/password/request/email", to: "sessions#password_request_email"
 
   # Account
   resource :account, only: [ :show, :edit, :update ] do

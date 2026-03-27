@@ -3,7 +3,7 @@ class SitemapsController < ApplicationController
     @base_url = request.base_url
     @static_pages = [
       { path: root_path, priority: 1.0, changefreq: 'daily' },
-      { path: login_path, priority: 0.6, changefreq: 'monthly' },
+      { path: signin_path, priority: 0.6, changefreq: 'monthly' },
       { path: signup_path, priority: 0.6, changefreq: 'monthly' },
       { path: products_path, priority: 0.9, changefreq: 'daily' },
       { path: about_path, priority: 0.5, changefreq: 'monthly' },

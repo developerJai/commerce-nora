@@ -49,7 +49,7 @@
         <p class="text-stone-500 mt-1.5 text-sm">Sign in to continue shopping</p>
       </header>
 
-      <%= form_with url: login_path, method: :post, novalidate: true, class: 'space-y-4',
+      <%= form_with url: signin_path, method: :post, novalidate: true, class: 'space-y-4',
           data: { controller: 'signup-form', action: 'submit->signup-form#submit' },
           aria: { label: 'Sign in form' } do |f| %>
         <div>

@@ -1,0 +1,17 @@
+<% content_for(:title) { "Sign In" } %>
+
+<div class="min-h-[60vh] flex items-center justify-center px-4 py-12">
+
+  <div class="w-full max-w-md">
+
+    <div class="bg-white rounded-xl border border-stone-200 p-8 shadow-sm">
+
+      <turbo-frame id="login_step">
+        <%= render "sessions/login_step" %>
+      </turbo-frame>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,15 @@
+<div
+  id="login_error"
+  data-controller="error"
+  data-error-target="errorMessage"
+  class="flex items-center justify-between text-red-600 text-sm mb-2 transition-opacity duration-500"
+>
+  <!-- Left: Icon + Message -->
+  <div class="flex items-center gap-2">
+    <!-- Red Circle Icon -->
+    <span class="flex items-center justify-center w-5 h-5 rounded-full bg-red-600 text-white text-xs font-bold">
+      !
+    </span>
+    <span><%= message %></span>
+  </div>
+</div>
