@@ -2,23 +2,23 @@
 <% content_for(:native_title) { "Account" } %>
 
 <div class="min-h-screen bg-stone-50">
-  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 lg:py-10">
-    <div class="flex flex-col md:flex-row gap-6 md:gap-8">
-      <!-- Sidebar -->
-      <div class="w-full md:w-72 flex-shrink-0">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 md:py-6 lg:py-10">
+    <div class="flex flex-col md:flex-row gap-4 md:gap-8">
+      <!-- Sidebar (hidden on mobile for account page — tabs are redundant with quick stats) -->
+      <div class="hidden md:block w-full md:w-72 flex-shrink-0">
         <%= render 'shared/account_sidebar', active_page: 'profile' %>
       </div>
 
       <!-- Main Content -->
-      <div class="flex-1 space-y-5 lg:space-y-8">
+      <div class="flex-1 space-y-3 md:space-y-5 lg:space-y-8">
         <!-- Welcome Header -->
-        <div class="bg-white md:bg-gradient-to-br md:from-rose-50 md:to-amber-50 rounded-xl md:rounded-2xl border border-stone-200 p-4 md:p-6 lg:p-8 shadow-sm">
-          <div class="flex items-center gap-3.5 md:block">
-            <div class="w-12 h-12 md:hidden bg-rose-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span class="text-lg font-bold text-rose-700"><%= @customer.first_name[0] %><%= @customer.last_name&.first %></span>
+        <div class="bg-white md:bg-gradient-to-br md:from-rose-50 md:to-amber-50 rounded-xl md:rounded-2xl border border-stone-200 p-3.5 md:p-6 lg:p-8 shadow-sm">
+          <div class="flex items-center gap-3 md:block">
+            <div class="w-11 h-11 md:hidden bg-rose-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span class="text-base font-bold text-rose-700"><%= @customer.first_name[0] %><%= @customer.last_name&.first %></span>
             </div>
             <div>
-              <h1 class="text-lg md:text-2xl lg:text-3xl font-sans font-semibold text-stone-900 md:mb-2">
+              <h1 class="text-base md:text-2xl lg:text-3xl font-sans font-semibold text-stone-900 md:mb-2">
                 <%= @customer.first_name %>
               </h1>
               <p class="text-xs md:text-sm lg:text-base text-stone-500"><%= @customer.email %></p>
@@ -27,7 +27,7 @@
         </div>
 
         <!-- Quick Stats - Compact horizontal on mobile -->
-        <div class="grid grid-cols-3 gap-2.5 md:gap-5">
+        <div class="grid grid-cols-3 gap-2 md:gap-5">
           <%= link_to orders_path, class: "group bg-white rounded-xl border border-stone-200 p-3 md:p-6 text-center md:text-left hover:shadow-lg hover:border-rose-300 transition-all" do %>
             <div class="md:flex md:items-center md:gap-4">
               <div class="w-10 h-10 mx-auto md:mx-0 md:w-14 md:h-14 bg-rose-50 rounded-xl flex items-center justify-center flex-shrink-0 mb-1.5 md:mb-0">
@@ -182,8 +182,8 @@
         </div>
 
         <!-- Logout Button (mobile only - desktop uses sidebar) -->
-        <div class="md:hidden pt-2 pb-4">
-          <%= button_to logout_path, method: :delete, data: { show_loader: 'true' }, class: "w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-stone-500 hover:text-red-600 transition" do %>
+        <div class="md:hidden">
+          <%= button_to logout_path, method: :delete, data: { show_loader: 'true' }, class: "w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 active:scale-[0.98] transition" do %>
             <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
