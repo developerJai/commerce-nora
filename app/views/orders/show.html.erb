@@ -33,7 +33,7 @@
           
           <!-- Mobile action buttons -->
           <div class="flex gap-2">
-            <%= link_to invoice_path(@order.order_number, format: :pdf), target: (request.user_agent&.include?('Hotwire') ? '_blank' : nil), download: (request.user_agent&.include?('Hotwire') ? nil : "Invoice_#{@order.order_number}.pdf"), class: 'flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 active:bg-rose-950 text-white text-xs font-medium rounded-lg transition-colors whitespace-nowrap' do %>
+            <%= link_to invoice_path(@order.order_number, format: :pdf), target: (request.user_agent&.include?('NoraLooks/iOS') ? '_blank' : nil), download: (request.user_agent&.include?('NoraLooks/iOS') ? nil : "Invoice_#{@order.order_number}.pdf"), class: 'flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-800 hover:bg-rose-900 active:bg-rose-950 text-white text-xs font-medium rounded-lg transition-colors whitespace-nowrap' do %>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>

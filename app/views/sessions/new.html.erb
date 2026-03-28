@@ -21,7 +21,7 @@
   }
   </script>
   
-  <% if request.user_agent&.include?("Hotwire") %>
+  <% if request.user_agent&.include?("NoraLooks/iOS") %>
   <!-- Mobile app specific styles -->
   <style>
     /* Prevent zoom on iOS - minimum 16px font size */
@@ -40,9 +40,9 @@
   <% end %>
 <% end %>
 
-<div class="<%= request.user_agent&.include?('Hotwire') ? 'mobile-app flex items-center justify-center px-4 py-4' : 'sm:min-h-[60vh] flex items-center justify-center px-4 py-4 sm:py-12' %>">
+<div class="<%= request.user_agent&.include?('NoraLooks/iOS') ? 'mobile-app flex items-center justify-center px-4 py-4' : 'sm:min-h-[60vh] flex items-center justify-center px-4 py-4 sm:py-12' %>">
   <div class="w-full max-w-md">
-    <div class="bg-white <%= request.user_agent&.include?('Hotwire') ? 'p-5' : 'rounded-xl border border-stone-200 p-5 sm:p-6 md:p-8 shadow-sm sm:shadow-none' %>">
+    <div class="bg-white <%= request.user_agent&.include?('NoraLooks/iOS') ? 'p-5' : 'rounded-xl border border-stone-200 p-5 sm:p-6 md:p-8 shadow-sm sm:shadow-none' %>">
       <!-- Header -->
       <header class="text-center mb-6">
         <%= image_tag asset_path('storefront/logo-icon.png'), class: 'w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-xl shadow-lg shadow-amber-900/20 mb-3', alt: 'Noralooks' %>

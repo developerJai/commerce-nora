@@ -8,6 +8,12 @@ export default class extends Controller {
   }
 
   connect() {
+    // Don't show app download section inside native apps
+    if (this.isNativeApp()) {
+      this.sectionTarget.classList.add("hidden")
+      return
+    }
+
     if (this.isDismissed()) {
       this.sectionTarget.classList.add("hidden")
       this.fabTarget.classList.remove("hidden")
@@ -78,6 +84,11 @@ export default class extends Controller {
     if (/iPhone|iPad|iPod/.test(ua)) return this.iosUrlValue
     if (/Android/.test(ua)) return this.androidUrlValue
     return this.iosUrlValue || this.androidUrlValue
+  }
+
+  isNativeApp() {
+    const ua = navigator.userAgent || ""
+    return ua.includes("NoraLooks/")
   }
 
   isDismissed() {

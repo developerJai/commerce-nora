@@ -13,12 +13,14 @@
     </script>
   <% end %>
 
-  <% if request.user_agent&.include?("Hotwire") %>
+  <% if request.user_agent&.include?("NoraLooks/iOS") %>
     <title><%= native_page_title(content_for(:native_title)) %></title>
   <% else %>
     <title><%= meta_title(content_for(:title)) %></title>
   <% end %>
-  <meta name="viewport" content="width=device-width,initial-scale=1,<%= 'maximum-scale=1,user-scalable=no,' if request.user_agent&.include?('Hotwire') %>viewport-fit=cover">
+  <% is_native = request.user_agent&.include?('NoraLooks/iOS') || request.user_agent&.include?('NoraLooks/Android') %>
+  <% is_ios_native = request.user_agent&.include?('NoraLooks/iOS') %>
+  <meta name="viewport" content="width=device-width,initial-scale=1<%= ',maximum-scale=1,user-scalable=no' if is_ios_native %><%= ',viewport-fit=cover' if !is_native || is_ios_native %>">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   
@@ -75,9 +77,9 @@
   <style>
     .font-serif { font-family: 'Playfair Display', serif; }
     .font-sans { font-family: 'Inter', sans-serif; }
-    <% if request.user_agent&.include?("Hotwire") %>
-      /* Only affects Hotwire Native app */
-      body {
+    <% if request.user_agent&.include?("NoraLooks/iOS") %>
+      /* Only affects Hotwire Native iOS app */
+      html, body {
         -webkit-overflow-scrolling: touch;
         overflow-y: auto !important;
         height: auto !important;
@@ -87,12 +89,16 @@
         -webkit-touch-callout: none !important;
         -webkit-user-select: none !important;
       }
+      /* Fixed bottom bars: sit at true bottom, pad for home indicator */
+      .ios-native-fixed-bottom {
+        bottom: 0 !important;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+      }
     <% end %>
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-stone-50 font-sans">
-  <% is_native_app = request.user_agent&.include?("Hotwire") || request.user_agent&.include?("NoraLooks/Android") %>
-  <% unless is_native_app %>
+  <% is_native_app = request.user_agent&.include?("NoraLooks/iOS") || request.user_agent&.include?("NoraLooks/Android") %>
   <!-- Top Bar -->
   <% banner = StoreSetting.instance %>
   <div class="hidden sm:block text-center py-2 px-3" style="background-color: <%= banner.effective_banner_bg_color %>;">
@@ -244,7 +250,7 @@
     </div>
 
     <!-- Categories Nav with Subcategory Dropdowns -->
-    <% unless controller_name == 'products' && action_name == 'index' %>
+    <% unless is_native_app || (controller_name == 'products' && action_name == 'index') %>
       <nav class="hidden sm:block relative z-10" style="background: #FFFFFF; border-bottom: 1px solid #EAEAEA;">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div class="overflow-x-auto overflow-y-visible scrollbar-hide">
@@ -294,7 +300,6 @@
       </nav>
     <% end %>
   </header>
-  <% end %>
 
   <div id="toasts" class="fixed top-20 sm:top-24 right-3 sm:right-6 z-[60] flex flex-col gap-2 items-end">
     <% if flash[:notice].present? %>
@@ -440,9 +445,9 @@
     </div>
   </footer>
 
-  <!-- Smart App Banner (mobile only) -->
+  <!-- Smart App Banner (mobile only, not inside native apps) -->
   <% app_banner_setting = StoreSetting.instance %>
-  <% if app_banner_setting.has_mobile_apps? && !['carts', 'checkouts'].include?(controller_name) %>
+  <% if !is_native_app && app_banner_setting.has_mobile_apps? && !['carts', 'checkouts'].include?(controller_name) %>
     <div data-controller="smart-app-banner"
          data-smart-app-banner-ios-url-value="<%= app_banner_setting.ios_app_url %>"
          data-smart-app-banner-android-url-value="<%= app_banner_setting.android_app_url %>">

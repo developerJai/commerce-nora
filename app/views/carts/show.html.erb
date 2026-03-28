@@ -95,8 +95,11 @@
 
         <!-- Mobile: Fixed bottom checkout bar -->
         <% unless @cart.empty? %>
-          <% is_native_app_cart = request.user_agent&.include?('Hotwire') || request.user_agent&.include?('NoraLooks/Android') %>
-          <div id="cart-checkout-bar" class="md:hidden fixed <%= is_native_app_cart ? 'bottom-0' : 'bottom-14' %> left-0 right-0 z-[45] bg-white border-t border-stone-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] px-4 py-3">
+          <% is_ios_native = request.user_agent&.include?('NoraLooks/iOS') %>
+          <% is_android_native = request.user_agent&.include?('NoraLooks/Android') %>
+          <% is_native_app_cart = is_ios_native || is_android_native %>
+          <% bottom_class = if is_native_app_cart then 'bottom-0' else 'bottom-14' end %>
+          <div id="cart-checkout-bar" class="md:hidden fixed <%= bottom_class %> left-0 right-0 z-[45] bg-white border-t border-stone-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] px-4 py-3 <%= 'ios-native-fixed-bottom' if is_ios_native %>">
             <%= render 'checkout_bar_mobile', cart: @cart %>
           </div>
         <% end %>

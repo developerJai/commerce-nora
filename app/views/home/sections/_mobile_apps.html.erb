@@ -1,5 +1,6 @@
 <% store_setting = StoreSetting.instance %>
-<% if store_setting.has_mobile_apps? %>
+<% is_native_app = request.user_agent&.include?('NoraLooks/iOS') || request.user_agent&.include?('NoraLooks/Android') %>
+<% if store_setting.has_mobile_apps? && !is_native_app %>
 <div data-controller="mobile-app-section"
      data-mobile-app-section-ios-url-value="<%= store_setting.ios_app_url %>"
      data-mobile-app-section-android-url-value="<%= store_setting.android_app_url %>">

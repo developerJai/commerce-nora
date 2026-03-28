@@ -100,7 +100,7 @@
   </script>
 <% end %>
 
-<% is_native_app_container = request.user_agent&.include?('Hotwire') || request.user_agent&.include?('NoraLooks/Android') %>
+<% is_native_app_container = request.user_agent&.include?('NoraLooks/iOS') || request.user_agent&.include?('NoraLooks/Android') %>
 <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 <%= is_native_app_container ? 'pb-16' : 'pb-24' %> sm:pb-6" data-controller="product-gallery product-variant product-page">
   <!-- Breadcrumb with back button -->
   <nav class="mb-2 sm:mb-4 md:mb-6 flex items-center gap-1.5 sm:gap-0 overflow-hidden" aria-label="Breadcrumb">
@@ -702,7 +702,7 @@
 
 <!-- Sticky Mobile Bottom Bar -->
 <% if @selected_variant %>
-  <% is_native_app_pdp = request.user_agent&.include?('Hotwire') || request.user_agent&.include?('NoraLooks/Android') %>
+  <% is_native_app_pdp = request.user_agent&.include?('NoraLooks/iOS') || request.user_agent&.include?('NoraLooks/Android') %>
   <div class="sm:hidden fixed <%= is_native_app_pdp ? 'bottom-0' : 'bottom-14' %> left-0 right-0 bg-white border-t border-stone-200 px-3 py-2.5 z-[45]">
     <div id="mobile-sticky-bar-<%= @selected_variant.id %>" class="flex items-center gap-3">
       <%= render 'products/mobile_sticky_bar', variant: @selected_variant, cart_item: @cart_item %>

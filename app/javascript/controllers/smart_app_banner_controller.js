@@ -102,7 +102,7 @@ export default class extends Controller {
   }
 
   isHotwireNative() {
-    return (navigator.userAgent || "").includes("Hotwire")
+    return (navigator.userAgent || "").includes("NoraLooks/")
   }
 
   wasDismissed() {
