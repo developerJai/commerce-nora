@@ -182,8 +182,8 @@ Rails.application.routes.draw do
   # Customer authentication
   get "signup", to: "registrations#new"
   post "signup", to: "registrations#create"
-  get "login", to: "sessions#new"
-  post "login", to: "sessions#create"
+  get "login(/:from)", to: "sessions#new", as: :login
+  post "login(/:from)", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
   # Account

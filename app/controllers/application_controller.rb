@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
     unless customer_logged_in?
       # Store the full URL to redirect back after login
       session[:return_to] = request.fullpath
-      redirect_to login_path(from: controller_name)
+      redirect_to login_path(controller_name)
     end
   end
 
