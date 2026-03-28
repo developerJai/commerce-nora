@@ -91,6 +91,8 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-stone-50 font-sans">
+  <% is_native_app = request.user_agent&.include?("Hotwire") || request.user_agent&.include?("NoraLooks/Android") %>
+  <% unless is_native_app %>
   <!-- Top Bar -->
   <% banner = StoreSetting.instance %>
   <div class="hidden sm:block text-center py-2 px-3" style="background-color: <%= banner.effective_banner_bg_color %>;">
@@ -292,6 +294,7 @@
       </nav>
     <% end %>
   </header>
+  <% end %>
 
   <div id="toasts" class="fixed top-20 sm:top-24 right-3 sm:right-6 z-[60] flex flex-col gap-2 items-end">
     <% if flash[:notice].present? %>
@@ -488,7 +491,6 @@
   <%# Bottom nav lives OUTSIDE the turbo-frame, so it never re-renders during tab switches.
       Tab links target "main-content" frame — only the page content swaps.
       iOS native uses its own native tab bar, so skip this entirely. %>
-  <% is_native_app = request.user_agent&.include?("Hotwire") || request.user_agent&.include?("NoraLooks/Android") %>
   <% unless is_native_app %>
   <nav id="mobile-bottom-nav" data-turbo-permanent data-mobile-nav
        data-controller="mobile-nav"
