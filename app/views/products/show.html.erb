@@ -100,7 +100,8 @@
   </script>
 <% end %>
 
-<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 pb-24 sm:pb-6" data-controller="product-gallery product-variant product-page">
+<% is_native_app_container = request.user_agent&.include?('Hotwire') || request.user_agent&.include?('NoraLooks/Android') %>
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 <%= is_native_app_container ? 'pb-16' : 'pb-24' %> sm:pb-6" data-controller="product-gallery product-variant product-page">
   <!-- Breadcrumb with back button -->
   <nav class="mb-2 sm:mb-4 md:mb-6 flex items-center gap-1.5 sm:gap-0 overflow-hidden" aria-label="Breadcrumb">
     <a href="<%= products_path %>" onclick="if (window.history.length > 1) { window.history.back(); return false; }" class="sm:hidden flex-shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full hover:bg-stone-100 active:bg-stone-200 transition text-stone-600">
