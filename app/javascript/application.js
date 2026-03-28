@@ -35,7 +35,7 @@ document.addEventListener("turbo:before-cache", () => {
   document.querySelectorAll('.infinite-scroll-sentinel, [data-sentinel="true"], .skeleton-loader').forEach(el => el.remove())
 })
 
-// --- Jewellery page loader: show/hide on Turbo visits ---
+// --- Jewellery page loader: show/hide on Turbo visits and auth form submissions ---
 ;(function () {
   const DELAY = 200 // only show loader if navigation takes longer than this (ms)
   let timer = null
@@ -52,17 +52,26 @@ document.addEventListener("turbo:before-cache", () => {
     if (el) { el.classList.remove("active"); el.setAttribute("aria-hidden", "true") }
   }
 
+  // Show loader on page navigations
   document.addEventListener("turbo:before-fetch-request", (event) => {
     // Don't show loader for turbo frame requests (e.g. modals, inline frames)
     if (event.target.closest && event.target.closest("turbo-frame")) return
     if (!timer) timer = setTimeout(show, DELAY)
   })
 
+  // Show loader immediately on login/logout form submissions
+  document.addEventListener("turbo:submit-start", (event) => {
+    const form = event.target
+    if (form && form.dataset.showLoader === "true") {
+      clearTimeout(timer)
+      show()
+    }
+  })
+
   document.addEventListener("turbo:load", hide)
   document.addEventListener("turbo:fetch-request-error", hide)
   // Hide loader after Turbo Stream responses (e.g. cart remove/update)
   // turbo:load only fires for full-page navigations, not stream responses
-  document.addEventListener("turbo:submit-end", hide)
   document.addEventListener("turbo:before-stream-render", hide)
   // Hide loader after turbo frame navigations (e.g. coupon modal)
   document.addEventListener("turbo:frame-load", hide)

@@ -51,7 +51,7 @@
       </header>
 
       <%= form_with url: login_path, method: :post, novalidate: true, class: 'space-y-4',
-          data: { controller: 'signup-form', action: 'submit->signup-form#submit' },
+          data: { controller: 'signup-form', action: 'submit->signup-form#submit', show_loader: 'true' },
           aria: { label: 'Sign in form' } do |f| %>
         <div>
           <%= f.label :email, class: 'block text-sm font-medium text-stone-700 mb-1' %>

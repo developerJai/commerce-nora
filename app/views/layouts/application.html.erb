@@ -190,7 +190,7 @@
                 <%= link_to 'Wishlist', wishlists_path, class: 'block px-4 py-2 text-sm text-stone-700 hover:bg-rose-50 hover:text-rose-800' %>
                 <%= link_to 'Help', support_tickets_path, class: 'block px-4 py-2 text-sm text-stone-700 hover:bg-rose-50 hover:text-rose-800' %>
                 <hr class="my-2 border-stone-100">
-                <%= button_to logout_path, method: :delete, class: 'block w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-rose-50 hover:text-rose-800' do %>
+                <%= button_to logout_path, method: :delete, data: { show_loader: 'true' }, class: 'block w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-rose-50 hover:text-rose-800' do %>
                   Sign Out
                 <% end %>
               <% else %>

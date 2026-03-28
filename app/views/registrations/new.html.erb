@@ -60,7 +60,7 @@
       </header>
 
       <%= form_with model: @customer, url: signup_path, method: :post, class: 'space-y-4',
-          data: { controller: 'signup-form', action: 'submit->signup-form#submit' },
+          data: { controller: 'signup-form', action: 'submit->signup-form#submit', show_loader: 'true' },
           aria: { label: 'Create account registration form' } do |f| %>
         <% if @customer.errors.any? %>
           <div class="rounded-lg bg-red-50 border border-red-200 p-3">
