@@ -16,7 +16,7 @@ module ApplicationHelper
 
     native_titles = {
       "Buy Fashion Jewellery, Gifts & Ethnic Wear Online" => "Best Deals | Noralooks",
-      "Buy Fashion Jewellery Online - Necklaces, Earrings, Bangles & More" => "Explore Collections",
+      "Buy Fashion Jewellery Online - Necklaces, Earrings, Bangles & More" => "Noralooks",
       "Shopping Bag" => "My Bag",
       "My Orders" => "Orders",
       "My Account" => "Account",
