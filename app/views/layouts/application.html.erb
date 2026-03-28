@@ -491,42 +491,51 @@
   <% end %>
 
   <% is_ios_native = request.user_agent&.include?("Hotwire") && !request.user_agent&.include?("NoraLooks/Android") %>
-  <% hide_mobile_nav = is_ios_native || (controller_name == 'products' && action_name == 'show') || controller_name == 'checkouts' %>
-  <nav data-mobile-nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-40 safe-area-pb <%= 'hidden' if hide_mobile_nav %>">
+  <% unless is_ios_native %>
+  <nav id="mobile-bottom-nav" data-turbo-permanent data-mobile-nav
+       data-controller="mobile-nav"
+       data-mobile-nav-hide-on-value='["/products/", "/checkouts"]'
+       class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-40 safe-area-pb">
     <div class="flex items-center justify-around h-14">
-      <%= link_to products_path, class: "tap-target flex flex-col items-center justify-center flex-1 py-2 #{current_page?(products_path) ? 'text-rose-800' : 'text-stone-400'}" do %>
+      <a href="/products" data-mobile-nav-target="tab" data-path="/products"
+         class="tap-target flex flex-col items-center justify-center flex-1 py-2 text-stone-400">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <span class="text-[10px] mt-0.5">Search</span>
-      <% end %>
-      <%= link_to cart_path, class: "tap-target flex flex-col items-center justify-center flex-1 py-2 relative #{current_page?(cart_path) ? 'text-rose-800' : 'text-stone-400'}" do %>
+      </a>
+      <a href="/cart" data-mobile-nav-target="tab" data-path="/cart"
+         class="tap-target flex flex-col items-center justify-center flex-1 py-2 relative text-stone-400">
         <div id="mobile-cart-count">
           <%= render 'shared/mobile_cart_count_badge' %>
         </div>
         <span class="text-[10px] mt-0.5">Cart</span>
-      <% end %>
-      <%= link_to root_path, class: "tap-target flex flex-col items-center justify-center flex-1 py-2 #{current_page?(root_path) ? 'text-rose-800' : 'text-stone-400'}" do %>
+      </a>
+      <a href="/" data-mobile-nav-target="tab" data-path="/"
+         class="tap-target flex flex-col items-center justify-center flex-1 py-2 text-stone-400">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
         </svg>
         <span class="text-[10px] mt-0.5">Home</span>
-      <% end %>
-      <%= link_to orders_path, class: "tap-target flex flex-col items-center justify-center flex-1 py-2 #{current_page?(orders_path) ? 'text-rose-800' : 'text-stone-400'}" do %>
+      </a>
+      <a href="/orders" data-mobile-nav-target="tab" data-path="/orders"
+         class="tap-target flex flex-col items-center justify-center flex-1 py-2 text-stone-400">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>
         <span class="text-[10px] mt-0.5">Orders</span>
-      <% end %>
-      <%= link_to (customer_logged_in? ? account_path : login_path), class: "tap-target flex flex-col items-center justify-center flex-1 py-2 #{current_page?(account_path) ? 'text-rose-800' : 'text-stone-400'}" do %>
+      </a>
+      <a href="/account" data-mobile-nav-target="tab" data-path="/account"
+         class="tap-target flex flex-col items-center justify-center flex-1 py-2 text-stone-400">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
         <span class="text-[10px] mt-0.5">Account</span>
-      <% end %>
+      </a>
     </div>
   </nav>
-  <div class="sm:hidden h-14 <%= 'hidden' if hide_mobile_nav %>"></div>
+  <div id="mobile-bottom-nav-spacer" data-turbo-permanent class="sm:hidden h-14"></div>
+  <% end %>
   <div id="native-bridge"></div>
 
   <!-- Jewellery page loader (replaces default Turbo progress bar) -->
