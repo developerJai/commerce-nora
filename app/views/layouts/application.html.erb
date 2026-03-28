@@ -82,12 +82,6 @@
         overflow-y: auto !important;
         height: auto !important;
       }
-      <% if !request.user_agent&.include?("NoraLooks/Android") %>
-      /* Add padding for iOS native bottom tab bar only */
-      main {
-        padding-bottom: 70px !important;
-      }
-      <% end %>
       /* Prevent long-press context menu / link preview in native app */
       a, img, button {
         -webkit-touch-callout: none !important;
