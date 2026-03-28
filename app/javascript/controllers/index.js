@@ -25,6 +25,7 @@ import PriceValidationController from "controllers/price_validation_controller"
 import ProductPageController from "controllers/product_page_controller"
 import SmartAppBannerController from "controllers/smart_app_banner_controller"
 import MobileAppSectionController from "controllers/mobile_app_section_controller"
+import CouponCelebrationController from "controllers/coupon_celebration_controller"
 
 application.register("sidebar", SidebarController)
 application.register("dropdown", DropdownController)
@@ -47,3 +48,4 @@ application.register("captcha", CaptchaController)
 application.register("price-validation", PriceValidationController)
 application.register("smart-app-banner", SmartAppBannerController)
 application.register("mobile-app-section", MobileAppSectionController)
+application.register("coupon-celebration", CouponCelebrationController)

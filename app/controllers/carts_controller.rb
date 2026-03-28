@@ -239,7 +239,8 @@ class CartsController < ApplicationController
       respond_to_coupon_action(alert: "Minimum order amount of #{helpers.format_price(coupon.minimum_order_amount)} required")
     else
       session[:coupon_id] = coupon.id
-      respond_to_coupon_action
+      savings = coupon.calculate_discount(current_cart.subtotal)
+      respond_to_coupon_action(savings: savings)
     end
   end
 
@@ -258,7 +259,7 @@ class CartsController < ApplicationController
     @cart_item = current_cart.cart_items.find_by!(product_variant_id: params[:variant_id])
   end
 
-  def respond_to_coupon_action(alert: nil)
+  def respond_to_coupon_action(alert: nil, savings: nil)
     respond_to do |format|
       format.html { redirect_to cart_path, alert: alert }
       format.turbo_stream do
@@ -296,6 +297,16 @@ class CartsController < ApplicationController
         else
           # Close the modal by replacing the frame with empty content
           streams << turbo_stream.update("coupon_modal", "")
+
+          # Show celebration animation with savings amount
+          if savings && savings > 0
+            streams << turbo_stream.append("cart-content",
+              helpers.content_tag(:div, "",
+                data: {
+                  controller: "coupon-celebration",
+                  coupon_celebration_amount_value: helpers.format_price(savings)
+                }))
+          end
         end
 
         render turbo_stream: streams

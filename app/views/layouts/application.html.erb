@@ -440,7 +440,7 @@
 
   <!-- Smart App Banner (mobile only) -->
   <% app_banner_setting = StoreSetting.instance %>
-  <% if app_banner_setting.has_mobile_apps? %>
+  <% if app_banner_setting.has_mobile_apps? && !['carts', 'checkouts'].include?(controller_name) %>
     <div data-controller="smart-app-banner"
          data-smart-app-banner-ios-url-value="<%= app_banner_setting.ios_app_url %>"
          data-smart-app-banner-android-url-value="<%= app_banner_setting.android_app_url %>">

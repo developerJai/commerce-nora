@@ -1,18 +1,19 @@
 <% if items_by_vendor.any? %>
   <div class="space-y-4">
-    <% items_by_vendor.each do |vendor, cart_items| %>
+    <% total_shipments = items_by_vendor.size %>
+    <% items_by_vendor.each_with_index do |(vendor, cart_items), index| %>
       <div class="bg-white rounded-xl border border-stone-200 overflow-hidden">
-        <!-- Vendor Header -->
+        <!-- Shipment Header -->
         <div class="bg-stone-50 border-b border-stone-200 px-4 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
                 <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
               </div>
               <div>
-                <p class="font-semibold text-stone-900 text-sm">Seller: <%= vendor&.business_name || "Seller ##{vendor&.id}" %></p>
+                <p class="font-semibold text-stone-900 text-sm">Shipment <%= index + 1 %> of <%= total_shipments %></p>
                 <p class="text-xs text-stone-500"><%= cart_items.size %> <%= cart_items.size == 1 ? 'item' : 'items' %></p>
               </div>
             </div>

@@ -2,17 +2,26 @@
 <% subtotal = cart.subtotal %>
 <% discount = coupon&.calculate_discount(subtotal) || 0 %>
 <% discounted = subtotal - discount %>
-<% items_by_vendor = cart.cart_items.includes(product_variant: { product: :vendor }).group_by { |item| item.product_variant.product.vendor_id } %>
+<% items_by_vendor = cart.cart_items.includes(product_variant: { product: [:vendor, :hsn_code] }).group_by { |item| item.product_variant.product.vendor_id } %>
 <% estimated_shipping = items_by_vendor.sum do |_vid, items|
   vendor_subtotal = items.sum(&:total_price)
   Order.calculate_shipping_amount(vendor_subtotal)
 end %>
-<% est_total = discounted + estimated_shipping %>
+<% estimated_tax = if subtotal > 0
+  total_tax = cart.cart_items.includes(product_variant: { product: :hsn_code }).sum do |item|
+    rate = item.product_variant&.product&.hsn_code&.gst_rate || 3.0
+    (item.total_price.to_f * rate / 100.0)
+  end
+  (total_tax * (discounted.to_f / subtotal.to_f)).round(2)
+else
+  0
+end %>
+<% est_total = discounted + estimated_shipping + estimated_tax %>
 
 <div class="flex items-center justify-between gap-3">
   <div class="flex-shrink-0">
-    <p class="text-[11px] text-stone-500 leading-tight">Est. Total</p>
     <p class="text-base font-bold text-stone-900 leading-tight"><%= format_price(est_total) %></p>
+    <p class="text-[10px] text-stone-400 leading-tight">Incl. taxes & shipping</p>
   </div>
   <%= link_to checkout_path, class: 'flex-1 block py-3 bg-rose-800 hover:bg-rose-900 text-white text-center text-sm font-semibold rounded-xl transition shadow-lg' do %>
     Proceed to Checkout

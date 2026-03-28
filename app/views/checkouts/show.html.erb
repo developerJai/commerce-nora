@@ -28,26 +28,39 @@
         <!-- Left Column: Address, Payment, Items -->
         <div class="md:col-span-2 space-y-3 sm:space-y-6 pb-[140px] md:pb-0">
           
-          <!-- Delivery Address (Compact) -->
+          <!-- Delivery Address -->
           <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 p-3 sm:p-5 md:p-6" id="address-display">
-            <div class="flex items-start justify-between gap-2">
-              <div class="flex items-start gap-2 flex-1 min-w-0">
-                <div class="w-7 h-7 sm:w-10 sm:h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  </svg>
-                </div>
-                <div id="address-details" class="flex-1 min-w-0">
-                  <p class="text-xs sm:text-sm font-semibold text-stone-900"><%= @address.full_name %></p>
-                  <p class="text-xs sm:text-sm text-stone-600 mt-0.5 line-clamp-2"><%= @address.full_address %></p>
-                </div>
-              </div>
-              <button type="button" 
+            <div class="flex items-center justify-between mb-2 sm:mb-3">
+              <h2 class="text-sm sm:text-base font-sans font-semibold text-stone-900">Deliver to</h2>
+              <button type="button"
                       id="change-address-btn"
-                      class="text-xs sm:text-sm text-rose-700 hover:text-rose-900 font-semibold whitespace-nowrap flex-shrink-0">
+                      class="text-[11px] sm:text-xs text-stone-500 hover:text-rose-700 font-medium whitespace-nowrap flex-shrink-0 border border-stone-300 rounded px-2 py-0.5 transition">
                 Change
               </button>
+            </div>
+            <div class="flex items-start gap-2">
+              <div class="w-7 h-7 sm:w-10 sm:h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              </div>
+              <div id="address-details" class="flex-1 min-w-0">
+                <p class="text-xs sm:text-sm font-semibold text-stone-900"><%= @address.full_name %></p>
+                <p class="text-xs sm:text-sm text-stone-600 mt-0.5 line-clamp-2"><%= @address.full_address %></p>
+              </div>
+            </div>
+            <!-- Dispatch Info -->
+            <div class="mt-2.5 sm:mt-3 pt-2.5 sm:pt-3 border-t border-stone-100 flex items-start gap-2.5">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-50 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs sm:text-sm font-semibold text-emerald-700">24-Hour Dispatch</p>
+                <p class="text-[11px] sm:text-xs text-stone-500 mt-0.5">Estimated delivery in 3–7 business days</p>
+              </div>
             </div>
           </div>
 
@@ -201,13 +214,13 @@
           <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 overflow-hidden">
             <!-- Header — tappable on mobile to expand/collapse -->
             <button type="button" id="toggle-items-btn"
-                    class="md:pointer-events-none w-full flex items-center justify-between p-3 sm:p-5 md:p-6 text-left">
+                    class="w-full flex items-center justify-between p-3 sm:p-5 md:p-6 text-left cursor-pointer">
               <div class="flex items-center gap-2">
                 <h2 class="text-sm sm:text-base font-semibold text-stone-900">
                   <%= "#{current_cart.cart_items.count} #{current_cart.cart_items.count == 1 ? 'Item' : 'Items'}" %>
                 </h2>
-                <!-- Tiny product thumbnails on mobile (collapsed preview) -->
-                <div class="flex -space-x-1.5 md:hidden" id="items-thumb-preview">
+                <!-- Tiny product thumbnails (collapsed preview) -->
+                <div class="flex -space-x-1.5" id="items-thumb-preview">
                   <% current_cart.cart_items.first(3).each do |item| %>
                     <div class="w-6 h-6 rounded-full border-2 border-white bg-stone-100 overflow-hidden flex-shrink-0">
                       <% if item.product_variant.product.images.attached? %>
@@ -223,33 +236,34 @@
                 </div>
               </div>
               <div class="flex items-center gap-2">
-                <%= link_to cart_path, class: "text-xs sm:text-sm text-rose-700 hover:text-rose-900 font-semibold", onclick: "event.stopPropagation()" do %>
+                <%= link_to cart_path, class: "hidden sm:inline-flex text-[11px] sm:text-xs text-stone-400 hover:text-stone-600 font-medium border border-stone-200 rounded px-2 py-0.5 transition", onclick: "event.stopPropagation()" do %>
                   Edit
                 <% end %>
-                <svg class="w-4 h-4 text-stone-400 md:hidden transition-transform duration-200" id="items-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg class="w-4 h-4 text-stone-400 transition-transform duration-200" id="items-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                 </svg>
               </div>
             </button>
 
-            <!-- Collapsible items body — hidden on mobile by default, always visible on desktop -->
-            <div id="items-body" class="hidden md:block border-t border-stone-100">
+            <!-- Collapsible items body — hidden by default, click to expand -->
+            <div id="items-body" class="hidden border-t border-stone-100">
               <div class="p-3 sm:p-5 md:p-6 pt-3">
             <% if @vendor_estimates.size > 1 %>
               <!-- Multiple Vendors -->
               <div class="space-y-4">
+                <% total_shipments = @vendor_estimates.size %>
                 <% @vendor_estimates.each_with_index do |(vendor, estimate), index| %>
                   <div class="border border-stone-200 rounded-lg p-3 sm:p-4">
-                    <!-- Vendor Header -->
+                    <!-- Shipment Header -->
                     <div class="flex items-center justify-between mb-2 sm:mb-3 pb-2 sm:pb-3 border-b border-stone-100">
                       <div class="flex items-center gap-2">
                         <div class="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-100 rounded-full flex items-center justify-center">
                           <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                           </svg>
                         </div>
                         <div>
-                          <p class="font-medium text-stone-900 text-xs sm:text-sm"><%= vendor&.business_name || "Seller ##{vendor&.id}" %></p>
+                          <p class="font-medium text-stone-900 text-xs sm:text-sm">Shipment <%= index + 1 %> of <%= total_shipments %></p>
                           <p class="text-[10px] sm:text-xs text-stone-500"><%= estimate[:item_count] %> <%= estimate[:item_count] == 1 ? 'item' : 'items' %></p>
                         </div>
                       </div>
@@ -303,7 +317,7 @@
                         <span class="text-stone-900"><%= format_price(estimate[:tax]) %></span>
                       </div>
                       <div class="flex justify-between pt-1 border-t border-stone-200">
-                        <span class="font-medium text-stone-900">Seller Total</span>
+                        <span class="font-medium text-stone-900">Shipment Total</span>
                         <span class="font-semibold text-stone-900"><%= format_price(estimate[:total]) %></span>
                       </div>
                     </div>
@@ -319,7 +333,7 @@
                   </svg>
                   <div>
                     <p class="text-xs font-semibold text-emerald-900">One Simple Payment</p>
-                    <p class="text-[10px] sm:text-xs text-emerald-700 mt-0.5">Pay <%= format_price(@total) %> once. We'll handle delivery from each seller.</p>
+                    <p class="text-[10px] sm:text-xs text-emerald-700 mt-0.5">Pay <%= format_price(@total) %> once. We'll handle delivery for all shipments.</p>
                   </div>
                 </div>
               </div>
@@ -379,6 +393,60 @@
                 </div>
               </div>
             <% end %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trust & Assurance (Mobile) -->
+          <div class="md:hidden space-y-2.5">
+            <!-- Fast Delivery Promise -->
+            <div class="bg-white rounded-xl border border-stone-200 px-4 py-3.5 flex items-center gap-3">
+              <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5.5 h-5.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold text-stone-800">Fast Delivery Promise</p>
+                <p class="text-[11px] text-stone-500 mt-0.5 leading-relaxed">We do our best to dispatch & deliver your order as quickly as possible</p>
+              </div>
+            </div>
+
+            <!-- Trust Badges Grid -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="bg-white rounded-xl border border-stone-200 px-3 py-3 flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <div>
+                  <p class="text-[11px] font-bold text-stone-800">100% Genuine</p>
+                  <p class="text-[10px] text-stone-400">Certified products</p>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl border border-stone-200 px-3 py-3 flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                </div>
+                <div>
+                  <p class="text-[11px] font-bold text-stone-800">Secure Payment</p>
+                  <p class="text-[10px] text-stone-400">SSL encrypted</p>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl border border-stone-200 px-3 py-3 flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </div>
+                <div>
+                  <p class="text-[11px] font-bold text-stone-800">Easy Returns</p>
+                  <p class="text-[10px] text-stone-400">Hassle-free process</p>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl border border-stone-200 px-3 py-3 flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-[11px] font-bold text-stone-800">24/7 Support</p>
+                  <p class="text-[10px] text-stone-400">Always here to help</p>
+                </div>
               </div>
             </div>
           </div>
@@ -503,13 +571,12 @@
                     id: 'place-order-btn-mobile',
                     class: 'flex-1 py-3 px-4 bg-rose-800 text-white font-semibold text-sm rounded-xl hover:bg-rose-900 transition shadow-lg cursor-pointer' %>
               </div>
+              <p class="md:hidden mt-3 text-[10px] text-stone-400 text-center leading-snug">
+                By placing this order, you agree to our Terms & Privacy Policy
+              </p>
 
               <!-- Desktop: Full button -->
               <div class="hidden md:block">
-                <p id="payment-info-box" class="text-xs text-stone-500 mb-2.5 flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  <span id="payment-info-desc">Pay when you receive your order</span>
-                </p>
                 <%= f.submit 'Place Order',
                     id: 'place-order-btn',
                     class: 'w-full py-3.5 lg:py-4 px-4 bg-rose-800 text-white font-semibold text-base lg:text-lg rounded-xl hover:bg-rose-900 transition shadow-lg cursor-pointer' %>
@@ -517,14 +584,22 @@
 
               <!-- Security Badges (Desktop Only) -->
               <div class="hidden lg:flex mt-4 items-center justify-center gap-4 text-xs text-stone-500">
-                <span class="flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                <span class="flex items-center gap-1.5">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                   </svg>
                   Secure Checkout
                 </span>
                 <span>|</span>
-                <span>SSL Encrypted</span>
+                <span class="flex items-center gap-1.5">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  100% Genuine
+                </span>
+                <span>|</span>
+                <span class="flex items-center gap-1.5">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  Easy Returns
+                </span>
               </div>
             <% else %>
               <!-- Disabled State -->
@@ -547,8 +622,8 @@
               </button>
             <% end %>
 
-            <p class="hidden md:block mt-4 text-xs text-stone-400 text-center">
-              By placing this order, you agree to our Terms and Privacy Policy
+            <p class="hidden md:block mt-4 text-[10px] text-stone-400 text-center leading-snug">
+              By placing this order, you agree to our Terms & Privacy Policy
             </p>
           </div>
         </div>
@@ -567,8 +642,6 @@
       const submitBtnMobile = document.getElementById('place-order-btn-mobile');
       const paymentCod = document.getElementById('payment_cod');
       const paymentRazorpay = document.getElementById('payment_razorpay');
-      const paymentInfoBox = document.getElementById('payment-info-box');
-      const paymentInfoDesc = document.getElementById('payment-info-desc');
 
       // --- Collapsible items section (mobile) ---
       const toggleItemsBtn = document.getElementById('toggle-items-btn');
@@ -759,10 +832,8 @@
             if (checkIcon) checkIcon.classList.remove('opacity-0');
 
             if (radio.id === 'payment_cod') {
-              if (paymentInfoDesc) paymentInfoDesc.textContent = 'Pay when you receive your order';
               setButtonText('Place Order');
             } else if (radio.id === 'payment_razorpay') {
-              if (paymentInfoDesc) paymentInfoDesc.textContent = 'You will be redirected to secure payment page';
               setButtonText('Proceed to Payment');
             }
           } else {
@@ -898,7 +969,6 @@
           const checkIcon = razorpayOption.querySelector('.check-icon');
           if (checkIcon) checkIcon.classList.remove('opacity-0');
         }
-        if (paymentInfoDesc) paymentInfoDesc.textContent = 'You will be redirected to secure payment page';
         setButtonText('Proceed to Payment');
       }
     }

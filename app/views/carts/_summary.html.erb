@@ -3,26 +3,36 @@
 <% discount = coupon&.calculate_discount(subtotal) || 0 %>
 <% discounted = subtotal - discount %>
 <%# Calculate shipping per-vendor to match checkout logic %>
-<% items_by_vendor = cart.cart_items.includes(product_variant: { product: :vendor }).group_by { |item| item.product_variant.product.vendor_id } %>
+<% items_by_vendor = cart.cart_items.includes(product_variant: { product: [:vendor, :hsn_code] }).group_by { |item| item.product_variant.product.vendor_id } %>
 <% estimated_shipping = items_by_vendor.sum do |_vid, items|
   vendor_subtotal = items.sum(&:total_price)
   Order.calculate_shipping_amount(vendor_subtotal)
 end %>
-<% total = discounted + estimated_shipping %>
+<%# Calculate tax based on HSN codes %>
+<% estimated_tax = if subtotal > 0
+  total_tax = cart.cart_items.includes(product_variant: { product: :hsn_code }).sum do |item|
+    rate = item.product_variant&.product&.hsn_code&.gst_rate || 3.0
+    (item.total_price.to_f * rate / 100.0)
+  end
+  (total_tax * (discounted.to_f / subtotal.to_f)).round(2)
+else
+  0
+end %>
+<% total = discounted + estimated_shipping + estimated_tax %>
 
 <div class="space-y-2 text-sm">
   <div class="flex justify-between">
     <span class="text-stone-500">Subtotal</span>
     <span class="text-stone-800"><%= format_price(subtotal) %></span>
   </div>
-  
+
   <% if discount > 0 %>
     <div class="flex justify-between text-emerald-600">
       <span>Coupon (<%= coupon.code %>)</span>
       <span class="font-medium">-<%= format_price(discount) %></span>
     </div>
   <% end %>
-  
+
   <div class="flex justify-between">
     <span class="text-stone-500">Shipping</span>
     <span class="<%= estimated_shipping > 0 ? 'text-stone-800' : 'text-emerald-600 font-medium' %>">
@@ -35,10 +45,15 @@ end %>
       <p class="text-[10px] text-rose-600">Add <%= format_price(remaining) %> more for free delivery</p>
     <% end %>
   <% end %>
-  
+
+  <div class="flex justify-between">
+    <span class="text-stone-500">Tax (GST)</span>
+    <span class="text-stone-800"><%= format_price(estimated_tax) %></span>
+  </div>
+
   <div class="border-t border-stone-100 pt-2 mt-2 flex justify-between">
-    <span class="font-medium text-stone-900">Est. Total</span>
+    <span class="font-medium text-stone-900">Total</span>
     <span class="font-semibold text-stone-900 text-base"><%= format_price(total) %></span>
   </div>
-  <p class="text-[10px] text-stone-400">Taxes calculated at checkout</p>
+  <p class="text-[10px] text-stone-400">Inclusive of all taxes</p>
 </div>
