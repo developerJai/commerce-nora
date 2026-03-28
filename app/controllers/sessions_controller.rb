@@ -2,8 +2,8 @@ class SessionsController < ApplicationController
   before_action :redirect_if_logged_in, only: [ :new, :create ]
 
   def new
-    # Store the return URL if provided
-    session[:return_to] = params[:return_to] || request.referer
+    # Store the return URL if provided (skip external/unreliable referrers)
+    session[:return_to] = params[:return_to] if params[:return_to].present?
   end
 
   def create
@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
 
     if customer
       session[:customer_id] = customer.id
-      customer.update(last_login_at: Time.current)
+      customer.update_column(:last_login_at, Time.current)
 
       # Merge guest cart
       if session[:cart_token]
@@ -22,7 +22,6 @@ class SessionsController < ApplicationController
         end
       end
 
-      # Redirect to stored location or account page
       redirect_to session.delete(:return_to) || account_path
     else
       flash.now[:alert] = "Invalid email or password"
@@ -33,8 +32,7 @@ class SessionsController < ApplicationController
 
   def destroy
     session.delete(:customer_id)
-
-    redirect_to root_path, notice: "You have been logged out"
+    redirect_to login_path, notice: "You have been logged out"
   end
 
   private
