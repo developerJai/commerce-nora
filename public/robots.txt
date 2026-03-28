@@ -1,4 +1,4 @@
-# Robots.txt for Noralooks - Artificial Jewellery, Gifts & Ethnic Wear E-commerce
+# Robots.txt for Noralooks - Fashion Jewellery, Gifts & Ethnic Wear E-commerce
 # Allow all search engines to crawl public pages
 
 User-agent: *

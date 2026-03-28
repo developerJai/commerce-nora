@@ -5,7 +5,7 @@ class CreateHomepageSettings < ActiveRecord::Migration[8.1]
       t.boolean :flash_sale_enabled, default: true, null: false
       t.string :flash_sale_title, default: "Flash Sale"
       t.string :flash_sale_heading, default: "Up to 50% OFF"
-      t.text :flash_sale_description, default: "Limited time offer on bestselling artificial jewellery. Shop now before it is gone!"
+      t.text :flash_sale_description, default: "Limited time offer on bestselling fashion jewellery. Shop now before it is gone!"
       t.integer :flash_sale_discount, default: 50
       t.string :flash_sale_cta_text, default: "Shop Now"
       t.string :flash_sale_cta_link, default: "/products"
@@ -27,7 +27,7 @@ class CreateHomepageSettings < ActiveRecord::Migration[8.1]
 
       # Hero Section Settings
       t.string :hero_tagline, default: "Timeless Elegance"
-      t.string :hero_subtitle, default: "Exquisite artificial jewellery, thoughtful gifts, and beautiful ethnic wear for every occasion"
+      t.string :hero_subtitle, default: "Exquisite fashion jewellery, thoughtful gifts, and beautiful ethnic wear for every occasion"
       t.string :search_placeholder_prefix, default: "Search"
 
       t.timestamps

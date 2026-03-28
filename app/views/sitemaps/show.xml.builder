@@ -33,7 +33,7 @@ xml.urlset xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9",
         product.images.limit(5).each do |image|
           xml.tag!("image:image") do
             xml.tag!("image:loc", Rails.application.routes.url_helpers.rails_blob_url(image, host: @base_url))
-            xml.tag!("image:title", "#{product.name} - #{product.category&.name || 'Artificial Jewellery'} | Noralooks")
+            xml.tag!("image:title", "#{product.name} - #{product.category&.name || 'Fashion Jewellery'} | Noralooks")
           end
         end
       end

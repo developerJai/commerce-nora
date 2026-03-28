@@ -13,7 +13,11 @@
     </script>
   <% end %>
 
-  <title><%= meta_title(content_for(:title)) %></title>
+  <% if request.user_agent&.include?("Hotwire") %>
+    <title><%= native_page_title(content_for(:title)) %></title>
+  <% else %>
+    <title><%= meta_title(content_for(:title)) %></title>
+  <% end %>
   <meta name="viewport" content="width=device-width,initial-scale=1,<%= 'maximum-scale=1,user-scalable=no,' if request.user_agent&.include?('Hotwire') %>viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -349,7 +353,7 @@
         <% footer_store_setting = StoreSetting.instance %>
         <div class="col-span-2 md:col-span-1">
           <span class="text-xl font-serif font-semibold text-white">Noralooks</span>
-          <p class="text-stone-400 text-sm mt-3 leading-relaxed">Buy artificial jewellery, fashion jewellery, ethnic wear & gifts online. Premium quality at affordable prices with free shipping across India.</p>
+          <p class="text-stone-400 text-sm mt-3 leading-relaxed">Buy fashion jewellery, fashion jewellery, ethnic wear & gifts online. Premium quality at affordable prices with free shipping across India.</p>
           <% if footer_store_setting.has_social_links? %>
             <div class="flex items-center gap-3 mt-4">
               <% if footer_store_setting.instagram_url.present? %>
@@ -378,7 +382,7 @@
         <div>
           <h4 class="text-white font-medium mb-4 text-sm">Shop Jewellery</h4>
           <ul class="space-y-2 text-sm">
-            <li><%= link_to 'All Artificial Jewellery', products_path(sort: 'price_low'), class: 'text-stone-400 hover:text-rose-400 transition' %></li>
+            <li><%= link_to 'All Fashion Jewellery', products_path(sort: 'price_low'), class: 'text-stone-400 hover:text-rose-400 transition' %></li>
             <li><%= link_to 'New Arrivals', products_path(sort: 'newest'), class: 'text-stone-400 hover:text-rose-400 transition' %></li>
             <li><%= link_to 'Best Sellers', products_path(sort: 'rating'), class: 'text-stone-400 hover:text-rose-400 transition' %></li>
           </ul>
@@ -433,7 +437,7 @@
       </div>
       
       <div class="border-t border-stone-800 mt-8 pt-8 text-center">
-        <p class="text-stone-500 text-xs">&copy; <%= Date.current.year %> Noralooks - Buy Artificial Jewellery, Gifts & Ethnic Wear Online India. All rights reserved.</p>
+        <p class="text-stone-500 text-xs">&copy; <%= Date.current.year %> Noralooks - Buy Fashion Jewellery, Gifts & Ethnic Wear Online India. All rights reserved.</p>
       </div>
     </div>
   </footer>

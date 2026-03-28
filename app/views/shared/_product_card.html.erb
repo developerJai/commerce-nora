@@ -32,9 +32,9 @@
   <%= link_to product_path_url, data: { turbo_frame: '_top' } do %>
     <div class="aspect-square bg-stone-50 relative overflow-hidden">
       <% if variant&.image&.attached? %>
-        <%= image_tag variant.image, alt: "Buy #{product.name} online at Noralooks - #{product.category&.name || 'Artificial Jewellery'}", class: 'w-full h-full object-cover group-hover:scale-105 transition duration-500', loading: 'lazy' %>
+        <%= image_tag variant.image, alt: "Buy #{product.name} online at Noralooks - #{product.category&.name || 'Fashion Jewellery'}", class: 'w-full h-full object-cover group-hover:scale-105 transition duration-500', loading: 'lazy' %>
       <% elsif product.images.attached? %>
-        <%= image_tag product.images.first, alt: "Buy #{product.name} online at Noralooks - #{product.category&.name || 'Artificial Jewellery'}", class: 'w-full h-full object-cover group-hover:scale-105 transition duration-500', loading: 'lazy' %>
+        <%= image_tag product.images.first, alt: "Buy #{product.name} online at Noralooks - #{product.category&.name || 'Fashion Jewellery'}", class: 'w-full h-full object-cover group-hover:scale-105 transition duration-500', loading: 'lazy' %>
       <% else %>
         <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-50 to-amber-50">
           <svg class="w-12 h-12 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">

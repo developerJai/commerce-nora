@@ -63,7 +63,7 @@ class BotReviewGenerator
       -> (p) { "Gifted to my friend, she said it's really nice." },
       -> (p) { "Good product for the price range. No issues so far." },
       -> (p) { "Looks elegant. Only wish it came with a box." },
-      -> (p) { "One of the better artificial jewellery pieces I have bought." },
+      -> (p) { "One of the better fashion jewellery pieces I have bought." },
     ],
     3 => [
       -> (p) { "Average product. OK for the price." },

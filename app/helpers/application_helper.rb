@@ -6,18 +6,61 @@ module ApplicationHelper
 
   # SEO Meta Tags
   def meta_title(title = nil)
-    base_title = "Noralooks - Buy Artificial Jewellery, Gifts & Ethnic Wear Online India"
+    base_title = "Noralooks - Buy Fashion Jewellery, Gifts & Ethnic Wear Online India"
     title.present? ? "#{title} | #{base_title}" : base_title
   end
 
+  # Short titles for native mobile app (Hotwire Native) — keeps nav bar clean
+  def native_page_title(title = nil)
+    return title if title.blank?
+
+    native_titles = {
+      "Buy Fashion Jewellery, Gifts & Ethnic Wear Online" => "Best Deals | Noralooks",
+      "Buy Fashion Jewellery Online - Necklaces, Earrings, Bangles & More" => "Explore Collections",
+      "Shopping Bag" => "My Bag",
+      "My Orders" => "Orders",
+      "My Account" => "Account",
+      "My Wishlist" => "Wishlist",
+      "My Addresses" => "Addresses",
+      "Sign In" => "Sign In | Noralooks",
+      "Create Account" => "Join Us | Noralooks",
+      "Edit Profile" => "Edit Profile",
+      "Checkout" => "Checkout",
+      "Support" => "Help | Noralooks",
+      "New Support Ticket" => "New Ticket",
+      "Change Password" => "Password",
+      "Add New Address" => "New Address",
+      "Edit Address" => "Edit Address",
+      "Write Review" => "Review",
+      "About Us" => "About",
+      "Privacy Policy" => "Privacy",
+      "Terms & Conditions" => "Terms",
+      "Shipping Information" => "Shipping",
+      "Returns & Exchange" => "Returns"
+    }
+
+    return native_titles[title] if native_titles[title]
+
+    # Dynamic titles: product pages, order details, ticket details
+    if title.start_with?("Buy ") && title.end_with?(" Online at Best Price")
+      title.sub("Buy ", "").sub(" Online at Best Price", "").truncate(20, omission: "")
+    elsif title.start_with?("Order ")
+      title # Keep order numbers short as-is
+    elsif title.start_with?("Ticket ")
+      title
+    else
+      title.truncate(20, omission: "")
+    end
+  end
+
   def meta_description(description = nil)
-    description || "Shop artificial jewellery, fashion jewellery, ethnic wear, traditional clothes & unique gifts online at Noralooks. Best prices, free shipping above #{format_price(free_delivery_threshold)}, quality checked before dispatch. Buy necklaces, earrings, bangles, rings, anklets, bracelets & more."
+    description || "Shop fashion jewellery, designer jewellery, ethnic wear, traditional clothes & unique gifts online at Noralooks. Best prices, free shipping above #{format_price(free_delivery_threshold)}, quality checked before dispatch. Buy necklaces, earrings, bangles, rings, anklets, bracelets & more."
   end
 
   def meta_keywords(keywords = [])
     base_keywords = [
-      "artificial jewellery", "fashion jewellery", "imitation jewellery", "costume jewellery",
-      "artificial jewellery online", "buy artificial jewellery", "artificial jewellery India",
+      "fashion jewellery", "designer jewellery", "imitation jewellery", "costume jewellery",
+      "fashion jewellery online", "buy fashion jewellery", "fashion jewellery India",
       "fashion jewellery online India", "women jewellery online",
       "necklace set online", "earrings online", "bangles online", "rings online",
       "anklets online", "bracelets online", "jhumka earrings", "kundan jewellery",
@@ -29,7 +72,7 @@ module ApplicationHelper
       "Noralooks", "affordable jewellery", "cheap jewellery online",
       "jewellery under 500", "jewellery under 1000",
       "online jewellery shopping", "Indian jewellery online shopping",
-      "jewellery store India", "best artificial jewellery website"
+      "jewellery store India", "best fashion jewellery website"
     ]
     (base_keywords + keywords).uniq.join(", ")
   end

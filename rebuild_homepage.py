@@ -93,13 +93,13 @@ css_animations = '''
 # Update page title
 original = original.replace(
     '<% content_for(:title) { "Jewellery & Traditional Wear" } %>',
-    '<% content_for(:title) { "Artificial Jewellery, Gifts & Ethnic Wear" } %>'
+    '<% content_for(:title) { "Fashion Jewellery, Gifts & Ethnic Wear" } %>'
 )
 
 # Update hero subtitle
 original = original.replace(
     'Curated picks for weddings, festivals, everyday elegance, and gifting',
-    'Exquisite artificial jewellery, thoughtful gifts, and beautiful ethnic wear for every occasion'
+    'Exquisite fashion jewellery, thoughtful gifts, and beautiful ethnic wear for every occasion'
 )
 
 # Insert CSS after line 2
