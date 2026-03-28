@@ -1,4 +1,5 @@
 <% content_for(:title) { "Buy #{@product.name} Online at Best Price" } %>
+<% content_for(:native_title) { @product.name.truncate(25) } %>
 <% content_for(:meta_description) { truncate(@product.description.to_s, length: 120).presence&.+(". ").to_s + "Buy #{@product.name} online at Noralooks starting #{format_price(@product.min_price)}. #{@product.exchange_in_days.to_i > 0 ? "#{@product.exchange_in_days}-day exchange." : ''} Free shipping above #{format_price(free_delivery_threshold)}. Quality checked. Shop now!" } %>
 <% content_for(:meta_keywords) { [@product.category&.name, "buy #{@product.name.downcase}", "#{@product.name.downcase} online", "#{@product.name.downcase} price", "#{@product.category&.name&.downcase} online", "fashion jewellery", "buy #{@product.category&.name&.downcase} online India"].compact } %>
 <% content_for(:og_type) { 'product' } %>

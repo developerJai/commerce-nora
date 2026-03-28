@@ -1,4 +1,5 @@
 <% content_for(:title) { "Checkout" } %>
+<% content_for(:native_title) { "Checkout" } %>
 <%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css", "data-turbo-track": "reload" %>
 <% store_setting = StoreSetting.instance %>
 <% enable_razorpay = store_setting.razorpay_enabled? %>

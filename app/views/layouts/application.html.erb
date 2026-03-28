@@ -14,7 +14,7 @@
   <% end %>
 
   <% if request.user_agent&.include?("Hotwire") %>
-    <title><%= native_page_title(content_for(:title)) %></title>
+    <title><%= native_page_title(content_for(:native_title)) %></title>
   <% else %>
     <title><%= meta_title(content_for(:title)) %></title>
   <% end %>

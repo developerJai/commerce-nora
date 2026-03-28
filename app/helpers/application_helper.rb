@@ -10,47 +10,11 @@ module ApplicationHelper
     title.present? ? "#{title} | #{base_title}" : base_title
   end
 
-  # Short titles for native mobile app (Hotwire Native) — keeps nav bar clean
-  def native_page_title(title = nil)
-    return title if title.blank?
-
-    native_titles = {
-      "Buy Fashion Jewellery, Gifts & Ethnic Wear Online" => "Best Deals | Noralooks",
-      "Buy Fashion Jewellery Online - Necklaces, Earrings, Bangles & More" => "Noralooks",
-      "Shopping Bag" => "My Bag",
-      "My Orders" => "Orders",
-      "My Account" => "Account",
-      "My Wishlist" => "Wishlist",
-      "My Addresses" => "Addresses",
-      "Sign In" => "Sign In | Noralooks",
-      "Create Account" => "Join Us | Noralooks",
-      "Edit Profile" => "Edit Profile",
-      "Checkout" => "Checkout",
-      "Support" => "Help | Noralooks",
-      "New Support Ticket" => "New Ticket",
-      "Change Password" => "Password",
-      "Add New Address" => "New Address",
-      "Edit Address" => "Edit Address",
-      "Write Review" => "Review",
-      "About Us" => "About",
-      "Privacy Policy" => "Privacy",
-      "Terms & Conditions" => "Terms",
-      "Shipping Information" => "Shipping",
-      "Returns & Exchange" => "Returns"
-    }
-
-    return native_titles[title] if native_titles[title]
-
-    # Dynamic titles: product pages, order details, ticket details
-    if title.start_with?("Buy ") && title.end_with?(" Online at Best Price")
-      title.sub("Buy ", "").sub(" Online at Best Price", "").truncate(20, omission: "")
-    elsif title.start_with?("Order ")
-      title # Keep order numbers short as-is
-    elsif title.start_with?("Ticket ")
-      title
-    else
-      title.truncate(20, omission: "")
-    end
+  # Short title for native mobile app (Hotwire Native) nav bar.
+  # Uses content_for(:native_title) set independently in each view,
+  # so web title changes never break mobile titles.
+  def native_page_title(native_title = nil)
+    native_title.presence || "Noralooks"
   end
 
   def meta_description(description = nil)

@@ -1,4 +1,5 @@
 <% content_for(:title) { "Buy #{@category.name} Online at Best Prices" } %>
+<% content_for(:native_title) { @category.name.truncate(25) } %>
 <% content_for(:meta_description) { "Shop #{@category.name.downcase} online at Noralooks. Browse #{@pagy.count}+ products with best prices, free shipping above #{format_price(free_delivery_threshold)}. #{@category.description.present? ? truncate(@category.description, length: 100) : "Quality checked before dispatch. Buy #{@category.name.downcase} now!"}" } %>
 <% content_for(:meta_keywords) { ["buy #{@category.name.downcase} online", "#{@category.name.downcase} online India", "#{@category.name.downcase} price", "#{@category.name.downcase} shopping", "best #{@category.name.downcase}", "cheap #{@category.name.downcase} online", "#{@category.name.downcase} collection"] } %>
 
