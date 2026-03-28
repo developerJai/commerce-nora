@@ -494,8 +494,8 @@
   <%# Bottom nav lives OUTSIDE the turbo-frame, so it never re-renders during tab switches.
       Tab links target "main-content" frame — only the page content swaps.
       iOS native uses its own native tab bar, so skip this entirely. %>
-  <% is_ios_native = request.user_agent&.include?("Hotwire") && !request.user_agent&.include?("NoraLooks/Android") %>
-  <% unless is_ios_native %>
+  <% is_native_app = request.user_agent&.include?("Hotwire") || request.user_agent&.include?("NoraLooks/Android") %>
+  <% unless is_native_app %>
   <nav id="mobile-bottom-nav" data-turbo-permanent data-mobile-nav
        data-controller="mobile-nav"
        data-mobile-nav-hide-on-value='["/checkouts"]'

@@ -70,8 +70,9 @@ document.addEventListener("turbo:before-cache", () => {
 
   document.addEventListener("turbo:load", hide)
   document.addEventListener("turbo:fetch-request-error", hide)
+  // Hide when a new visit starts (cancels previous in-flight visit)
+  document.addEventListener("turbo:before-render", hide)
   // Hide loader after Turbo Stream responses (e.g. cart remove/update)
-  // turbo:load only fires for full-page navigations, not stream responses
   document.addEventListener("turbo:before-stream-render", hide)
   // Hide loader after turbo frame navigations (e.g. coupon modal)
   document.addEventListener("turbo:frame-load", hide)
