@@ -1,8 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Keeps the permanent bottom nav in sync with the current page.
-// - Highlights the active tab based on URL
-// - Hides nav on pages like product show and checkout
+// Keeps the bottom nav bar in sync with the current page.
+// Uses data-turbo-permanent to persist across Turbo Drive navigations.
+// This controller updates the active tab highlight, show/hide state,
+// and syncs the cart count badge from the new page's response.
 export default class extends Controller {
   static targets = ["tab"]
   static values = { hideOn: Array }
@@ -10,10 +11,25 @@ export default class extends Controller {
   connect() {
     this.update()
     document.addEventListener("turbo:load", this.update)
+    document.addEventListener("turbo:before-render", this.syncCartCount)
   }
 
   disconnect() {
     document.removeEventListener("turbo:load", this.update)
+    document.removeEventListener("turbo:before-render", this.syncCartCount)
+  }
+
+  // Before Turbo swaps the page, grab the fresh cart count from the new body
+  // and inject it into our permanent nav (which Turbo will preserve).
+  syncCartCount = (event) => {
+    const newBody = event.detail.newBody
+    if (!newBody) return
+
+    const freshBadge = newBody.querySelector("#mobile-cart-count")
+    const currentBadge = this.element.querySelector("#mobile-cart-count")
+    if (freshBadge && currentBadge) {
+      currentBadge.innerHTML = freshBadge.innerHTML
+    }
   }
 
   update = () => {
@@ -21,7 +37,6 @@ export default class extends Controller {
 
     // Show/hide nav based on current page
     const shouldHide = this.hideOnValue.some(pattern => {
-      // "/products/" hides /products/:id but not /products
       if (pattern.endsWith("/")) return path.startsWith(pattern) && path !== pattern.slice(0, -1)
       return path.startsWith(pattern)
     })

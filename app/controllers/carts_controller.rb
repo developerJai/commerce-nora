@@ -87,6 +87,7 @@ class CartsController < ApplicationController
 
         # Update cart content based on whether cart is empty or not
         if current_cart.empty?
+          session.delete(:coupon_id)
           streams << turbo_stream.replace("cart-content",
             partial: "carts/empty_cart")
           streams << turbo_stream.update("cart-header",
@@ -175,6 +176,7 @@ class CartsController < ApplicationController
 
         # Update cart content based on whether cart is empty or not
         if @cart.empty?
+          session.delete(:coupon_id)
           streams << turbo_stream.replace("cart-content",
             partial: "carts/empty_cart")
           streams << turbo_stream.update("cart-header",
@@ -211,6 +213,7 @@ class CartsController < ApplicationController
 
   def clear
     current_cart.clear!
+    session.delete(:coupon_id)
     redirect_to cart_path, notice: "Cart cleared"
   end
 

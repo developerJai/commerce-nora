@@ -91,6 +91,12 @@ document.addEventListener("turbo:before-cache", () => {
     return element.closest("[data-mobile-nav]") !== null
   }
 
+  function resetNav() {
+    navigating = false
+    const nav = document.querySelector("[data-mobile-nav]")
+    if (nav) nav.style.pointerEvents = ""
+  }
+
   // Intercept clicks on mobile nav links before Turbo processes them
   document.addEventListener("turbo:click", (event) => {
     if (!isMobileNavLink(event.target)) return
@@ -112,11 +118,7 @@ document.addEventListener("turbo:before-cache", () => {
   })
 
   // Re-enable nav once the page finishes loading
-  document.addEventListener("turbo:load", () => {
-    navigating = false
-    const nav = document.querySelector("[data-mobile-nav]")
-    if (nav) nav.style.pointerEvents = ""
-  })
+  document.addEventListener("turbo:load", resetNav)
 
   // Also re-enable if the visit fails or is cancelled
   document.addEventListener("turbo:fetch-request-error", () => {

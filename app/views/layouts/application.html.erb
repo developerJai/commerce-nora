@@ -82,10 +82,12 @@
         overflow-y: auto !important;
         height: auto !important;
       }
-      /* Add padding for native mobile bottom tab bar (Hotwire Native) */
+      <% if !request.user_agent&.include?("NoraLooks/Android") %>
+      /* Add padding for iOS native bottom tab bar only */
       main {
         padding-bottom: 70px !important;
       }
+      <% end %>
       /* Prevent long-press context menu / link preview in native app */
       a, img, button {
         -webkit-touch-callout: none !important;
@@ -306,7 +308,6 @@
     <% end %>
   </div>
 
-  <!-- Main content -->
   <main class="flex-1">
     <%= yield %>
   </main>
@@ -490,11 +491,14 @@
     </div>
   <% end %>
 
+  <%# Bottom nav lives OUTSIDE the turbo-frame, so it never re-renders during tab switches.
+      Tab links target "main-content" frame — only the page content swaps.
+      iOS native uses its own native tab bar, so skip this entirely. %>
   <% is_ios_native = request.user_agent&.include?("Hotwire") && !request.user_agent&.include?("NoraLooks/Android") %>
   <% unless is_ios_native %>
   <nav id="mobile-bottom-nav" data-turbo-permanent data-mobile-nav
        data-controller="mobile-nav"
-       data-mobile-nav-hide-on-value='["/products/", "/checkouts"]'
+       data-mobile-nav-hide-on-value='["/checkouts"]'
        class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-40 safe-area-pb">
     <div class="flex items-center justify-around h-14">
       <a href="/products" data-mobile-nav-target="tab" data-path="/products"
