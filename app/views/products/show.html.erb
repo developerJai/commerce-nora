@@ -701,7 +701,8 @@
 
 <!-- Sticky Mobile Bottom Bar -->
 <% if @selected_variant %>
-  <div class="sm:hidden fixed bottom-14 left-0 right-0 bg-white border-t border-stone-200 px-3 py-2.5 z-[45] safe-area-bottom">
+  <% is_native_app_pdp = request.user_agent&.include?('Hotwire') || request.user_agent&.include?('NoraLooks/Android') %>
+  <div class="sm:hidden fixed <%= is_native_app_pdp ? 'bottom-0 pb-[calc(0.625rem+env(safe-area-inset-bottom))]' : 'bottom-14' %> left-0 right-0 bg-white border-t border-stone-200 px-3 py-2.5 z-[45]">
     <div id="mobile-sticky-bar-<%= @selected_variant.id %>" class="flex items-center gap-3">
       <%= render 'products/mobile_sticky_bar', variant: @selected_variant, cart_item: @cart_item %>
     </div>
