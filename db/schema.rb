@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_195049) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_095513) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -540,6 +540,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_195049) do
     t.datetime "created_at", null: false
     t.decimal "delivery_charge_amount", precision: 10, scale: 2, default: "99.0", null: false
     t.boolean "enable_coupons", default: true
+    t.boolean "enable_multi_vendor_coupons", default: false, null: false
     t.string "facebook_url"
     t.jsonb "filter_config", default: {}, null: false
     t.decimal "free_delivery_min_amount", precision: 10, scale: 2, default: "499.0", null: false
@@ -550,6 +551,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_195049) do
     t.string "mobile_app_section_title", default: "Shop on the Go"
     t.boolean "mobile_apps_enabled", default: false, null: false
     t.jsonb "payment_config", default: {}
+    t.string "smart_banner_subtitle"
+    t.string "smart_banner_title"
     t.string "twitter_url"
     t.datetime "updated_at", null: false
     t.string "youtube_url"

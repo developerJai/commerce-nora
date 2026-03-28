@@ -8,19 +8,13 @@
       </div>
 
       <div class="flex-1 min-h-[600px]">
-      <div id="wishlist-header" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-        <div>
-          <h1 class="text-2xl font-sans font-semibold text-stone-900">My Wishlist</h1>
-          <p class="text-sm text-stone-600 mt-1">
-            <% if @wishlist_items.any? %>
-              <%= pluralize(@wishlist_items.size, 'item') %> saved
-            <% else %>
-              Save items you love and revisit them anytime
-            <% end %>
-          </p>
-        </div>
+      <% if @wishlist_items.any? %>
+        <div id="wishlist-header" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+          <div>
+            <h1 class="text-2xl font-sans font-semibold text-stone-900">My Wishlist</h1>
+            <p class="text-sm text-stone-600 mt-1"><%= pluralize(@wishlist_items.size, 'item') %> saved</p>
+          </div>
 
-        <% if @wishlist_items.any? %>
           <%= button_to clear_wishlists_path, method: :delete,
               data: { turbo_confirm: "Are you sure you want to clear your entire wishlist?" },
               class: 'inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition' do %>
@@ -29,8 +23,8 @@
             </svg>
             Clear Wishlist
           <% end %>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
 
       <div id="wishlist-content">
         <% if @wishlist_items.any? %>

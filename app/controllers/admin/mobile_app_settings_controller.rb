@@ -10,7 +10,8 @@ module Admin
       @store_setting = StoreSetting.instance
       mobile_params = params.require(:store_setting).permit(
         :mobile_apps_enabled, :ios_app_url, :android_app_url,
-        :mobile_app_section_title, :mobile_app_section_subtitle
+        :mobile_app_section_title, :mobile_app_section_subtitle,
+        :smart_banner_title, :smart_banner_subtitle
       )
 
       if @store_setting.update(mobile_params)

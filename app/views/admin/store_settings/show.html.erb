@@ -1,342 +1,451 @@
 <% content_for(:title) { "Store Settings" } %>
 
-<div class="max-w-3xl">
+<div class="max-w-4xl">
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Store Settings</h1>
-    <p class="mt-1 text-sm text-gray-500">Configure store filters and payment methods.</p>
+    <p class="mt-1 text-sm text-gray-500">Manage your store configuration. Each section saves independently.</p>
   </div>
 
-  <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, local: true, class: "space-y-6" do |f| %>
-    
-    <!-- Company Details Section -->
-    <div>
-      <h2 class="text-lg font-bold text-gray-900 mb-4">Company Details</h2>
-      <p class="text-sm text-gray-500 mb-4">Company information used on invoices and tax documents.</p>
-      
-      <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <div>
-          <%= f.label :gst_number, "Company GST Number", class: "block text-sm font-semibold text-gray-900 mb-1" %>
-          <%= f.text_field :gst_number, 
-              placeholder: "e.g., 27AABCU9603R1ZX",
-              class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
-          <p class="text-xs text-gray-500 mt-1">15-digit GST identification number displayed on all invoices.</p>
-        </div>
+  <!-- Quick nav pills -->
+  <div class="mb-6 flex flex-wrap gap-2">
+    <% [
+      ["company-section", "Company", "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"],
+      ["social-section", "Social", "M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"],
+      ["banner-section", "Banner", "M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"],
+      ["delivery-section", "Delivery", "M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"],
+      ["coupon-section", "Coupons", "M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"],
+      ["payment-section", "Payments", "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"],
+      ["display-section", "Categories", "M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"],
+      ["filter-section", "Filters", "M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"]
+    ].each do |id, label, icon| %>
+      <a href="#<%= id %>" data-turbo="false" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:text-gray-900 transition">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="<%= icon %>"/></svg>
+        <%= label %>
+      </a>
+    <% end %>
+  </div>
 
-        <div>
-          <%= f.label :company_address, "Company Address", class: "block text-sm font-semibold text-gray-900 mb-1" %>
-          <%= f.text_area :company_address, 
-              rows: 3,
-              placeholder: "Full company address for invoices...",
-              class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
-        </div>
+  <div class="space-y-5">
 
-        <div>
-          <%= f.label :company_phone, "Company Phone", class: "block text-sm font-semibold text-gray-900 mb-1" %>
-          <%= f.text_field :company_phone, 
-              placeholder: "e.g., +91 98765 43210",
-              class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
-        </div>
-      </div>
-    </div>
-
-    <!-- Social Media Links Section -->
-    <div class="mt-8">
-      <h2 class="text-lg font-bold text-gray-900 mb-4">Social Media Links</h2>
-      <p class="text-sm text-gray-500 mb-4">Add your social media profile URLs. These will appear in the website footer and help with SEO.</p>
-
-      <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <svg class="w-4 h-4 text-red-600" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-              <%= f.label :youtube_url, "YouTube", class: "block text-sm font-semibold text-gray-900" %>
-            </div>
-            <%= f.url_field :youtube_url,
-                placeholder: "https://youtube.com/@noralooks",
-                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
-          </div>
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <svg class="w-4 h-4 text-pink-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-              <%= f.label :instagram_url, "Instagram", class: "block text-sm font-semibold text-gray-900" %>
-            </div>
-            <%= f.url_field :instagram_url,
-                placeholder: "https://www.instagram.com/noralooksofficial",
-                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
-          </div>
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <svg class="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              <%= f.label :facebook_url, "Facebook", class: "block text-sm font-semibold text-gray-900" %>
-            </div>
-            <%= f.url_field :facebook_url,
-                placeholder: "https://www.facebook.com/noralooks",
-                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
-          </div>
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <svg class="w-4 h-4 text-gray-900" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              <%= f.label :twitter_url, "X (Twitter)", class: "block text-sm font-semibold text-gray-900" %>
-            </div>
-            <%= f.url_field :twitter_url,
-                placeholder: "https://x.com/noralooks",
-                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
-          </div>
-        </div>
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <p class="text-xs text-blue-800">
-            <strong>SEO Tip:</strong> Social media links are automatically added to the website's structured data (schema.org), helping search engines understand your brand presence. They also appear in the website footer for customers.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Banner Colors Section -->
-    <div class="mt-8">
-      <h2 class="text-lg font-bold text-gray-900 mb-4">Announcement Banner Colors</h2>
-      <p class="text-sm text-gray-500 mb-4">Customize the colors of the top promotional banner (e.g., "Free Shipping" bar).</p>
-
-      <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <!-- Live Preview -->
-        <div>
-          <p class="text-xs font-medium text-gray-500 uppercase mb-2">Preview</p>
-          <div id="banner-preview" class="text-center py-2 px-3 rounded-lg" style="background-color: <%= @store_setting.effective_banner_bg_color %>;">
-            <p class="text-sm" style="color: <%= @store_setting.effective_banner_text_color %>;">
-              <span class="font-medium" style="color: <%= @store_setting.effective_banner_accent_color %>;">Free Shipping</span> on orders above ₹499 | 24-Hour Dispatch
-            </p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <%= f.label :banner_bg_color, "Background Color", class: "block text-sm font-semibold text-gray-900 mb-1" %>
-            <div class="flex items-center gap-2">
-              <%= f.color_field :banner_bg_color,
-                  value: @store_setting.effective_banner_bg_color,
-                  class: "h-10 w-14 rounded border border-gray-300 cursor-pointer",
-                  data: { action: "input->banner-preview#update" } %>
-              <%= f.text_field :banner_bg_color,
-                  value: @store_setting.effective_banner_bg_color,
-                  class: "flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono uppercase",
-                  data: { banner_preview_target: "bgInput" } %>
-            </div>
-          </div>
-          <div>
-            <%= f.label :banner_text_color, "Text Color", class: "block text-sm font-semibold text-gray-900 mb-1" %>
-            <div class="flex items-center gap-2">
-              <%= f.color_field :banner_text_color,
-                  value: @store_setting.effective_banner_text_color,
-                  class: "h-10 w-14 rounded border border-gray-300 cursor-pointer",
-                  data: { action: "input->banner-preview#update" } %>
-              <%= f.text_field :banner_text_color,
-                  value: @store_setting.effective_banner_text_color,
-                  class: "flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono uppercase",
-                  data: { banner_preview_target: "textInput" } %>
-            </div>
-          </div>
-          <div>
-            <%= f.label :banner_accent_color, "Accent Color", class: "block text-sm font-semibold text-gray-900 mb-1" %>
-            <div class="flex items-center gap-2">
-              <%= f.color_field :banner_accent_color,
-                  value: @store_setting.effective_banner_accent_color,
-                  class: "h-10 w-14 rounded border border-gray-300 cursor-pointer",
-                  data: { action: "input->banner-preview#update" } %>
-              <%= f.text_field :banner_accent_color,
-                  value: @store_setting.effective_banner_accent_color,
-                  class: "flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono uppercase",
-                  data: { banner_preview_target: "accentInput" } %>
-            </div>
-          </div>
-        </div>
-        <p class="text-xs text-gray-400">Click the color swatch to pick a color, or type a hex code directly.</p>
-      </div>
-    </div>
-
-    <!-- Delivery Settings Section -->
-    <div class="mt-8">
-      <h2 class="text-lg font-bold text-gray-900 mb-4">Delivery Settings</h2>
-      <p class="text-sm text-gray-500 mb-4">Configure free delivery threshold and delivery charges for orders below the threshold.</p>
-      
-      <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <%= f.label :free_delivery_min_amount, "Free Delivery Minimum Order (₹)", class: "block text-sm font-semibold text-gray-900 mb-1" %>
-            <%= f.number_field :free_delivery_min_amount,
-                value: @store_setting.effective_free_delivery_min_amount,
-                min: 0, step: 1,
-                placeholder: "e.g., 499",
-                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
-            <p class="text-xs text-gray-500 mt-1">Orders at or above this amount get free delivery. Set to 0 for free delivery on all orders.</p>
-          </div>
-          <div>
-            <%= f.label :delivery_charge_amount, "Delivery Charge (₹)", class: "block text-sm font-semibold text-gray-900 mb-1" %>
-            <%= f.number_field :delivery_charge_amount,
-                value: @store_setting.effective_delivery_charge_amount,
-                min: 0, step: 1,
-                placeholder: "e.g., 99",
-                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
-            <p class="text-xs text-gray-500 mt-1">Flat delivery charge for orders below the free delivery minimum.</p>
-          </div>
-        </div>
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <p class="text-xs text-blue-800">
-            <strong>Current policy:</strong> Orders of 
-            <strong><%= number_to_currency(@store_setting.effective_free_delivery_min_amount, unit: "₹", precision: 0) %></strong> 
-            or above get free delivery. Orders below this amount are charged 
-            <strong><%= number_to_currency(@store_setting.effective_delivery_charge_amount, unit: "₹", precision: 0) %></strong> 
-            for delivery.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Coupon Settings Section -->
-    <div class="mt-8">
-      <h2 class="text-lg font-bold text-gray-900 mb-4">Coupon Settings</h2>
-      <p class="text-sm text-gray-500 mb-4">Configure coupon code functionality for customers.</p>
-      
-      <div class="bg-white shadow rounded-lg p-6">
-        <div class="flex items-start gap-4">
-          <div class="flex-shrink-0 mt-0.5">
-            <div class="w-9 h-9 rounded-lg bg-rose-50 flex items-center justify-center">
-              <svg class="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="flex-1 min-w-0">
-            <span class="text-sm font-semibold text-gray-900">
-              Enable Coupon Codes
-            </span>
-            <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">
-              Allow customers to apply coupon codes in the shopping cart. When enabled, customers can enter coupon codes like SAVE20 to get discounts. 
-              <span class="text-amber-600 font-medium">Note: Coupons are automatically disabled for multi-vendor orders to prevent calculation issues.</span>
-            </p>
-          </div>
-
-          <div class="flex-shrink-0 pt-1">
-            <%= f.label :enable_coupons, class: "relative inline-flex items-center cursor-pointer" do %>
-              <%= f.check_box :enable_coupons,
-                  { checked: @store_setting.coupons_enabled?,
-                    class: "sr-only peer" },
-                  "1", "0" %>
-              <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-rose-600 transition-colors duration-200"></div>
-              <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
-            <% end %>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Payment Methods Section -->
-    <div class="mt-8">
-      <h2 class="text-lg font-bold text-gray-900 mb-4">Payment Methods</h2>
-      <p class="text-sm text-gray-500 mb-4">Enable or disable payment options available at checkout.</p>
-      
-      <div class="bg-white shadow rounded-lg divide-y divide-gray-100">
-        <%
-          payment_config = @store_setting.effective_payment_config
-          payment_items = [
-            {
-              key: "enable_razorpay",
-              label: "Online Payments (Razorpay)",
-              description: "Allow customers to pay via UPI, Credit/Debit Cards, Netbanking, and Wallets through Razorpay.",
-              icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z",
-              color: "blue"
-            },
-            {
-              key: "enable_cod",
-              label: "Cash on Delivery",
-              description: "Allow customers to pay with cash or UPI when they receive their order.",
-              icon: "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z",
-              color: "amber"
-            }
-          ]
-        %>
-
-        <% payment_items.each do |item| %>
-          <div class="px-5 py-4 flex items-start gap-4 group hover:bg-gray-50 transition-colors">
-            <div class="flex-shrink-0 mt-0.5">
-              <div class="w-9 h-9 rounded-lg bg-<%= item[:color] %>-50 flex items-center justify-center group-hover:bg-<%= item[:color] %>-100 transition-colors">
-                <svg class="w-5 h-5 text-<%= item[:color] %>-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>"/>
-                </svg>
-              </div>
-            </div>
-
-            <div class="flex-1 min-w-0">
-              <label for="payment_<%= item[:key] %>" class="text-sm font-semibold text-gray-900 cursor-pointer">
-                <%= item[:label] %>
-              </label>
-              <p class="text-xs text-gray-500 mt-0.5 leading-relaxed"><%= item[:description] %></p>
-            </div>
-
-            <div class="flex-shrink-0 pt-1">
-              <label for="payment_<%= item[:key] %>" class="relative inline-flex items-center cursor-pointer">
-                <%= check_box_tag "store_setting[payment_config][#{item[:key]}]", "1",
-                    payment_config[item[:key]],
-                    id: "payment_#{item[:key]}",
-                    class: "sr-only peer" %>
-                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-<%= item[:color] %>-600 transition-colors duration-200"></div>
-                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
-              </label>
-            </div>
-          </div>
-        <% end %>
-      </div>
-
-      <% if !@store_setting.any_payment_method_enabled? %>
-        <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 text-red-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- COMPANY DETAILS                            -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="company-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
             </svg>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-gray-900">Company Details</h2>
+            <p class="text-xs text-gray-500">Used on invoices and tax documents</p>
+          </div>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <div>
+            <%= f.label :gst_number, "GST Number", class: "block text-xs font-medium text-gray-700 mb-1" %>
+            <%= f.text_field :gst_number,
+                placeholder: "e.g., 27AABCU9603R1ZX",
+                class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <p class="text-sm font-semibold text-red-800">Warning: No Payment Methods Enabled</p>
-              <p class="text-xs text-red-700 mt-1">Customers will not be able to place orders. Please enable at least one payment method.</p>
+              <%= f.label :company_phone, "Phone", class: "block text-xs font-medium text-gray-700 mb-1" %>
+              <%= f.text_field :company_phone,
+                  placeholder: "+91 98765 43210",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+            </div>
+            <div>
+              <%= f.label :company_address, "Address", class: "block text-xs font-medium text-gray-700 mb-1" %>
+              <%= f.text_area :company_address,
+                  rows: 1,
+                  placeholder: "Company address...",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm resize-none" %>
             </div>
           </div>
+        </div>
+
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save
+          </button>
         </div>
       <% end %>
     </div>
 
-    <!-- Save Settings (Company / Coupon / Payment) -->
-    <div class="flex items-center justify-between pt-2">
-      <p class="text-xs text-gray-400">Changes take effect immediately on the storefront.</p>
-      <button type="submit"
-              class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition cursor-pointer">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-        Save Settings
-      </button>
-    </div>
-  <% end %>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SOCIAL MEDIA                               -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="social-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-gray-900">Social Media</h2>
+            <p class="text-xs text-gray-500">Shown in footer and used for SEO structured data</p>
+          </div>
+        </div>
 
-  <!-- Storefront Display Manager -->
-  <div class="mt-8">
-    <div class="mb-5">
-      <h2 class="text-lg font-bold text-gray-900">Storefront Display Manager</h2>
-      <p class="text-sm text-gray-500 mt-1">Control which categories appear in the top navigation bar and the homepage hero section.</p>
+        <div class="p-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <svg class="w-3.5 h-3.5 text-pink-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                <%= f.label :instagram_url, "Instagram", class: "text-xs font-medium text-gray-700" %>
+              </div>
+              <%= f.url_field :instagram_url,
+                  placeholder: "https://instagram.com/...",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <svg class="w-3.5 h-3.5 text-red-600" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <%= f.label :youtube_url, "YouTube", class: "text-xs font-medium text-gray-700" %>
+              </div>
+              <%= f.url_field :youtube_url,
+                  placeholder: "https://youtube.com/@...",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                <%= f.label :facebook_url, "Facebook", class: "text-xs font-medium text-gray-700" %>
+              </div>
+              <%= f.url_field :facebook_url,
+                  placeholder: "https://facebook.com/...",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <svg class="w-3.5 h-3.5 text-gray-900" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                <%= f.label :twitter_url, "X (Twitter)", class: "text-xs font-medium text-gray-700" %>
+              </div>
+              <%= f.url_field :twitter_url,
+                  placeholder: "https://x.com/...",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save
+          </button>
+        </div>
+      <% end %>
     </div>
 
-    <%= form_with url: update_storefront_navbar_admin_categories_path, method: :patch, local: true do %>
-      <div class="bg-white shadow rounded-lg overflow-hidden">
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ANNOUNCEMENT BANNER                        -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="banner-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-gray-900">Announcement Banner</h2>
+            <p class="text-xs text-gray-500">Customize the top promotional bar colors</p>
+          </div>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <!-- Live Preview -->
+          <div>
+            <p class="text-xs font-medium text-gray-500 uppercase mb-2">Preview</p>
+            <div id="banner-preview" class="text-center py-2 px-3 rounded-lg" style="background-color: <%= @store_setting.effective_banner_bg_color %>;">
+              <p class="text-sm" style="color: <%= @store_setting.effective_banner_text_color %>;">
+                <span class="font-medium" style="color: <%= @store_setting.effective_banner_accent_color %>;">Free Shipping</span> on orders above ₹499 | 24-Hour Dispatch
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <%= f.label :banner_bg_color, "Background", class: "block text-xs font-medium text-gray-700 mb-1" %>
+              <div class="flex items-center gap-2">
+                <%= f.color_field :banner_bg_color,
+                    value: @store_setting.effective_banner_bg_color,
+                    class: "h-9 w-12 rounded border border-gray-200 cursor-pointer",
+                    data: { action: "input->banner-preview#update" } %>
+                <%= f.text_field :banner_bg_color,
+                    value: @store_setting.effective_banner_bg_color,
+                    class: "flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-mono uppercase",
+                    data: { banner_preview_target: "bgInput" } %>
+              </div>
+            </div>
+            <div>
+              <%= f.label :banner_text_color, "Text", class: "block text-xs font-medium text-gray-700 mb-1" %>
+              <div class="flex items-center gap-2">
+                <%= f.color_field :banner_text_color,
+                    value: @store_setting.effective_banner_text_color,
+                    class: "h-9 w-12 rounded border border-gray-200 cursor-pointer",
+                    data: { action: "input->banner-preview#update" } %>
+                <%= f.text_field :banner_text_color,
+                    value: @store_setting.effective_banner_text_color,
+                    class: "flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-mono uppercase",
+                    data: { banner_preview_target: "textInput" } %>
+              </div>
+            </div>
+            <div>
+              <%= f.label :banner_accent_color, "Accent", class: "block text-xs font-medium text-gray-700 mb-1" %>
+              <div class="flex items-center gap-2">
+                <%= f.color_field :banner_accent_color,
+                    value: @store_setting.effective_banner_accent_color,
+                    class: "h-9 w-12 rounded border border-gray-200 cursor-pointer",
+                    data: { action: "input->banner-preview#update" } %>
+                <%= f.text_field :banner_accent_color,
+                    value: @store_setting.effective_banner_accent_color,
+                    class: "flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-mono uppercase",
+                    data: { banner_preview_target: "accentInput" } %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- DELIVERY SETTINGS                          -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="delivery-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-gray-900">Delivery Settings</h2>
+            <p class="text-xs text-gray-500">Free delivery threshold and delivery charges</p>
+          </div>
+        </div>
+
+        <div class="p-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <%= f.label :free_delivery_min_amount, "Free Delivery Minimum (₹)", class: "block text-xs font-medium text-gray-700 mb-1" %>
+              <%= f.number_field :free_delivery_min_amount,
+                  value: @store_setting.effective_free_delivery_min_amount,
+                  min: 0, step: 1,
+                  placeholder: "499",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+              <p class="text-[11px] text-gray-400 mt-1">Set to 0 for free delivery on all orders</p>
+            </div>
+            <div>
+              <%= f.label :delivery_charge_amount, "Delivery Charge (₹)", class: "block text-xs font-medium text-gray-700 mb-1" %>
+              <%= f.number_field :delivery_charge_amount,
+                  value: @store_setting.effective_delivery_charge_amount,
+                  min: 0, step: 1,
+                  placeholder: "99",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+              <p class="text-[11px] text-gray-400 mt-1">Flat charge for orders below the minimum</p>
+            </div>
+          </div>
+          <div class="mt-3 p-2.5 bg-blue-50 border border-blue-100 rounded-lg">
+            <p class="text-[11px] text-blue-700">
+              <strong>Current:</strong> Free delivery on orders ≥ <%= number_to_currency(@store_setting.effective_free_delivery_min_amount, unit: "₹", precision: 0) %>, otherwise <%= number_to_currency(@store_setting.effective_delivery_charge_amount, unit: "₹", precision: 0) %> delivery charge.
+            </p>
+          </div>
+        </div>
+
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- COUPON SETTINGS                            -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="coupon-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-gray-900">Coupon Settings</h2>
+            <p class="text-xs text-gray-500">Enable/disable coupon codes for customers</p>
+          </div>
+        </div>
+
+        <div class="divide-y divide-gray-100">
+          <!-- Enable coupons toggle -->
+          <div class="px-5 py-4 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-sm font-medium text-gray-900">Enable Coupon Codes</p>
+              <p class="text-xs text-gray-500 mt-0.5">Allow customers to apply coupons in the cart</p>
+            </div>
+            <div class="flex-shrink-0">
+              <%= f.label :enable_coupons, class: "relative inline-flex items-center cursor-pointer" do %>
+                <%= f.check_box :enable_coupons,
+                    { checked: @store_setting.coupons_enabled?,
+                      class: "sr-only peer" },
+                    "1", "0" %>
+                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Multi-vendor coupons toggle -->
+          <div class="px-5 py-4 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-sm font-medium text-gray-900">Multi-Vendor Coupons</p>
+              <p class="text-xs text-gray-500 mt-0.5">Allow coupons on orders with items from multiple vendors</p>
+            </div>
+            <div class="flex-shrink-0">
+              <%= f.label :enable_multi_vendor_coupons, class: "relative inline-flex items-center cursor-pointer" do %>
+                <%= f.check_box :enable_multi_vendor_coupons,
+                    { checked: @store_setting.multi_vendor_coupons_enabled?,
+                      class: "sr-only peer" },
+                    "1", "0" %>
+                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- PAYMENT METHODS                            -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="payment-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-gray-900">Payment Methods</h2>
+            <p class="text-xs text-gray-500">Enable or disable checkout payment options</p>
+          </div>
+        </div>
+
+        <%
+          payment_config = @store_setting.effective_payment_config
+          payment_items = [
+            { key: "enable_razorpay", label: "Online Payments (Razorpay)", desc: "UPI, Cards, Netbanking, Wallets", icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z", color: "blue" },
+            { key: "enable_cod", label: "Cash on Delivery", desc: "Pay with cash or UPI on delivery", icon: "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z", color: "amber" }
+          ]
+        %>
+
+        <div class="divide-y divide-gray-100">
+          <% payment_items.each do |item| %>
+            <div class="px-5 py-4 flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-<%= item[:color] %>-50 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-<%= item[:color] %>-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900"><%= item[:label] %></p>
+                  <p class="text-xs text-gray-500"><%= item[:desc] %></p>
+                </div>
+              </div>
+              <div class="flex-shrink-0">
+                <label for="payment_<%= item[:key] %>" class="relative inline-flex items-center cursor-pointer">
+                  <%= check_box_tag "store_setting[payment_config][#{item[:key]}]", "1",
+                      payment_config[item[:key]],
+                      id: "payment_#{item[:key]}",
+                      class: "sr-only peer" %>
+                  <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+                  <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
+                </label>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <% if !@store_setting.any_payment_method_enabled? %>
+          <div class="mx-5 mb-4 p-2.5 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+            <svg class="w-4 h-4 text-red-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <p class="text-xs text-red-700"><strong>Warning:</strong> No payment methods enabled. Customers cannot place orders.</p>
+          </div>
+        <% end %>
+
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- STOREFRONT DISPLAY MANAGER                 -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="display-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+      <%= form_with url: update_storefront_navbar_admin_categories_path, method: :patch do %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-gray-900">Categories Display</h2>
+            <p class="text-xs text-gray-500">Control categories in the nav bar and homepage hero</p>
+          </div>
+        </div>
+
         <div class="overflow-x-auto">
           <table class="min-w-full">
             <thead>
-              <tr class="border-b border-gray-200 bg-gray-50">
-                <th class="py-3 px-5 text-left text-xs font-medium text-gray-500 uppercase w-full">Category</th>
-                <th class="py-3 px-6 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Top Nav Bar</th>
-                <th class="py-3 px-6 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Hero Section</th>
+              <tr class="border-b border-gray-200 bg-gray-50/50">
+                <th class="py-2.5 px-5 text-left text-[11px] font-medium text-gray-500 uppercase w-full">Category</th>
+                <th class="py-2.5 px-5 text-center text-[11px] font-medium text-gray-500 uppercase whitespace-nowrap">Nav Bar</th>
+                <th class="py-2.5 px-5 text-center text-[11px] font-medium text-gray-500 uppercase whitespace-nowrap">Hero</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-50">
               <% @categories.select(&:root?).each do |category| %>
-                <tr class="bg-gray-50/50">
-                  <td class="py-3 px-5">
-                    <span class="text-sm font-semibold text-gray-900"><%= category.name %></span>
+                <tr class="bg-gray-50/30">
+                  <td class="py-2.5 px-5">
+                    <span class="text-sm font-medium text-gray-900"><%= category.name %></span>
                   </td>
-                  <td class="py-3 px-6 text-center">
+                  <td class="py-2.5 px-5 text-center">
                     <label class="inline-flex items-center justify-center cursor-pointer">
                       <%= check_box_tag 'navbar_ids[]', category.id, category.show_in_storefront_navbar?, class: 'sr-only peer' %>
                       <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition">
@@ -344,7 +453,7 @@
                       </span>
                     </label>
                   </td>
-                  <td class="py-3 px-6 text-center">
+                  <td class="py-2.5 px-5 text-center">
                     <label class="inline-flex items-center justify-center cursor-pointer">
                       <%= check_box_tag 'hero_ids[]', category.id, category.show_in_hero_section?, class: 'sr-only peer' %>
                       <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition">
@@ -355,11 +464,11 @@
                 </tr>
                 <% category.children.order(:position, :name).each do |child| %>
                   <tr>
-                    <td class="py-2.5 px-5 pl-10">
+                    <td class="py-2 px-5 pl-10">
                       <span class="text-xs text-gray-400 mr-1">└</span>
-                      <span class="text-sm text-gray-700"><%= child.name %></span>
+                      <span class="text-sm text-gray-600"><%= child.name %></span>
                     </td>
-                    <td class="py-2.5 px-6 text-center">
+                    <td class="py-2 px-5 text-center">
                       <label class="inline-flex items-center justify-center cursor-pointer">
                         <%= check_box_tag 'navbar_ids[]', child.id, child.show_in_storefront_navbar?, class: 'sr-only peer' %>
                         <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition">
@@ -367,7 +476,7 @@
                         </span>
                       </label>
                     </td>
-                    <td class="py-2.5 px-6 text-center">
+                    <td class="py-2 px-5 text-center">
                       <label class="inline-flex items-center justify-center cursor-pointer">
                         <%= check_box_tag 'hero_ids[]', child.id, child.show_in_hero_section?, class: 'sr-only peer' %>
                         <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition">
@@ -381,135 +490,87 @@
             </tbody>
           </table>
         </div>
-      </div>
 
-      <div class="mt-4 flex items-center justify-between">
-        <p class="text-xs text-gray-400">Controls navbar links and homepage hero category buttons.</p>
-        <%= submit_tag 'Save Display Settings', class: 'inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-700 transition cursor-pointer' %>
-      </div>
-    <% end %>
-  </div>
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save
+          </button>
+        </div>
+      <% end %>
+    </div>
 
-  <!-- Storefront Filters Section -->
-  <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, local: true, class: "mt-8" do |f| %>
-    <div>
-      <h2 class="text-lg font-bold text-gray-900 mb-4">Storefront Filters</h2>
-      <p class="text-sm text-gray-500 mb-4">Choose which filter components are visible to customers on the product listing page.</p>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- STOREFRONT FILTERS                         -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="filter-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-gray-900">Product Filters</h2>
+            <p class="text-xs text-gray-500">Choose which filters customers see on the product listing page</p>
+          </div>
+        </div>
 
-      <div class="bg-white shadow rounded-lg divide-y divide-gray-100">
         <%
           config = @store_setting.effective_filter_config
           filter_items = [
-            {
-              key: "show_availability",
-              label: "In Stock Toggle",
-              description: "Let customers filter to see only products that are currently in stock.",
-              icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            },
-            {
-              key: "show_categories",
-              label: "Categories",
-              description: "Show parent category checkboxes so customers can browse by product type.",
-              icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-            },
-            {
-              key: "show_subcategories",
-              label: "Subcategories",
-              description: "Expand parent categories to reveal nested subcategories. Requires 'Categories' to be enabled.",
-              icon: "M4 6h16M4 10h16M4 14h16M4 18h16",
-              depends_on: "show_categories"
-            },
-            {
-              key: "show_price_range",
-              label: "Price Range",
-              description: "Dual-slider that lets customers set minimum and maximum price bounds.",
-              icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            },
-            {
-              key: "show_color",
-              label: "Color Swatches",
-              description: "Color chip badges with visual swatches and faceted product counts.",
-              icon: "M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v2a4 4 0 01-4 4H4a2 2 0 01-2-2v-2.343c0-.89.32-1.733.89-2.404l3.535-3.535a4 4 0 015.657 0l.707.707M7 7h.01"
-            },
-            {
-              key: "show_material",
-              label: "Material",
-              description: "Checkbox list of base materials (e.g., Brass, Alloy, Copper) with product counts.",
-              icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-            },
-            {
-              key: "show_stone_type",
-              label: "Stone Type / Gemstone",
-              description: "Checkbox list of stone types (e.g., AD Stone, CZ, Pearl) with product counts.",
-              icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-            },
-            {
-              key: "show_occasion",
-              label: "Occasion",
-              description: "Checkbox list of occasions (e.g., Wedding, Daily Wear, Festival) with product counts.",
-              icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            },
-            {
-              key: "show_discount",
-              label: "Discount",
-              description: "Radio buttons to filter by minimum discount percentage (10%, 20%, etc.).",
-              icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-            },
-            {
-              key: "show_rating",
-              label: "Customer Rating",
-              description: "Radio buttons to filter by minimum star rating (2★, 3★, 4★ & above).",
-              icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-            }
+            { key: "show_availability", label: "In Stock Toggle", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
+            { key: "show_categories", label: "Categories", icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" },
+            { key: "show_subcategories", label: "Subcategories", icon: "M4 6h16M4 10h16M4 14h16M4 18h16", depends: "Categories" },
+            { key: "show_price_range", label: "Price Range", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+            { key: "show_color", label: "Color Swatches", icon: "M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v2a4 4 0 01-4 4H4a2 2 0 01-2-2v-2.343c0-.89.32-1.733.89-2.404l3.535-3.535a4 4 0 015.657 0l.707.707M7 7h.01" },
+            { key: "show_material", label: "Material", icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" },
+            { key: "show_stone_type", label: "Stone Type", icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" },
+            { key: "show_occasion", label: "Occasion", icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" },
+            { key: "show_discount", label: "Discount", icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" },
+            { key: "show_rating", label: "Rating", icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" }
           ]
         %>
 
-        <% filter_items.each do |item| %>
-          <div class="px-5 py-4 flex items-start gap-4 group hover:bg-gray-50 transition-colors">
-            <div class="flex-shrink-0 mt-0.5">
-              <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
-                <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>"/>
-                </svg>
+        <div class="divide-y divide-gray-50">
+          <% filter_items.each do |item| %>
+            <div class="px-5 py-3 flex items-center justify-between gap-3 hover:bg-gray-50/50 transition-colors">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>"/>
+                  </svg>
+                </div>
+                <div>
+                  <label for="filter_<%= item[:key] %>" class="text-sm font-medium text-gray-900 cursor-pointer"><%= item[:label] %></label>
+                  <% if item[:depends] %>
+                    <p class="text-[10px] text-amber-600">Requires "<%= item[:depends] %>"</p>
+                  <% end %>
+                </div>
+              </div>
+              <div class="flex-shrink-0">
+                <label for="filter_<%= item[:key] %>" class="relative inline-flex items-center cursor-pointer">
+                  <%= check_box_tag "store_setting[filter_config][#{item[:key]}]", "1",
+                      config[item[:key]],
+                      id: "filter_#{item[:key]}",
+                      class: "sr-only peer" %>
+                  <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+                  <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
+                </label>
               </div>
             </div>
+          <% end %>
+        </div>
 
-            <div class="flex-1 min-w-0">
-              <label for="filter_<%= item[:key] %>" class="text-sm font-semibold text-gray-900 cursor-pointer">
-                <%= item[:label] %>
-              </label>
-              <p class="text-xs text-gray-500 mt-0.5 leading-relaxed"><%= item[:description] %></p>
-              <% if item[:depends_on] %>
-                <p class="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  Requires "<%= filter_items.find { |fi| fi[:key] == item[:depends_on] }&.dig(:label) %>" to be enabled
-                </p>
-              <% end %>
-            </div>
-
-            <div class="flex-shrink-0 pt-1">
-              <label for="filter_<%= item[:key] %>" class="relative inline-flex items-center cursor-pointer">
-                <%= check_box_tag "store_setting[filter_config][#{item[:key]}]", "1",
-                    config[item[:key]],
-                    id: "filter_#{item[:key]}",
-                    class: "sr-only peer" %>
-                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
-                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
-              </label>
-            </div>
-          </div>
-        <% end %>
-      </div>
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save
+          </button>
+        </div>
+      <% end %>
     </div>
 
-    <!-- Save Filters button -->
-    <div class="flex items-center justify-between pt-2">
-      <p class="text-xs text-gray-400">Changes take effect immediately on the storefront.</p>
-      <button type="submit"
-              class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition cursor-pointer">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-        Save Filter Settings
-      </button>
-    </div>
-  <% end %>
+  </div>
 </div>

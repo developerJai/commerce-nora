@@ -453,8 +453,8 @@
           </div>
           <!-- Info -->
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-stone-900 leading-tight">Noralooks</p>
-            <p class="text-xs text-stone-500 leading-tight mt-0.5">Shop jewellery, gifts & more</p>
+            <p class="text-sm font-semibold text-stone-900 leading-tight"><%= app_banner_setting.effective_smart_banner_title %></p>
+            <p class="text-xs text-stone-500 leading-tight mt-0.5"><%= app_banner_setting.effective_smart_banner_subtitle %></p>
             <p class="text-[10px] text-stone-400 mt-0.5">Free on the <span data-smart-app-banner-target="storeName">App Store</span></p>
           </div>
           <!-- CTA -->
@@ -486,7 +486,7 @@
     </div>
   <% end %>
 
-  <% hide_mobile_nav = request.user_agent&.include?("Hotwire") || (controller_name == 'products' && action_name == 'show') || controller_name == 'carts' || controller_name == 'checkout' %>
+  <% hide_mobile_nav = request.user_agent&.include?("Hotwire") || (controller_name == 'products' && action_name == 'show') || controller_name == 'checkouts' %>
   <nav data-mobile-nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-40 safe-area-pb <%= 'hidden' if hide_mobile_nav %>">
     <div class="flex items-center justify-around h-14">
       <%= link_to products_path, class: "tap-target flex flex-col items-center justify-center flex-1 py-2 #{current_page?(products_path) ? 'text-rose-800' : 'text-stone-400'}" do %>

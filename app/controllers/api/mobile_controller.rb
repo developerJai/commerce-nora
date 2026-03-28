@@ -12,7 +12,6 @@ class Api::MobileController < ApplicationController
       ],
       hide_native_menu_patterns: [
         { path: "/products/*", description: "Product detail pages" },
-        { path: "/cart", description: "Cart page" },
         { path: "/checkout", description: "Checkout pages" }
       ]
     }

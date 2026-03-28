@@ -15,7 +15,14 @@ module Admin
       Category.where(id: navbar_ids).update_all(show_in_storefront_navbar: true) if navbar_ids.any?
       Category.where(id: hero_ids).update_all(show_in_hero_section: true)        if hero_ids.any?
 
-      redirect_back fallback_location: admin_categories_path, notice: "Storefront display settings updated successfully"
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.append("toasts",
+            partial: "shared/toast",
+            locals: { message: "Categories display saved successfully", variant: :success })
+        end
+        format.html { redirect_back fallback_location: admin_categories_path, notice: "Storefront display settings updated successfully" }
+      end
     end
 
     def show

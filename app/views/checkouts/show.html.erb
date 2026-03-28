@@ -7,7 +7,7 @@
 
 <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 md:py-8">
   <div class="flex items-center gap-2 mb-3 sm:mb-6 md:mb-8">
-    <%= link_to cart_path, class: 'sm:hidden inline-flex items-center justify-center w-8 h-8 -ml-1 rounded-full hover:bg-stone-100 transition text-stone-700' do %>
+    <%= link_to cart_path, class: 'inline-flex items-center justify-center w-8 h-8 -ml-1 rounded-full hover:bg-stone-100 transition text-stone-700' do %>
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
       </svg>
@@ -26,7 +26,7 @@
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
         <!-- Left Column: Address, Payment, Items -->
-        <div class="md:col-span-2 space-y-3 sm:space-y-6 pb-[220px] md:pb-0">
+        <div class="md:col-span-2 space-y-3 sm:space-y-6 pb-[140px] md:pb-0">
           
           <!-- Delivery Address (Compact) -->
           <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 p-3 sm:p-5 md:p-6" id="address-display">
@@ -197,70 +197,91 @@
             <% end %>
           </div>
 
-          <!-- Per-Vendor Order Estimates -->
-          <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 p-3 sm:p-6">
-            <div class="flex items-center justify-between mb-2 sm:mb-4">
-              <h2 class="text-sm sm:text-base font-semibold text-stone-900">
-                <%= "#{current_cart.cart_items.count} #{current_cart.cart_items.count == 1 ? 'Item' : 'Items'}" %>
-              </h2>
-              <%= link_to cart_path, class: "text-xs sm:text-sm text-rose-700 hover:text-rose-900 font-semibold" do %>
-                Edit
-              <% end %>
-            </div>
-            
+          <!-- Order Items -->
+          <div class="bg-white rounded-lg sm:rounded-xl border border-stone-200 overflow-hidden">
+            <!-- Header — tappable on mobile to expand/collapse -->
+            <button type="button" id="toggle-items-btn"
+                    class="md:pointer-events-none w-full flex items-center justify-between p-3 sm:p-5 md:p-6 text-left">
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm sm:text-base font-semibold text-stone-900">
+                  <%= "#{current_cart.cart_items.count} #{current_cart.cart_items.count == 1 ? 'Item' : 'Items'}" %>
+                </h2>
+                <!-- Tiny product thumbnails on mobile (collapsed preview) -->
+                <div class="flex -space-x-1.5 md:hidden" id="items-thumb-preview">
+                  <% current_cart.cart_items.first(3).each do |item| %>
+                    <div class="w-6 h-6 rounded-full border-2 border-white bg-stone-100 overflow-hidden flex-shrink-0">
+                      <% if item.product_variant.product.images.attached? %>
+                        <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
+                      <% end %>
+                    </div>
+                  <% end %>
+                  <% if current_cart.cart_items.count > 3 %>
+                    <div class="w-6 h-6 rounded-full border-2 border-white bg-stone-200 flex items-center justify-center flex-shrink-0">
+                      <span class="text-[8px] font-bold text-stone-600">+<%= current_cart.cart_items.count - 3 %></span>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <%= link_to cart_path, class: "text-xs sm:text-sm text-rose-700 hover:text-rose-900 font-semibold", onclick: "event.stopPropagation()" do %>
+                  Edit
+                <% end %>
+                <svg class="w-4 h-4 text-stone-400 md:hidden transition-transform duration-200" id="items-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </div>
+            </button>
+
+            <!-- Collapsible items body — hidden on mobile by default, always visible on desktop -->
+            <div id="items-body" class="hidden md:block border-t border-stone-100">
+              <div class="p-3 sm:p-5 md:p-6 pt-3">
             <% if @vendor_estimates.size > 1 %>
-              <!-- Multiple Vendors - Show per-vendor breakdown -->
+              <!-- Multiple Vendors -->
               <div class="space-y-4">
                 <% @vendor_estimates.each_with_index do |(vendor, estimate), index| %>
-                  <div class="border border-stone-200 rounded-lg p-4 <%= index > 0 ? 'border-t' : '' %>">
+                  <div class="border border-stone-200 rounded-lg p-3 sm:p-4">
                     <!-- Vendor Header -->
-                    <div class="flex items-center justify-between mb-3 pb-3 border-b border-stone-100">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3 pb-2 sm:pb-3 border-b border-stone-100">
                       <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
-                          <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                          <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                           </svg>
                         </div>
                         <div>
-                          <p class="font-medium text-stone-900 text-sm">Seller: <%= vendor&.business_name || "Seller ##{vendor&.id}" %></p>
-                          <p class="text-xs text-stone-500"><%= estimate[:item_count] %> <%= estimate[:item_count] == 1 ? 'item' : 'items' %></p>
+                          <p class="font-medium text-stone-900 text-xs sm:text-sm"><%= vendor&.business_name || "Seller ##{vendor&.id}" %></p>
+                          <p class="text-[10px] sm:text-xs text-stone-500"><%= estimate[:item_count] %> <%= estimate[:item_count] == 1 ? 'item' : 'items' %></p>
                         </div>
                       </div>
-                      <span class="text-sm font-semibold text-stone-900"><%= format_price(estimate[:total]) %></span>
+                      <span class="text-xs sm:text-sm font-semibold text-stone-900"><%= format_price(estimate[:total]) %></span>
                     </div>
-                    
-                    <!-- Vendor Items -->
-                    <div class="space-y-3 mb-3">
+
+                    <!-- Vendor Items — compact on mobile -->
+                    <div class="space-y-2 sm:space-y-3 mb-3">
                       <% estimate[:items].each do |item|
                         tax_rate = item.product_variant&.product&.hsn_code&.gst_rate || 3.0
-                        # Calculate item tax amount
                         item_tax = (item.total_price.to_f * tax_rate / 100.0).round(2)
                       %>
-                        <div class="flex items-start gap-3 text-sm">
-                          <div class="w-12 h-12 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
+                        <div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+                          <div class="w-8 h-8 sm:w-12 sm:h-12 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
                             <% if item.product_variant.product.images.attached? %>
                               <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
                             <% end %>
                           </div>
                           <div class="flex-1 min-w-0">
-                            <p class="text-stone-900 truncate"><%= item.product_variant.product.name %></p>
-                            <p class="text-stone-500 text-xs">
+                            <p class="text-stone-900 truncate text-xs sm:text-sm"><%= item.product_variant.product.name %></p>
+                            <p class="text-stone-500 text-[10px] sm:text-xs">
                               <%= item.product_variant.name %> × <%= item.quantity %>
-                              <span class="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">
-                                <%= tax_rate %>% GST
-                              </span>
+                              <span class="hidden sm:inline ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium"><%= tax_rate %>% GST</span>
                             </p>
                           </div>
-                          <div class="text-right">
-                            <p class="font-medium text-stone-900"><%= format_price(item.total_price) %></p>
-                            <p class="text-xs text-stone-500">+ <%= format_price(item_tax) %> tax</p>
-                          </div>
+                          <p class="font-medium text-stone-900 text-xs sm:text-sm flex-shrink-0"><%= format_price(item.total_price) %></p>
                         </div>
                       <% end %>
                     </div>
-                    
+
                     <!-- Vendor Estimate Summary -->
-                    <div class="bg-stone-50 rounded-lg p-3 text-xs space-y-1">
+                    <div class="bg-stone-50 rounded-lg p-2.5 sm:p-3 text-[10px] sm:text-xs space-y-1">
                       <div class="flex justify-between">
                         <span class="text-stone-600">Subtotal</span>
                         <span class="text-stone-900"><%= format_price(estimate[:subtotal]) %></span>
@@ -289,53 +310,49 @@
                   </div>
                 <% end %>
               </div>
-              
+
               <!-- Combined Total Notice -->
-              <div class="mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <div class="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
                 <div class="flex items-start gap-2">
                   <svg class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                   <div>
                     <p class="text-xs font-semibold text-emerald-900">One Simple Payment</p>
-                    <p class="text-xs text-emerald-700 mt-0.5">Pay <%= format_price(@total) %> once. We'll coordinate with each seller and handle delivery for you.</p>
+                    <p class="text-[10px] sm:text-xs text-emerald-700 mt-0.5">Pay <%= format_price(@total) %> once. We'll handle delivery from each seller.</p>
                   </div>
                 </div>
               </div>
             <% else %>
-              <!-- Single Vendor - Simple Item List -->
-              <div class="space-y-4 mb-4">
+              <!-- Single Vendor - Compact Item List -->
+              <div class="space-y-2.5 sm:space-y-4 mb-3 sm:mb-4">
                 <% current_cart.cart_items.each do |item|
                   tax_rate = item.product_variant&.product&.hsn_code&.gst_rate || 3.0
-                  # Calculate item tax amount
                   item_tax = (item.total_price.to_f * tax_rate / 100.0).round(2)
                 %>
-                  <div class="flex items-start gap-4">
-                    <div class="w-16 h-16 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
+                  <div class="flex items-center gap-2.5 sm:gap-4">
+                    <div class="w-10 h-10 sm:w-16 sm:h-16 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
                       <% if item.product_variant.product.images.attached? %>
                         <%= image_tag item.product_variant.product.images.first, class: 'w-full h-full object-cover' %>
                       <% end %>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="font-medium text-stone-900 truncate"><%= item.product_variant.product.name %></p>
-                      <p class="text-sm text-stone-500">
-                        <%= item.product_variant.name %>
-                        <span class="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">
-                          <%= tax_rate %>% GST
-                        </span>
+                      <p class="font-medium text-stone-900 truncate text-xs sm:text-sm"><%= item.product_variant.product.name %></p>
+                      <p class="text-[10px] sm:text-sm text-stone-500">
+                        <%= item.product_variant.name %> × <%= item.quantity %>
+                        <span class="hidden sm:inline ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium"><%= tax_rate %>% GST</span>
                       </p>
-                      <p class="text-sm text-stone-500">Qty: <%= item.quantity %></p>
                     </div>
-                    <div class="text-right">
-                      <p class="font-semibold text-stone-900"><%= format_price(item.total_price) %></p>
-                      <p class="text-xs text-stone-500">+ <%= format_price(item_tax) %> tax</p>
+                    <div class="text-right flex-shrink-0">
+                      <p class="font-semibold text-stone-900 text-xs sm:text-sm"><%= format_price(item.total_price) %></p>
+                      <p class="hidden sm:block text-xs text-stone-500">+ <%= format_price(item_tax) %> tax</p>
                     </div>
                   </div>
                 <% end %>
               </div>
-              
+
               <!-- Single Vendor Estimate Summary -->
-              <div class="bg-stone-50 rounded-lg p-3 text-xs space-y-1">
+              <div class="bg-stone-50 rounded-lg p-2.5 sm:p-3 text-[10px] sm:text-xs space-y-1">
                 <div class="flex justify-between">
                   <span class="text-stone-600">Subtotal</span>
                   <span class="text-stone-900"><%= format_price(@subtotal) %></span>
@@ -362,6 +379,8 @@
                 </div>
               </div>
             <% end %>
+              </div>
+            </div>
           </div>
 
           <!-- Order Notes (Hidden on Mobile) -->
@@ -374,9 +393,9 @@
 
         <!-- Right Column: Order Summary -->
         <div class="fixed md:static md:col-span-1 z-[45] bottom-0 left-0 right-0 md:bottom-auto md:z-auto md:pb-0">
-          <div class="bg-white border-t-2 border-stone-200 md:border md:border-t md:rounded-xl shadow-[0_-2px_12px_rgba(0,0,0,0.08)] md:shadow-sm p-3.5 pb-6 md:p-6 md:sticky md:top-24">
+          <div class="bg-white border-t border-stone-200 md:border md:border-t md:rounded-xl shadow-[0_-4px_16px_rgba(0,0,0,0.06)] md:shadow-sm px-4 py-3 md:p-6 md:sticky md:top-24">
             <h2 class="hidden md:block text-base font-sans font-semibold text-stone-900 mb-4">Order Summary</h2>
-            
+
             <!-- Desktop Summary -->
             <div class="hidden md:block space-y-2 text-sm mb-4">
               <div class="flex justify-between py-1">
@@ -399,7 +418,7 @@
                 <span class="text-stone-600">Tax</span>
                 <span class="text-stone-900 font-medium"><%= format_price(@tax) %></span>
               </div>
-              
+
               <div class="border-t border-stone-200 pt-3 mt-2">
                 <div class="flex justify-between items-baseline">
                   <span class="font-semibold text-stone-900 text-base">Total</span>
@@ -408,38 +427,20 @@
                 <p class="text-xs text-stone-500 mt-1 text-right">Inclusive of all taxes</p>
               </div>
             </div>
-            
-            <!-- Mobile Summary (Compact) -->
-            <div class="md:hidden mb-3">
-              <div class="flex items-center justify-between mb-2">
-                <div>
-                  <p class="text-xs text-stone-500">Total Amount</p>
-                  <p class="text-xl font-bold text-stone-900"><%= format_price(@total) %></p>
-                </div>
-                <div class="text-right">
-                  <p class="text-xs text-stone-500"><%= current_cart.cart_items.count %> <%= current_cart.cart_items.count == 1 ? 'item' : 'items' %></p>
-                  <p class="text-xs text-stone-400">Inc. taxes</p>
-                </div>
-              </div>
-            </div>
-            
+
             <!-- Pricing Breakdown Modal -->
             <div id="pricing-breakdown-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
               <div class="flex items-center justify-center min-h-screen p-4">
                 <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <!-- Header -->
                   <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                    <h3 class="text-lg font-semibold text-gray-900">Detailed Pricing Breakdown</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">Pricing Breakdown</h3>
                     <button type="button" id="close-breakdown-modal" class="text-gray-400 hover:text-gray-600">
                       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                       </svg>
                     </button>
                   </div>
-                  
-                  <!-- Content -->
                   <div class="p-6 space-y-4">
-                    <!-- Order Summary -->
                     <div class="bg-gray-50 border rounded-xl p-4">
                       <h4 class="text-sm font-semibold text-gray-700 mb-3">Order Summary</h4>
                       <div class="space-y-2">
@@ -459,14 +460,12 @@
                         </div>
                       </div>
                     </div>
-                    
-                    <!-- Tax Details -->
                     <% if current_cart.cart_items.any? %>
                       <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
                         <h4 class="text-sm font-semibold text-blue-900 mb-3">Tax Details (IGST/CGST+SGST)</h4>
-                        <% 
+                        <%
                           items_by_rate = current_cart.cart_items.group_by { |item| item.product_variant&.product&.hsn_code&.gst_rate || 3.0 }
-                          items_by_rate.sort.each do |rate, items| 
+                          items_by_rate.sort.each do |rate, items|
                             taxable = items.sum { |i| i.total_price * (@subtotal > 0 ? (@subtotal - @discount) / @subtotal : 1) }
                             tax = taxable * rate / 100
                         %>
@@ -480,8 +479,6 @@
                         <% end %>
                       </div>
                     <% end %>
-                    
-                    <!-- Total -->
                     <div class="border-t-2 border-gray-200 pt-4">
                       <div class="flex justify-between items-center">
                         <span class="text-lg font-semibold text-gray-900">Total Amount</span>
@@ -491,20 +488,33 @@
                   </div>
                 </div>
               </div>
-            </div
+            </div>
 
             <% if any_payment_enabled %>
-              <!-- Payment Info Box -->
-              <p id="payment-info-box" class="text-[10px] text-stone-400 mb-2"><svg class="w-3 h-3 inline-block align-middle mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span id="payment-info-desc">Pay when you receive your order</span></p>
-
-              <!-- Submit Button -->
-              <%= f.submit 'Place Order', 
-                  id: 'place-order-btn',
-                  class: 'w-full py-3.5 lg:py-4 px-4 bg-rose-800 text-white font-semibold text-base lg:text-lg rounded-xl hover:bg-rose-900 transition shadow-lg cursor-pointer' %>
-              <div class="md:hidden flex justify-center mt-3">
-                <div class="w-16 h-1 rounded-full bg-stone-300"></div>
+              <!-- Mobile: Clean single-row bottom bar -->
+              <div class="md:hidden flex items-center gap-3">
+                <div class="flex-shrink-0">
+                  <button type="button" id="view-breakdown-btn" class="text-left">
+                    <p class="text-base font-bold text-stone-900"><%= format_price(@total) %></p>
+                    <p class="text-[10px] text-rose-700 font-medium">View details</p>
+                  </button>
+                </div>
+                <%= f.submit 'Place Order',
+                    id: 'place-order-btn-mobile',
+                    class: 'flex-1 py-3 px-4 bg-rose-800 text-white font-semibold text-sm rounded-xl hover:bg-rose-900 transition shadow-lg cursor-pointer' %>
               </div>
-              
+
+              <!-- Desktop: Full button -->
+              <div class="hidden md:block">
+                <p id="payment-info-box" class="text-xs text-stone-500 mb-2.5 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span id="payment-info-desc">Pay when you receive your order</span>
+                </p>
+                <%= f.submit 'Place Order',
+                    id: 'place-order-btn',
+                    class: 'w-full py-3.5 lg:py-4 px-4 bg-rose-800 text-white font-semibold text-base lg:text-lg rounded-xl hover:bg-rose-900 transition shadow-lg cursor-pointer' %>
+              </div>
+
               <!-- Security Badges (Desktop Only) -->
               <div class="hidden lg:flex mt-4 items-center justify-center gap-4 text-xs text-stone-500">
                 <span class="flex items-center gap-1">
@@ -554,10 +564,32 @@
     function initCheckout() {
       const form = document.getElementById('checkout-form');
       const submitBtn = document.getElementById('place-order-btn');
+      const submitBtnMobile = document.getElementById('place-order-btn-mobile');
       const paymentCod = document.getElementById('payment_cod');
       const paymentRazorpay = document.getElementById('payment_razorpay');
       const paymentInfoBox = document.getElementById('payment-info-box');
       const paymentInfoDesc = document.getElementById('payment-info-desc');
+
+      // --- Collapsible items section (mobile) ---
+      const toggleItemsBtn = document.getElementById('toggle-items-btn');
+      const itemsBody = document.getElementById('items-body');
+      const itemsChevron = document.getElementById('items-chevron');
+      const itemsThumbPreview = document.getElementById('items-thumb-preview');
+
+      if (toggleItemsBtn && itemsBody) {
+        toggleItemsBtn.addEventListener('click', function() {
+          const isHidden = itemsBody.classList.contains('hidden');
+          if (isHidden) {
+            itemsBody.classList.remove('hidden');
+            if (itemsChevron) itemsChevron.classList.add('rotate-180');
+            if (itemsThumbPreview) itemsThumbPreview.classList.add('hidden');
+          } else {
+            itemsBody.classList.add('hidden');
+            if (itemsChevron) itemsChevron.classList.remove('rotate-180');
+            if (itemsThumbPreview) itemsThumbPreview.classList.remove('hidden');
+          }
+        });
+      }
       
       // Address modal elements
       const changeAddressBtn = document.getElementById('change-address-btn');
@@ -705,34 +737,33 @@
         });
       });
       
-      if (!form || !submitBtn) return;
+      if (!form || (!submitBtn && !submitBtnMobile)) return;
+
+      // Helper to set value on both buttons
+      function setButtonText(text) {
+        if (submitBtn) submitBtn.value = text;
+        if (submitBtnMobile) submitBtnMobile.value = text;
+      }
 
       // Update UI based on payment selection
       function updatePaymentUI() {
         const paymentOptions = document.querySelectorAll('.payment-option');
-        
+
         paymentOptions.forEach(option => {
           const radio = option.querySelector('input[type="radio"]');
           const checkIcon = option.querySelector('.check-icon');
-          
+
           if (radio && radio.checked) {
             option.classList.add('border-rose-500', 'bg-rose-50', 'ring-2', 'ring-rose-200');
             option.classList.remove('border-stone-200');
             if (checkIcon) checkIcon.classList.remove('opacity-0');
-            
-            // Update payment info box
+
             if (radio.id === 'payment_cod') {
-              if (paymentInfoBox) {
-                paymentInfoBox.className = 'text-[10px] text-stone-400 mb-2';
-              }
               if (paymentInfoDesc) paymentInfoDesc.textContent = 'Pay when you receive your order';
-              submitBtn.value = 'Place Order';
+              setButtonText('Place Order');
             } else if (radio.id === 'payment_razorpay') {
-              if (paymentInfoBox) {
-                paymentInfoBox.className = 'text-[10px] text-stone-400 mb-2';
-              }
               if (paymentInfoDesc) paymentInfoDesc.textContent = 'You will be redirected to secure payment page';
-              submitBtn.value = 'Proceed to Payment';
+              setButtonText('Proceed to Payment');
             }
           } else {
             option.classList.remove('border-rose-500', 'bg-rose-50', 'ring-2', 'ring-rose-200');
@@ -750,20 +781,32 @@
         paymentRazorpay.addEventListener('change', updatePaymentUI);
       }
 
+      // Helper to disable/enable all submit buttons
+      function setButtonsLoading(loading) {
+        [submitBtn, submitBtnMobile].forEach(btn => {
+          if (!btn) return;
+          btn.disabled = loading;
+          if (loading) {
+            btn.value = 'Processing...';
+            btn.classList.add('opacity-75');
+          } else {
+            btn.classList.remove('opacity-75');
+          }
+        });
+      }
+
       // Form submission handler
       form.addEventListener('submit', async function(e) {
         // Check if Razorpay is selected
         if (paymentRazorpay && paymentRazorpay.checked) {
           e.preventDefault();
           e.stopPropagation();
-          
-          submitBtn.disabled = true;
-          submitBtn.value = 'Processing...';
-          submitBtn.classList.add('opacity-75');
+
+          setButtonsLoading(true);
 
           try {
             const formData = new FormData(form);
-            
+
             const response = await fetch('/checkout', {
               method: 'POST',
               headers: {
@@ -775,7 +818,7 @@
             });
 
             const contentType = response.headers.get('content-type');
-            
+
             if (!contentType || !contentType.includes('application/json')) {
               const text = await response.text();
               console.error('Non-JSON response:', text.substring(0, 500));
@@ -792,7 +835,6 @@
               throw new Error('Invalid response from server');
             }
 
-            // Initialize Razorpay checkout with single order for all vendors
             const options = {
               key: data.razorpay_key,
               order_id: data.razorpay_order_id,
@@ -808,9 +850,8 @@
               },
               modal: {
                 ondismiss: function() {
-                  submitBtn.disabled = false;
-                  submitBtn.value = 'Proceed to Payment';
-                  submitBtn.classList.remove('opacity-75');
+                  setButtonsLoading(false);
+                  setButtonText('Proceed to Payment');
                 }
               },
               handler: function(response) {
@@ -838,9 +879,8 @@
           } catch (error) {
             console.error('Payment Error:', error);
             alert('Error: ' + error.message);
-            submitBtn.disabled = false;
-            submitBtn.value = 'Proceed to Payment';
-            submitBtn.classList.remove('opacity-75');
+            setButtonsLoading(false);
+            setButtonText('Proceed to Payment');
           }
         }
         // If COD, let the form submit normally
@@ -858,11 +898,8 @@
           const checkIcon = razorpayOption.querySelector('.check-icon');
           if (checkIcon) checkIcon.classList.remove('opacity-0');
         }
-        if (paymentInfoBox) {
-          paymentInfoBox.className = 'text-[10px] text-stone-400 mb-2';
-        }
         if (paymentInfoDesc) paymentInfoDesc.textContent = 'You will be redirected to secure payment page';
-        submitBtn.value = 'Proceed to Payment';
+        setButtonText('Proceed to Payment');
       }
     }
 

@@ -16,7 +16,10 @@ class CartsController < ApplicationController
     end
 
     # Check if coupons are enabled in settings
-    @coupons_enabled = StoreSetting.instance.coupons_enabled?
+    store = StoreSetting.instance
+    @coupons_enabled = store.coupons_enabled?
+    # Allow coupons for multi-vendor carts if the setting is enabled
+    @coupon_blocked_by_multi_vendor = @multi_vendor && !store.multi_vendor_coupons_enabled?
   end
 
   def coupons
@@ -71,7 +74,9 @@ class CartsController < ApplicationController
         # Check if cart has multiple vendors (same logic as show action)
         vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
         @multi_vendor = vendor_ids.size > 1
-        @coupons_enabled = StoreSetting.instance.coupons_enabled?
+        store = StoreSetting.instance
+        @coupons_enabled = store.coupons_enabled?
+        coupon_blocked = @multi_vendor && !store.multi_vendor_coupons_enabled?
 
         # Group items by vendor if multi-vendor
         if @multi_vendor
@@ -99,7 +104,13 @@ class CartsController < ApplicationController
             locals: { cart: @cart })
           streams << turbo_stream.update("cart-coupon-section",
             partial: "carts/coupon_section",
-            locals: { coupons_enabled: @coupons_enabled, multi_vendor: @multi_vendor })
+            locals: { coupons_enabled: @coupons_enabled, multi_vendor: coupon_blocked })
+          streams << turbo_stream.update("cart-coupon-section-mobile",
+            partial: "carts/coupon_section_mobile",
+            locals: { coupons_enabled: @coupons_enabled, multi_vendor: coupon_blocked, cart: @cart })
+          streams << turbo_stream.update("cart-checkout-bar",
+            partial: "carts/checkout_bar_mobile",
+            locals: { cart: @cart })
         end
 
         # Update cart count badges
@@ -141,7 +152,9 @@ class CartsController < ApplicationController
         # Check if cart has multiple vendors (same logic as show action)
         vendor_ids = @cart_items.map { |item| item.product_variant.product.vendor_id }.uniq
         @multi_vendor = vendor_ids.size > 1
-        @coupons_enabled = StoreSetting.instance.coupons_enabled?
+        store = StoreSetting.instance
+        @coupons_enabled = store.coupons_enabled?
+        coupon_blocked = @multi_vendor && !store.multi_vendor_coupons_enabled?
 
         # Group items by vendor if multi-vendor
         if @multi_vendor
@@ -179,7 +192,13 @@ class CartsController < ApplicationController
             locals: { cart: @cart })
           streams << turbo_stream.update("cart-coupon-section",
             partial: "carts/coupon_section",
-            locals: { coupons_enabled: @coupons_enabled, multi_vendor: @multi_vendor })
+            locals: { coupons_enabled: @coupons_enabled, multi_vendor: coupon_blocked })
+          streams << turbo_stream.update("cart-coupon-section-mobile",
+            partial: "carts/coupon_section_mobile",
+            locals: { coupons_enabled: @coupons_enabled, multi_vendor: coupon_blocked, cart: @cart })
+          streams << turbo_stream.update("cart-checkout-bar",
+            partial: "carts/checkout_bar_mobile",
+            locals: { cart: @cart })
         end
 
         # Notify native app of cart count change
@@ -196,24 +215,37 @@ class CartsController < ApplicationController
   end
 
   def apply_coupon
+    store = StoreSetting.instance
+
+    # Block coupon application if coupons are disabled or multi-vendor without the setting
+    unless store.coupons_enabled?
+      return respond_to_coupon_action(alert: "Coupons are not available")
+    end
+
+    cart_items = current_cart.cart_items.includes(product_variant: { product: :vendor })
+    multi_vendor = cart_items.map { |i| i.product_variant.product.vendor_id }.uniq.size > 1
+    if multi_vendor && !store.multi_vendor_coupons_enabled?
+      return respond_to_coupon_action(alert: "Coupons are not available for multi-vendor orders")
+    end
+
     code = params[:coupon_code]&.strip
     coupon = Coupon.find_by_code(code)
 
     if coupon.nil?
-      redirect_to cart_path, alert: "Invalid coupon code"
+      respond_to_coupon_action(alert: "Invalid coupon code")
     elsif !coupon.valid_for_use?
-      redirect_to cart_path, alert: "This coupon is not valid"
+      respond_to_coupon_action(alert: "This coupon is not valid")
     elsif !coupon.applicable_to?(current_cart.subtotal)
-      redirect_to cart_path, alert: "Minimum order amount of #{helpers.format_price(coupon.minimum_order_amount)} required"
+      respond_to_coupon_action(alert: "Minimum order amount of #{helpers.format_price(coupon.minimum_order_amount)} required")
     else
       session[:coupon_id] = coupon.id
-      redirect_to cart_path
+      respond_to_coupon_action
     end
   end
 
   def remove_coupon
     session.delete(:coupon_id)
-    redirect_to cart_path
+    respond_to_coupon_action
   end
 
   private
@@ -224,6 +256,51 @@ class CartsController < ApplicationController
 
   def set_cart_item
     @cart_item = current_cart.cart_items.find_by!(product_variant_id: params[:variant_id])
+  end
+
+  def respond_to_coupon_action(alert: nil)
+    respond_to do |format|
+      format.html { redirect_to cart_path, alert: alert }
+      format.turbo_stream do
+        @cart = current_cart
+        store = StoreSetting.instance
+        coupons_enabled = store.coupons_enabled?
+        cart_items = @cart.cart_items.includes(product_variant: { product: :vendor })
+        vendor_ids = cart_items.map { |i| i.product_variant.product.vendor_id }.uniq
+        multi_vendor = vendor_ids.size > 1
+        coupon_blocked = multi_vendor && !store.multi_vendor_coupons_enabled?
+
+        streams = [
+          turbo_stream.update("cart-coupon-section",
+            partial: "carts/coupon_section",
+            locals: { coupons_enabled: coupons_enabled, multi_vendor: coupon_blocked }),
+          turbo_stream.update("cart-coupon-section-mobile",
+            partial: "carts/coupon_section_mobile",
+            locals: { coupons_enabled: coupons_enabled, multi_vendor: coupon_blocked, cart: @cart }),
+          turbo_stream.update("cart-summary",
+            partial: "carts/summary",
+            locals: { cart: @cart }),
+          turbo_stream.update("cart-summary-mobile",
+            partial: "carts/summary_mobile",
+            locals: { cart: @cart }),
+          turbo_stream.update("cart-checkout-bar",
+            partial: "carts/checkout_bar_mobile",
+            locals: { cart: @cart })
+        ]
+
+        # Close the coupon modal on success, show toast on error
+        if alert.present?
+          streams << turbo_stream.append("toasts",
+            partial: "shared/toast",
+            locals: { message: alert, variant: :error })
+        else
+          # Close the modal by replacing the frame with empty content
+          streams << turbo_stream.update("coupon_modal", "")
+        end
+
+        render turbo_stream: streams
+      end
+    end
   end
 
   def native_cart_count_stream

@@ -84,6 +84,10 @@ class StoreSetting < ApplicationRecord
     enable_coupons.nil? ? true : enable_coupons
   end
 
+  def multi_vendor_coupons_enabled?
+    enable_multi_vendor_coupons
+  end
+
   # Delivery settings
   def effective_free_delivery_min_amount
     free_delivery_min_amount.presence || 499.0
@@ -141,6 +145,14 @@ class StoreSetting < ApplicationRecord
 
   def effective_mobile_app_section_subtitle
     mobile_app_section_subtitle.presence || "Download our app for exclusive deals, faster checkout, and a personalised shopping experience"
+  end
+
+  def effective_smart_banner_title
+    smart_banner_title.presence || "Noralooks"
+  end
+
+  def effective_smart_banner_subtitle
+    smart_banner_subtitle.presence || "Download our app for great offers & deals"
   end
 
   # Class-level convenience for use in views/models without fetching full instance

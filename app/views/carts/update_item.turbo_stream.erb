@@ -35,4 +35,8 @@
   <%= render 'carts/summary_mobile', cart: @cart %>
 <% end %>
 
+<%= turbo_stream.update "cart-checkout-bar" do %>
+  <%= render 'carts/checkout_bar_mobile', cart: @cart %>
+<% end %>
+
 <%= render 'shared/native_cart_count_bridge' %>

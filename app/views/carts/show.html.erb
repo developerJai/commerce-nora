@@ -31,7 +31,7 @@
     <% else %>
       <div class="md:flex md:gap-6 xl:gap-8">
         <!-- Cart Items -->
-        <div class="md:flex-1 pb-[220px] md:pb-0">
+        <div class="md:flex-1 pb-[140px] md:pb-0">
           <div id="cart-items">
             <% if @multi_vendor %>
               <%= render 'items_by_vendor', items_by_vendor: @items_by_vendor %>
@@ -39,57 +39,65 @@
               <%= render 'items', cart_items: @cart_items %>
             <% end %>
           </div>
-        </div>
 
-        <!-- Order Summary -->
-        <div class="<%= is_android_app ? 'bottom-0 left-0 right-0 md:relative md:w-80 md:mt-0 z-[45] md:bottom-auto md:pb-0' : 'fixed md:static md:w-80 md:mt-0 z-[45] bottom-0 left-0 right-0 md:bottom-auto md:z-auto overflow-y-auto md:pb-0' %>">
-          <div class="bg-white border-t-2 border-stone-200 md:border md:border-t md:rounded-xl shadow-[0_-2px_12px_rgba(0,0,0,0.08)] md:shadow-sm p-3.5 pb-6 md:p-5 md:sticky md:top-24">
-            <h2 class="hidden md:block text-sm sm:text-base font-sans font-semibold text-stone-900 mb-3 sm:mb-4">Order Summary</h2>
-
-            <!-- Coupon Section -->
-            <div id="cart-coupon-section">
-              <%= render 'coupon_section', coupons_enabled: @coupons_enabled, multi_vendor: @multi_vendor %>
+          <!-- Mobile: Coupon & Summary in scrollable area -->
+          <div class="md:hidden mt-4 space-y-4">
+            <div id="cart-coupon-section-mobile">
+              <%= render 'coupon_section_mobile', coupons_enabled: @coupons_enabled, multi_vendor: @coupon_blocked_by_multi_vendor, cart: @cart %>
             </div>
 
-            <!-- Summary -->
-            <div id="cart-summary" class="hidden md:block mb-4">
+            <div id="cart-summary-mobile" class="bg-white rounded-xl border border-stone-200 p-4">
+              <h3 class="text-sm font-semibold text-stone-900 mb-3">Price Details</h3>
+              <%= render 'summary_mobile', cart: @cart %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Order Summary (sidebar) -->
+        <div class="hidden md:block md:w-80">
+          <div class="bg-white border md:rounded-xl shadow-sm p-5 sticky top-24">
+            <h2 class="text-base font-sans font-semibold text-stone-900 mb-4">Order Summary</h2>
+
+            <div id="cart-coupon-section">
+              <%= render 'coupon_section', coupons_enabled: @coupons_enabled, multi_vendor: @coupon_blocked_by_multi_vendor %>
+            </div>
+
+            <div id="cart-summary" class="mb-4">
               <%= render 'summary', cart: @cart %>
             </div>
 
-            <!-- Mobile Summary (Detailed) -->
-            <div id="cart-summary-mobile" class="md:hidden mb-3">
-              <%= render 'summary_mobile', cart: @cart %>
-            </div>
-
-            <!-- Checkout -->
             <% unless @cart.empty? %>
-              <%= link_to checkout_path, class: 'w-full block py-3.5 md:py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-center text-base font-semibold rounded-xl md:rounded-lg transition shadow-lg md:shadow-none' do %>
+              <%= link_to checkout_path, class: 'w-full block py-2.5 bg-rose-800 hover:bg-rose-900 text-white text-center text-base font-semibold rounded-lg transition' do %>
                 Proceed to Checkout
               <% end %>
-              <div class="md:hidden flex justify-center mt-3">
-                <div class="w-16 h-1 rounded-full bg-stone-300"></div>
-              </div>
             <% end %>
 
-            <div class="hidden md:block mt-2.5 sm:mt-3 text-center">
-              <%= link_to 'Continue Shopping', products_path, class: 'text-xs sm:text-sm text-stone-500 hover:text-rose-700' %>
+            <div class="mt-3 text-center">
+              <%= link_to 'Continue Shopping', products_path, class: 'text-sm text-stone-500 hover:text-rose-700' %>
             </div>
-            
+
             <!-- Trust -->
-            <div class="hidden md:block mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-stone-100">
-              <div class="flex items-center justify-center gap-3 sm:gap-4 text-[10px] sm:text-xs text-stone-400">
-                <div class="flex items-center gap-0.5 sm:gap-1">
-                  <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <div class="mt-5 pt-5 border-t border-stone-100">
+              <div class="flex items-center justify-center gap-4 text-xs text-stone-400">
+                <div class="flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                   <span>Secure</span>
                 </div>
-                <div class="flex items-center gap-0.5 sm:gap-1">
-                  <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <div class="flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                   <span>Certified</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Mobile: Fixed bottom checkout bar -->
+        <% unless @cart.empty? %>
+          <div id="cart-checkout-bar" class="md:hidden fixed bottom-14 left-0 right-0 z-[45] bg-white border-t border-stone-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] px-4 py-3">
+            <%= render 'checkout_bar_mobile', cart: @cart %>
+          </div>
+        <% end %>
       </div>
     <% end %>
   </div>

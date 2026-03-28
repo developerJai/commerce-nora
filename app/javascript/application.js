@@ -52,12 +52,21 @@ document.addEventListener("turbo:before-cache", () => {
     if (el) { el.classList.remove("active"); el.setAttribute("aria-hidden", "true") }
   }
 
-  document.addEventListener("turbo:before-fetch-request", () => {
+  document.addEventListener("turbo:before-fetch-request", (event) => {
+    // Don't show loader for turbo frame requests (e.g. modals, inline frames)
+    if (event.target.closest && event.target.closest("turbo-frame")) return
     if (!timer) timer = setTimeout(show, DELAY)
   })
 
   document.addEventListener("turbo:load", hide)
   document.addEventListener("turbo:fetch-request-error", hide)
+  // Hide loader after Turbo Stream responses (e.g. cart remove/update)
+  // turbo:load only fires for full-page navigations, not stream responses
+  document.addEventListener("turbo:submit-end", hide)
+  document.addEventListener("turbo:before-stream-render", hide)
+  // Hide loader after turbo frame navigations (e.g. coupon modal)
+  document.addEventListener("turbo:frame-load", hide)
+  document.addEventListener("turbo:frame-render", hide)
 })()
 
 // --- Mobile bottom nav: debounce rapid tab switches to prevent screen freeze ---

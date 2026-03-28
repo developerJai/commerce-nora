@@ -37,7 +37,7 @@
                       <% end %>
                     </div>
 
-                    <%= form_with url: apply_coupon_cart_path, method: :post, data: { turbo_frame: '_top' } do |f| %>
+                    <%= form_with url: apply_coupon_cart_path, method: :post do |f| %>
                       <%= f.hidden_field :coupon_code, value: coupon.code %>
                       <%= f.submit 'Apply', class: 'px-4 py-2 text-sm bg-stone-900 text-white font-medium rounded-lg hover:bg-stone-800 cursor-pointer whitespace-nowrap' %>
                     <% end %>

@@ -1,0 +1,20 @@
+<% coupon = session[:coupon_id] ? Coupon.find_by(id: session[:coupon_id]) : nil %>
+<% subtotal = cart.subtotal %>
+<% discount = coupon&.calculate_discount(subtotal) || 0 %>
+<% discounted = subtotal - discount %>
+<% items_by_vendor = cart.cart_items.includes(product_variant: { product: :vendor }).group_by { |item| item.product_variant.product.vendor_id } %>
+<% estimated_shipping = items_by_vendor.sum do |_vid, items|
+  vendor_subtotal = items.sum(&:total_price)
+  Order.calculate_shipping_amount(vendor_subtotal)
+end %>
+<% est_total = discounted + estimated_shipping %>
+
+<div class="flex items-center justify-between gap-3">
+  <div class="flex-shrink-0">
+    <p class="text-[11px] text-stone-500 leading-tight">Est. Total</p>
+    <p class="text-base font-bold text-stone-900 leading-tight"><%= format_price(est_total) %></p>
+  </div>
+  <%= link_to checkout_path, class: 'flex-1 block py-3 bg-rose-800 hover:bg-rose-900 text-white text-center text-sm font-semibold rounded-xl transition shadow-lg' do %>
+    Proceed to Checkout
+  <% end %>
+</div>
