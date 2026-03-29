@@ -1,0 +1,20 @@
+<div class="overflow-x-auto hide-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0" data-controller="category-chips">
+  <div class="flex gap-2 min-w-max py-1">
+    <%= link_to "All",
+        vendor_storefront_path(@vendor.slug, sort: @sort, q: @q.presence),
+        class: "px-4 py-1.5 rounded-full text-sm font-medium transition whitespace-nowrap
+               #{@category_ids.empty? ? 'bg-rose-800 text-white shadow-sm' : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 active:bg-stone-100'}" %>
+    <% @vendor_categories.each do |cat| %>
+      <% selected = @category_ids.include?(cat.id.to_s) %>
+      <% count = @category_counts[cat.id] || 0 %>
+      <%= link_to vendor_storefront_path(@vendor.slug, category_ids: [cat.id], sort: @sort, q: @q.presence),
+          class: "px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition
+                 #{selected ? 'bg-rose-800 text-white shadow-sm' : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 active:bg-stone-100'}" do %>
+        <%= cat.name %>
+        <% if count > 0 %>
+          <span class="ml-0.5 text-xs opacity-70">(<%= count %>)</span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

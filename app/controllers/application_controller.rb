@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
-  helper_method :current_customer, :customer_logged_in?, :current_cart, :search_placeholder
+  helper_method :current_customer, :customer_logged_in?, :current_cart, :search_placeholder, :vendor_storefront_origin
 
   private
 
@@ -53,6 +53,11 @@ class ApplicationController < ActionController::Base
     cart = Cart.create!(token: SecureRandom.uuid)
     session[:cart_token] = cart.token
     cart
+  end
+
+  def vendor_storefront_origin
+    return nil unless session[:vendor_storefront_slug]
+    @vendor_storefront_origin ||= Vendor.active.find_by(slug: session[:vendor_storefront_slug])
   end
 
   def search_placeholder

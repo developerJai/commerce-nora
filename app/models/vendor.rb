@@ -11,13 +11,16 @@ class Vendor < ApplicationRecord
   validates :contact_name, presence: true
   validates :email, presence: true, uniqueness: { case_sensitive: false },
             format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :slug, presence: true, uniqueness: true
   validates :gst_number, length: { is: 15 }, allow_blank: true,
             format: { with: /\A[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}\z/, message: "must be a valid 15-character GST number" }
 
+  before_validation :generate_slug, if: -> { slug.blank? && business_name.present? }
   before_save :downcase_email
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(business_name: :asc) }
+  scope :with_storefront, -> { active.where.not(slug: [ nil, "" ]) }
 
   def display_name
     business_name
@@ -63,6 +66,16 @@ class Vendor < ApplicationRecord
   end
 
   private
+
+  def generate_slug
+    base_slug = business_name.parameterize
+    self.slug = base_slug
+    counter = 2
+    while Vendor.where(slug: slug).where.not(id: id).exists?
+      self.slug = "#{base_slug}-#{counter}"
+      counter += 1
+    end
+  end
 
   def downcase_email
     self.email = email.downcase

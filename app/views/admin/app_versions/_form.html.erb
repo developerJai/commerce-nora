@@ -1,0 +1,105 @@
+<%= form_with model: [:admin, app_version], class: "space-y-6" do |f| %>
+  <% if app_version.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div class="flex gap-2">
+        <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-red-800">Please fix the following errors:</p>
+          <ul class="mt-1 text-sm text-red-700 list-disc list-inside">
+            <% app_version.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Platform & Version -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Version Details</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :platform, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.select :platform,
+              options_for_select([["iOS", "ios"], ["Android", "android"]], app_version.platform),
+              {},
+              class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :version_number, "Version Number", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :version_number, placeholder: "1.2.0", class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+        <p class="mt-1 text-xs text-gray-400">Semantic versioning format: major.minor.patch</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Type -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Update Type</h2>
+
+    <div class="flex items-start gap-4">
+      <label class="relative inline-flex items-center cursor-pointer mt-1">
+        <%= f.check_box :force_update, class: "sr-only peer", id: "force_update_toggle" %>
+        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+      </label>
+      <div>
+        <p class="text-sm font-medium text-gray-900">Force Update</p>
+        <p class="text-sm text-gray-500 mt-0.5">When enabled, users on older versions will see a <strong>blocking modal</strong> and cannot use the app until they update.</p>
+        <div class="mt-2 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+          <p class="text-xs text-red-700">
+            <strong>Warning:</strong> This affects ALL users on versions older than this one. Use only for breaking changes, security fixes, or critical bugs.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Release Info -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Release Information</h2>
+
+    <div class="space-y-4">
+      <div>
+        <%= f.label :release_notes, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_area :release_notes, rows: 3, placeholder: "Bug fixes and performance improvements...", class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+        <p class="mt-1 text-xs text-gray-400">Shown to users in the update prompt</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :store_url, "Store URL (optional)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.url_field :store_url, placeholder: "Leave blank to use default from Mobile App Settings", class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+          <p class="mt-1 text-xs text-gray-400">Overrides the default store URL for this version</p>
+        </div>
+        <div>
+          <%= f.label :released_at, "Release Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.datetime_local_field :released_at, class: "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Toggle -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-gray-900">Active</p>
+        <p class="text-sm text-gray-500">Only active versions are considered by the update check</p>
+      </div>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <%= f.check_box :active, class: "sr-only peer", id: "active_toggle" %>
+        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex items-center justify-between">
+    <%= link_to "Cancel", admin_app_versions_path, class: "text-sm text-gray-600 hover:text-gray-900 font-medium" %>
+    <%= f.submit app_version.persisted? ? "Update Version" : "Create Version", class: "px-6 py-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium cursor-pointer transition text-sm" %>
+  </div>
+<% end %>

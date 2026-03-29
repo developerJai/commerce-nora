@@ -20,4 +20,12 @@ class Api::MobileController < ApplicationController
   def cart_count
     render json: { count: current_cart.item_count }
   end
+
+  def check_update
+    platform = params[:platform].to_s.downcase
+    current_version = params[:current_version].to_s
+
+    result = AppVersion.check_update(platform, current_version)
+    render json: result
+  end
 end

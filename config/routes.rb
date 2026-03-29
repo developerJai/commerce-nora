@@ -10,6 +10,11 @@ Rails.application.routes.draw do
     resource :settings, only: [ :show, :update ]
     resource :store_settings, only: [ :show, :update ]
     resource :mobile_app_settings, only: [ :show, :update ]
+    resources :app_versions do
+      member do
+        patch :toggle_status
+      end
+    end
     resource :password, only: [ :edit, :update ]
 
     resources :customers do
@@ -191,6 +196,9 @@ Rails.application.routes.draw do
     resource :password, only: [ :edit, :update ], controller: "account_passwords"
   end
 
+  # Vendor Storefronts
+  get "shop/:slug", to: "vendor_storefronts#show", as: :vendor_storefront
+
   # Products
   resources :products, only: [ :index, :show ], param: :slug
 
@@ -275,6 +283,7 @@ Rails.application.routes.draw do
   namespace :api do
     get "mobile/navigation", to: "mobile#navigation"
     get "mobile/cart_count", to: "mobile#cart_count"
+    get "mobile/check_update", to: "mobile#check_update"
   end
 
   # Health check

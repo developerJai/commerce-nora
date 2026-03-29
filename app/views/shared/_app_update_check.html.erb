@@ -1,0 +1,22 @@
+<%# Rendered only inside Hotwire Native apps. Parses the app version from
+    the User-Agent string and wires up the Stimulus controller that handles
+    force/normal update modals. %>
+<%
+  ua = request.user_agent.to_s
+  if ua.include?("NoraLooks/iOS")
+    update_platform = "ios"
+    version_match = ua.match(/NoraLooks\/iOS\s+([\d.]+)/)
+  elsif ua.include?("NoraLooks/Android")
+    update_platform = "android"
+    version_match = ua.match(/NoraLooks\/Android\s+([\d.]+)/)
+  end
+  app_current_version = version_match ? version_match[1] : "0.0.0"
+%>
+
+<% if update_platform %>
+  <div data-controller="app-update"
+       data-app-update-platform-value="<%= update_platform %>"
+       data-app-update-current-version-value="<%= app_current_version %>"
+       data-app-update-check-url-value="<%= api_mobile_check_update_url %>">
+  </div>
+<% end %>

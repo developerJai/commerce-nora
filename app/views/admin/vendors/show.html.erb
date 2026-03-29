@@ -85,6 +85,32 @@
           </dd>
         </div>
         <div>
+          <dt class="text-gray-500">Storefront URL</dt>
+          <dd class="mt-0.5">
+            <div class="flex items-center gap-2">
+              <code id="storefront-url-value" class="flex-1 bg-gray-100 px-2.5 py-1.5 rounded text-xs font-mono text-gray-900 truncate select-all"><%= vendor_storefront_url(@vendor.slug) %></code>
+              <button type="button" onclick="copyStorefrontUrl()" id="copy-storefront-btn"
+                      class="flex-shrink-0 px-2.5 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded hover:bg-indigo-700 transition cursor-pointer">
+                Copy
+              </button>
+              <%= link_to vendor_storefront_path(@vendor.slug), target: "_blank", class: "flex-shrink-0 px-2.5 py-1.5 border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition" do %>
+                Open
+              <% end %>
+            </div>
+            <script>
+              function copyStorefrontUrl() {
+                const url = document.getElementById('storefront-url-value').textContent;
+                navigator.clipboard.writeText(url).then(() => {
+                  const btn = document.getElementById('copy-storefront-btn');
+                  btn.textContent = 'Copied!';
+                  btn.classList.replace('bg-indigo-600', 'bg-green-600');
+                  setTimeout(() => { btn.textContent = 'Copy'; btn.classList.replace('bg-green-600', 'bg-indigo-600'); }, 2000);
+                });
+              }
+            </script>
+          </dd>
+        </div>
+        <div>
           <dt class="text-gray-500">Vendor Login</dt>
           <dd class="font-medium text-gray-900 mt-0.5"><%= @admin_user&.email || 'No login configured' %></dd>
         </div>

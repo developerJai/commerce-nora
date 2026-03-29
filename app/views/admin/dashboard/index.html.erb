@@ -6,6 +6,38 @@
     <p class="mt-1 text-sm text-gray-500">Welcome back, <%= current_admin.name %>!</p>
   </div>
 
+  <% if vendor_context? && current_vendor.slug.present? %>
+    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-4 sm:p-5">
+      <div class="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h3 class="text-sm font-semibold text-indigo-900">Your Storefront</h3>
+          <p class="text-xs text-indigo-600 mt-0.5">Share this link with your customers to browse your catalog</p>
+        </div>
+        <div class="flex items-center gap-2 flex-1 sm:flex-initial min-w-0">
+          <code id="vendor-storefront-url" class="flex-1 sm:flex-initial bg-white/80 px-3 py-1.5 rounded-md text-xs font-mono text-gray-800 truncate border border-indigo-200 select-all"><%= vendor_storefront_url(current_vendor.slug) %></code>
+          <button type="button" onclick="copyVendorStorefrontUrl()" id="copy-vendor-url-btn"
+                  class="flex-shrink-0 px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-md hover:bg-indigo-700 transition cursor-pointer">
+            Copy Link
+          </button>
+          <%= link_to vendor_storefront_path(current_vendor.slug), target: "_blank", class: "flex-shrink-0 px-3 py-1.5 bg-white border border-indigo-300 text-indigo-700 text-xs font-medium rounded-md hover:bg-indigo-50 transition" do %>
+            Preview
+          <% end %>
+        </div>
+      </div>
+      <script>
+        function copyVendorStorefrontUrl() {
+          const url = document.getElementById('vendor-storefront-url').textContent;
+          navigator.clipboard.writeText(url).then(() => {
+            const btn = document.getElementById('copy-vendor-url-btn');
+            btn.textContent = 'Copied!';
+            btn.classList.replace('bg-indigo-600', 'bg-green-600');
+            setTimeout(() => { btn.textContent = 'Copy Link'; btn.classList.replace('bg-green-600', 'bg-indigo-600'); }, 2000);
+          });
+        }
+      </script>
+    </div>
+  <% end %>
+
   <% if vendor_context? && ((@out_of_stock_variants_count.to_i > 0) || (@low_stock_variants_count.to_i > 0)) %>
     <div class="bg-white shadow rounded-lg">
       <div class="px-4 py-5 sm:px-6 border-b border-gray-200">

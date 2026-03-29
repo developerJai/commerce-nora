@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_29_070314) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_29_082859) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -81,6 +81,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_070314) do
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["role"], name: "index_admin_users_on_role"
     t.index ["vendor_id"], name: "index_admin_users_on_vendor_id"
+  end
+
+  create_table "app_versions", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.boolean "force_update", default: false, null: false
+    t.string "platform", null: false
+    t.text "release_notes"
+    t.datetime "released_at"
+    t.string "store_url"
+    t.datetime "updated_at", null: false
+    t.string "version_number", null: false
+    t.index ["platform", "active"], name: "index_app_versions_on_platform_and_active"
+    t.index ["platform", "version_number"], name: "index_app_versions_on_platform_and_version_number", unique: true
   end
 
   create_table "banners", force: :cascade do |t|
@@ -643,10 +657,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_070314) do
     t.string "gst_number"
     t.string "phone"
     t.string "pincode"
+    t.string "slug", null: false
     t.string "state"
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_vendors_on_deleted_at"
     t.index ["email"], name: "index_vendors_on_email", unique: true
+    t.index ["slug"], name: "index_vendors_on_slug", unique: true
   end
 
   create_table "wishlists", force: :cascade do |t|

@@ -1,0 +1,33 @@
+<%# For infinite scroll (pagination) - append new products %>
+<% if params[:page].present? && params[:page].to_i > 1 %>
+  <%= turbo_stream.append 'products-grid' do %>
+    <% @products.each do |product| %>
+      <%= render 'shared/product_card', product: product, in_stock_filter: @in_stock %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%# For filter/sort changes - replace entire products grid %>
+  <%= turbo_stream.replace 'products-grid' do %>
+    <div id="products-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 pb-6">
+      <% @products.each do |product| %>
+        <%= render 'shared/product_card', product: product, in_stock_filter: @in_stock %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace 'results-counter' do %>
+  <p class="text-sm text-stone-600">
+    <span class="font-medium text-stone-900"><%= number_with_delimiter(@pagy.count) %></span>
+    <span class="text-stone-500">products</span>
+  </p>
+<% end %>
+
+<%= turbo_stream.replace 'infinite-scroll-pagination' do %>
+  <div id="infinite-scroll-pagination"
+       data-next-url="<%= @pagy.next ? vendor_storefront_path(@vendor.slug, **request.query_parameters.merge(page: @pagy.next)) : '' %>"
+       data-has-next="<%= @pagy.next.present? %>"
+       data-updated="<%= Time.current.to_i %>"
+       data-infinite-scroll-target="pagination"
+       style="display: none;"></div>
+<% end %>

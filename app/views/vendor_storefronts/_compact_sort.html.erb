@@ -1,0 +1,14 @@
+<% sort_options = [
+  ['Popularity', 'rating'],
+  ['Price: Low', 'price_low'],
+  ['Price: High', 'price_high'],
+  ['Newest', 'newest']
+] %>
+<div class="flex items-center gap-0.5 bg-stone-100 rounded-lg p-0.5">
+  <% sort_options.each do |label, value| %>
+    <% active = (@sort == value) || (@sort.blank? && value == 'rating') %>
+    <%= link_to label,
+        vendor_storefront_path(@vendor.slug, **request.query_parameters.except("page").merge(sort: value)),
+        class: "px-2.5 py-1 text-xs font-medium rounded-md transition whitespace-nowrap #{active ? 'bg-white text-rose-700 shadow-sm' : 'text-stone-600 hover:text-stone-900 hover:bg-white/60'}" %>
+  <% end %>
+</div>
