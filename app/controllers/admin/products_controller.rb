@@ -129,6 +129,7 @@ module Admin
         image = @product.images.find_by(id: image_id)
         image&.purge
       end
+      @product.reload
     end
 
     def product_params

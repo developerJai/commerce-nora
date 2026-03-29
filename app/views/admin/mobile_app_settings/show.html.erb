@@ -116,11 +116,17 @@
       <p class="text-sm text-gray-500 mb-4">Configure identifiers so shared URLs open directly in the native app instead of the browser</p>
 
       <div class="space-y-4">
-        <div class="bg-gray-50 rounded-lg p-3 mb-2">
-          <p class="text-xs text-gray-600">
-            These settings power the <code class="bg-gray-200 px-1 rounded text-xs">/.well-known/apple-app-site-association</code> and
-            <code class="bg-gray-200 px-1 rounded text-xs">/.well-known/assetlinks.json</code> files that iOS and Android use to verify your app owns this domain.
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
+          <p class="text-xs font-medium text-blue-800 mb-2">How deep linking works</p>
+          <p class="text-xs text-blue-700 mb-2">
+            When someone taps a link to your store (e.g. noralooks.com/products/gold-ring), it opens directly in your app instead of the browser.
+            Apple and Google verify ownership by checking files hosted on your domain:
           </p>
+          <ul class="text-xs text-blue-700 space-y-1 ml-3 list-disc">
+            <li><strong>iOS</strong> reads <code class="bg-blue-100 px-1 rounded text-xs">/.well-known/apple-app-site-association</code> &mdash; uses Team ID + Bundle ID</li>
+            <li><strong>Android</strong> reads <code class="bg-blue-100 px-1 rounded text-xs">/.well-known/assetlinks.json</code> &mdash; uses Package Name + SHA-256 fingerprint</li>
+          </ul>
+          <p class="text-xs text-blue-700 mt-2">These files are generated automatically from the values below. No code changes needed.</p>
         </div>
 
         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">iOS (Universal Links)</p>
@@ -128,12 +134,12 @@
           <div>
             <%= f.label :ios_team_id, 'Apple Team ID', class: 'block text-sm font-medium text-gray-700 mb-1' %>
             <%= f.text_field :ios_team_id, placeholder: 'ABCDE12345', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
-            <p class="mt-1 text-xs text-gray-400">Found in Apple Developer Account > Membership</p>
+            <p class="mt-1 text-xs text-gray-400">10-character ID from <strong>Apple Developer Account &rarr; Membership Details</strong>. This never changes.</p>
           </div>
           <div>
             <%= f.label :ios_bundle_id, 'iOS Bundle ID', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-            <%= f.text_field :ios_bundle_id, placeholder: 'com.noralooks.app', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
-            <p class="mt-1 text-xs text-gray-400">Your app's bundle identifier in Xcode</p>
+            <%= f.text_field :ios_bundle_id, placeholder: 'com.noralooks.shop', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
+            <p class="mt-1 text-xs text-gray-400">From <strong>Xcode &rarr; Target &rarr; General &rarr; Bundle Identifier</strong>. Must match exactly.</p>
           </div>
         </div>
 
@@ -141,12 +147,17 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <%= f.label :android_package_name, 'Android Package Name', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-            <%= f.text_field :android_package_name, placeholder: 'com.noralooks.app', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
+            <%= f.text_field :android_package_name, placeholder: 'com.noralooks.shop', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
+            <p class="mt-1 text-xs text-gray-400">The <code class="bg-gray-200 px-1 rounded">package</code> value from your app's <strong>build.gradle</strong> or <strong>AndroidManifest.xml</strong>.</p>
           </div>
           <div>
             <%= f.label :android_sha256_fingerprint, 'SHA-256 Certificate Fingerprint', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-            <%= f.text_field :android_sha256_fingerprint, placeholder: 'AA:BB:CC:DD:...', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
-            <p class="mt-1 text-xs text-gray-400">Run: <code class="bg-gray-200 px-1 rounded">keytool -list -v -keystore your.keystore</code></p>
+            <%= f.text_field :android_sha256_fingerprint, placeholder: 'AA:BB:CC:DD:EE:FF:...', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
+            <div class="mt-1 space-y-1">
+              <p class="text-xs text-gray-400">Format: colon-separated hex pairs (e.g. 61:DE:5A:4D:FA:CB:...)</p>
+              <p class="text-xs text-gray-400"><strong>For testing:</strong> Run <code class="bg-gray-200 px-1 rounded">keytool -list -v -keystore ~/.android/debug.keystore -storepass android</code> and copy the SHA256 line.</p>
+              <p class="text-xs text-gray-400"><strong>For production:</strong> Get it from <strong>Google Play Console &rarr; Setup &rarr; App signing &rarr; SHA-256 certificate fingerprint</strong>. Update this value when you publish.</p>
+            </div>
           </div>
         </div>
       </div>

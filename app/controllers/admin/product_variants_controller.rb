@@ -30,6 +30,11 @@ module Admin
     end
 
     def update
+      if params[:product_variant][:remove_image] == "1" && @variant.image.attached?
+        @variant.image.purge
+        @variant.reload
+      end
+
       if @variant.update(variant_params)
         redirect_to admin_product_variant_path(@product, @variant), notice: "Variant updated successfully"
       else

@@ -6,18 +6,18 @@ class DeepLinksController < ApplicationController
   def apple
     render json: {
       applinks: {
-        apps: [],
         details: [
           {
-            appID: "#{StoreSetting.instance.ios_team_id}.#{StoreSetting.instance.ios_bundle_id}",
-            paths: [
-              "/products/*",
-              "/categories/*",
-              "/orders/*",
-              "/cart",
-              "/search",
-              "/support/*",
-              "/"
+            appIDs: [ "#{StoreSetting.instance.ios_team_id}.#{StoreSetting.instance.ios_bundle_id}" ],
+            components: [
+              { "/" => "/products/*", comment: "Product pages" },
+              { "/" => "/categories/*", comment: "Category pages" },
+              { "/" => "/orders/*", comment: "Order pages" },
+              { "/" => "/cart", comment: "Cart" },
+              { "/" => "/search", comment: "Search" },
+              { "/" => "/support/*", comment: "Support pages" },
+              { "/" => "/account/*", comment: "Account pages" },
+              { "/" => "/*", comment: "All other pages" }
             ]
           }
         ]
