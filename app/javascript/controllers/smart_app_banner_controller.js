@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["banner", "storeName", "ctaButton", "fab"]
+  static targets = ["banner", "storeName", "ctaButton", "fab", "fabIconIos", "fabIconAndroid", "fabIconFallback", "bannerIconDefault", "bannerIconIos", "bannerIconAndroid"]
   static values = {
     iosUrl: String,
     androidUrl: String,
@@ -27,6 +27,16 @@ export default class extends Controller {
 
     this.ctaButtonTarget.href = url
     this.storeNameTarget.textContent = platform === "ios" ? "App Store" : "Google Play"
+
+    // Show platform icon in banner
+    if (platform === "ios" && this.hasBannerIconIosTarget) {
+      this.bannerIconIosTarget.classList.remove("hidden")
+      if (this.hasBannerIconDefaultTarget) this.bannerIconDefaultTarget.classList.add("hidden")
+    } else if (platform === "android" && this.hasBannerIconAndroidTarget) {
+      this.bannerIconAndroidTarget.classList.remove("hidden")
+      if (this.hasBannerIconDefaultTarget) this.bannerIconDefaultTarget.classList.add("hidden")
+    }
+
     this.bannerTarget.classList.remove("hidden")
 
     // Animate in
@@ -54,6 +64,17 @@ export default class extends Controller {
 
   showFab() {
     if (!this.hasFabTarget) return
+
+    // Show the correct platform icon
+    const platform = this.detectPlatform()
+    if (platform === "ios" && this.hasFabIconIosTarget) {
+      this.fabIconIosTarget.classList.remove("hidden")
+      if (this.hasFabIconFallbackTarget) this.fabIconFallbackTarget.classList.add("hidden")
+    } else if (platform === "android" && this.hasFabIconAndroidTarget) {
+      this.fabIconAndroidTarget.classList.remove("hidden")
+      if (this.hasFabIconFallbackTarget) this.fabIconFallbackTarget.classList.add("hidden")
+    }
+
     this.fabTarget.classList.remove("hidden")
     requestAnimationFrame(() => {
       this.fabTarget.classList.remove("scale-0", "opacity-0")

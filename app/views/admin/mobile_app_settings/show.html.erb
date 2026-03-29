@@ -8,8 +8,8 @@
     </div>
   </div>
 
-  <%= form_with model: @store_setting, url: admin_mobile_app_settings_path, method: :patch, class: 'space-y-6' do |f| %>
-    <!-- Enable/Disable Toggle -->
+  <!-- Enable/Disable Toggle -->
+  <%= form_with model: @store_setting, url: admin_mobile_app_settings_path, method: :patch do |f| %>
     <div class="bg-white rounded-lg shadow-sm p-6">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -24,20 +24,25 @@
           </div>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
-          <%= f.check_box :mobile_apps_enabled, class: 'sr-only peer', id: 'mobile_apps_toggle' %>
+          <%= f.check_box :mobile_apps_enabled, class: 'sr-only peer', id: 'mobile_apps_toggle', onchange: 'this.form.requestSubmit()' %>
           <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
         </label>
       </div>
     </div>
+  <% end %>
 
-    <!-- App Store URLs -->
+  <!-- App Store URLs -->
+  <%= form_with model: @store_setting, url: admin_mobile_app_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
     <div class="bg-white rounded-lg shadow-sm p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-        <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-        </svg>
-        App Store URLs
-      </h2>
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
+          App Store URLs
+        </h2>
+        <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
+      </div>
       <p class="text-sm text-gray-500 mb-4">Add links to your iOS and Android apps</p>
 
       <div class="space-y-4">
@@ -46,7 +51,7 @@
             <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
             <%= f.label :ios_app_url, 'iOS App Store URL', class: 'text-sm font-medium text-gray-700' %>
           </div>
-          <%= f.url_field :ios_app_url, placeholder: 'https://apps.apple.com/app/your-app/id123456789', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm' %>
+          <%= f.url_field :ios_app_url, placeholder: 'https://apps.apple.com/app/your-app/id123456789', disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500' %>
           <p class="mt-1 text-xs text-gray-400">e.g., https://apps.apple.com/app/noralooks/id123456789</p>
         </div>
 
@@ -55,124 +60,81 @@
             <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 2.258l-3.5 6.06a.5.5 0 00.433.75h7a.5.5 0 00.432-.75L18.39 2.258a.5.5 0 00-.866 0zM1 21.5h10V11H1v10.5zm11.5 0H23V11H12.5v10.5zM6 9.5a4.5 4.5 0 100-9 4.5 4.5 0 000 9z"/></svg>
             <%= f.label :android_app_url, 'Google Play Store URL', class: 'text-sm font-medium text-gray-700' %>
           </div>
-          <%= f.url_field :android_app_url, placeholder: 'https://play.google.com/store/apps/details?id=com.yourapp', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm' %>
+          <%= f.url_field :android_app_url, placeholder: 'https://play.google.com/store/apps/details?id=com.yourapp', disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500' %>
           <p class="mt-1 text-xs text-gray-400">e.g., https://play.google.com/store/apps/details?id=com.noralooks.app</p>
         </div>
       </div>
-    </div>
 
-    <!-- Section Customization -->
+      <div data-editable-section-target="actions" class="hidden flex items-center gap-3 mt-5 pt-4 border-t border-gray-100">
+        <%= f.submit 'Save URLs', class: 'px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 font-medium cursor-pointer transition' %>
+        <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Homepage Section Content -->
+  <%= form_with model: @store_setting, url: admin_mobile_app_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
     <div class="bg-white rounded-lg shadow-sm p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-        <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-        </svg>
-        Homepage Section Content
-      </h2>
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          Homepage Section Content
+        </h2>
+        <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
+      </div>
       <p class="text-sm text-gray-500 mb-4">Customise the text displayed in the mobile apps download section on the homepage</p>
 
       <div class="space-y-4">
         <div>
           <%= f.label :mobile_app_section_title, 'Section Title', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-          <%= f.text_field :mobile_app_section_title, placeholder: 'Shop on the Go', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm' %>
+          <%= f.text_field :mobile_app_section_title, placeholder: 'Shop on the Go', disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500' %>
         </div>
         <div>
           <%= f.label :mobile_app_section_subtitle, 'Section Subtitle', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-          <%= f.text_area :mobile_app_section_subtitle, rows: 2, placeholder: 'Download our app for exclusive deals...', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm' %>
+          <%= f.text_area :mobile_app_section_subtitle, rows: 2, placeholder: 'Download our app for exclusive deals...', disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500' %>
         </div>
       </div>
-    </div>
 
-    <!-- Smart Banner Content -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-        <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-        </svg>
-        Smart Banner Content
-      </h2>
-      <p class="text-sm text-gray-500 mb-4">Customise the heading and subheading shown in the mobile browser smart app banner</p>
-
-      <div class="space-y-4">
-        <div>
-          <%= f.label :smart_banner_title, 'Banner Title', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-          <%= f.text_field :smart_banner_title, placeholder: 'Noralooks', value: @store_setting.effective_smart_banner_title, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm' %>
-        </div>
-        <div>
-          <%= f.label :smart_banner_subtitle, 'Banner Subtitle', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-          <%= f.text_field :smart_banner_subtitle, placeholder: 'Download our app for great offers & deals', value: @store_setting.effective_smart_banner_subtitle, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm' %>
-        </div>
+      <div data-editable-section-target="actions" class="hidden flex items-center gap-3 mt-5 pt-4 border-t border-gray-100">
+        <%= f.submit 'Save Content', class: 'px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 font-medium cursor-pointer transition' %>
+        <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
       </div>
     </div>
+  <% end %>
 
-    <!-- Deep Linking Configuration -->
+  <!-- Smart Banner & Preview -->
+  <%= form_with model: @store_setting, url: admin_mobile_app_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
     <div class="bg-white rounded-lg shadow-sm p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-        <svg class="w-5 h-5 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-        </svg>
-        Deep Linking (Universal Links / App Links)
-      </h2>
-      <p class="text-sm text-gray-500 mb-4">Configure identifiers so shared URLs open directly in the native app instead of the browser</p>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+          Smart Banner & Preview
+        </h2>
+        <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
+      </div>
 
       <div class="space-y-4">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
-          <p class="text-xs font-medium text-blue-800 mb-2">How deep linking works</p>
-          <p class="text-xs text-blue-700 mb-2">
-            When someone taps a link to your store (e.g. noralooks.com/products/gold-ring), it opens directly in your app instead of the browser.
-            Apple and Google verify ownership by checking files hosted on your domain:
-          </p>
-          <ul class="text-xs text-blue-700 space-y-1 ml-3 list-disc">
-            <li><strong>iOS</strong> reads <code class="bg-blue-100 px-1 rounded text-xs">/.well-known/apple-app-site-association</code> &mdash; uses Team ID + Bundle ID</li>
-            <li><strong>Android</strong> reads <code class="bg-blue-100 px-1 rounded text-xs">/.well-known/assetlinks.json</code> &mdash; uses Package Name + SHA-256 fingerprint</li>
-          </ul>
-          <p class="text-xs text-blue-700 mt-2">These files are generated automatically from the values below. No code changes needed.</p>
-        </div>
-
-        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">iOS (Universal Links)</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <%= f.label :ios_team_id, 'Apple Team ID', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-            <%= f.text_field :ios_team_id, placeholder: 'ABCDE12345', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
-            <p class="mt-1 text-xs text-gray-400">10-character ID from <strong>Apple Developer Account &rarr; Membership Details</strong>. This never changes.</p>
-          </div>
-          <div>
-            <%= f.label :ios_bundle_id, 'iOS Bundle ID', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-            <%= f.text_field :ios_bundle_id, placeholder: 'com.noralooks.shop', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
-            <p class="mt-1 text-xs text-gray-400">From <strong>Xcode &rarr; Target &rarr; General &rarr; Bundle Identifier</strong>. Must match exactly.</p>
-          </div>
-        </div>
-
-        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mt-4">Android (App Links)</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <%= f.label :android_package_name, 'Android Package Name', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-            <%= f.text_field :android_package_name, placeholder: 'com.noralooks.shop', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
-            <p class="mt-1 text-xs text-gray-400">The <code class="bg-gray-200 px-1 rounded">package</code> value from your app's <strong>build.gradle</strong> or <strong>AndroidManifest.xml</strong>.</p>
-          </div>
-          <div>
-            <%= f.label :android_sha256_fingerprint, 'SHA-256 Certificate Fingerprint', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-            <%= f.text_field :android_sha256_fingerprint, placeholder: 'AA:BB:CC:DD:EE:FF:...', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
-            <div class="mt-1 space-y-1">
-              <p class="text-xs text-gray-400">Format: colon-separated hex pairs (e.g. 61:DE:5A:4D:FA:CB:...)</p>
-              <p class="text-xs text-gray-400"><strong>For testing:</strong> Run <code class="bg-gray-200 px-1 rounded">keytool -list -v -keystore ~/.android/debug.keystore -storepass android</code> and copy the SHA256 line.</p>
-              <p class="text-xs text-gray-400"><strong>For production:</strong> Get it from <strong>Google Play Console &rarr; Setup &rarr; App signing &rarr; SHA-256 certificate fingerprint</strong>. Update this value when you publish.</p>
+        <!-- Banner Content Fields -->
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Smart Banner Content</p>
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <%= f.label :smart_banner_title, 'Banner Title', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= f.text_field :smart_banner_title, placeholder: 'Noralooks', value: @store_setting.effective_smart_banner_title, disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500' %>
+              </div>
+              <div>
+                <%= f.label :smart_banner_subtitle, 'Banner Subtitle', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= f.text_field :smart_banner_subtitle, placeholder: 'Download our app for great offers & deals', value: @store_setting.effective_smart_banner_subtitle, disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500' %>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Preview -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-        <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-        </svg>
-        What Users Will See
-      </h2>
-
-      <div class="space-y-4">
         <!-- Homepage Section Preview -->
         <div>
           <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Homepage Section</p>
@@ -200,26 +162,170 @@
           </div>
         </div>
 
-        <!-- Smart Banner Preview -->
+        <!-- Banner Previews -->
         <div>
-          <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Mobile Smart Banner (shown on mobile browsers)</p>
-          <div class="bg-white border border-stone-200 rounded-xl p-3 flex items-center gap-3 max-w-sm">
-            <div class="w-10 h-10 bg-stone-900 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span class="text-white font-serif font-semibold text-sm">N</span>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Smart Banner (shown on mobile browsers)</p>
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1 space-y-3">
+              <% if @store_setting.ios_app_url.present? %>
+                <div>
+                  <p class="text-[10px] text-gray-400 mb-1">iOS</p>
+                  <div class="bg-white border border-stone-200 rounded-xl p-3 flex items-center gap-3 relative">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: #1a1410;">
+                      <svg class="w-5 h-5 text-white" viewBox="0 0 384 512" fill="currentColor">
+                        <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-stone-900"><%= @store_setting.effective_smart_banner_title %></p>
+                      <p class="text-xs text-stone-500"><%= @store_setting.effective_smart_banner_subtitle %></p>
+                      <p class="text-[10px] text-stone-400">Free on the App Store</p>
+                    </div>
+                    <div class="px-3 py-1.5 rounded-full text-xs font-semibold text-white flex-shrink-0" style="background-color: #B8962E;">OPEN</div>
+                  </div>
+                </div>
+              <% end %>
+              <% if @store_setting.android_app_url.present? %>
+                <div>
+                  <p class="text-[10px] text-gray-400 mb-1">Android</p>
+                  <div class="bg-white border border-stone-200 rounded-xl p-3 flex items-center gap-3 relative">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: #1a1410;">
+                      <svg class="w-5 h-5 text-white" viewBox="0 0 512 512" fill="currentColor">
+                        <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-stone-900"><%= @store_setting.effective_smart_banner_title %></p>
+                      <p class="text-xs text-stone-500"><%= @store_setting.effective_smart_banner_subtitle %></p>
+                      <p class="text-[10px] text-stone-400">Free on Google Play</p>
+                    </div>
+                    <div class="px-3 py-1.5 rounded-full text-xs font-semibold text-white flex-shrink-0" style="background-color: #B8962E;">OPEN</div>
+                  </div>
+                </div>
+              <% end %>
+              <% if @store_setting.ios_app_url.blank? && @store_setting.android_app_url.blank? %>
+                <div class="bg-white border border-stone-200 rounded-xl p-3 flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: #1a1410;">
+                    <span class="text-white font-serif font-semibold text-sm">N</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-stone-900"><%= @store_setting.effective_smart_banner_title %></p>
+                    <p class="text-xs text-stone-500"><%= @store_setting.effective_smart_banner_subtitle %></p>
+                  </div>
+                  <div class="px-3 py-1.5 rounded-full text-xs font-semibold text-white flex-shrink-0" style="background-color: #B8962E;">OPEN</div>
+                </div>
+                <p class="text-xs text-gray-400 italic">Add app URLs above to see platform-specific icons</p>
+              <% end %>
             </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-stone-900"><%= @store_setting.effective_smart_banner_title %></p>
-              <p class="text-xs text-stone-500"><%= @store_setting.effective_smart_banner_subtitle %></p>
+
+            <!-- Floating Button Previews -->
+            <div class="flex-shrink-0">
+              <p class="text-[10px] text-gray-400 mb-1">Floating button</p>
+              <div class="flex sm:flex-col gap-3">
+                <% if @store_setting.ios_app_url.present? %>
+                  <div class="text-center">
+                    <div class="relative w-12 h-12 bg-white rounded-2xl shadow-lg border border-stone-200 flex items-center justify-center">
+                      <svg class="w-7 h-7 text-stone-900" viewBox="0 0 384 512" fill="currentColor">
+                        <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+                      </svg>
+                      <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                      </span>
+                    </div>
+                    <p class="text-[9px] text-gray-400 mt-1">iOS</p>
+                  </div>
+                <% end %>
+                <% if @store_setting.android_app_url.present? %>
+                  <div class="text-center">
+                    <div class="relative w-12 h-12 bg-white rounded-2xl shadow-lg border border-stone-200 flex items-center justify-center">
+                      <svg class="w-7 h-7 text-stone-900" viewBox="0 0 512 512" fill="currentColor">
+                        <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
+                      </svg>
+                      <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                      </span>
+                    </div>
+                    <p class="text-[9px] text-gray-400 mt-1">Android</p>
+                  </div>
+                <% end %>
+              </div>
             </div>
-            <div class="px-3 py-1.5 bg-indigo-600 rounded-full text-xs font-medium text-white flex-shrink-0">Open</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Save Button -->
-    <div class="flex justify-end">
-      <%= f.submit 'Save Settings', class: 'px-6 py-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium cursor-pointer transition' %>
+      <div data-editable-section-target="actions" class="hidden flex items-center gap-3 mt-5 pt-4 border-t border-gray-100">
+        <%= f.submit 'Save Banner', class: 'px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 font-medium cursor-pointer transition' %>
+        <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Deep Linking Configuration -->
+  <%= form_with model: @store_setting, url: admin_mobile_app_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
+          Deep Linking (Universal Links / App Links)
+        </h2>
+        <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
+      </div>
+      <p class="text-sm text-gray-500 mb-4">Configure identifiers so shared URLs open directly in the native app instead of the browser</p>
+
+      <div class="space-y-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
+          <p class="text-xs font-medium text-blue-800 mb-2">How deep linking works</p>
+          <p class="text-xs text-blue-700 mb-2">
+            When someone taps a link to your store (e.g. noralooks.com/products/gold-ring), it opens directly in your app instead of the browser.
+            Apple and Google verify ownership by checking files hosted on your domain:
+          </p>
+          <ul class="text-xs text-blue-700 space-y-1 ml-3 list-disc">
+            <li><strong>iOS</strong> reads <code class="bg-blue-100 px-1 rounded text-xs">/.well-known/apple-app-site-association</code> &mdash; uses Team ID + Bundle ID</li>
+            <li><strong>Android</strong> reads <code class="bg-blue-100 px-1 rounded text-xs">/.well-known/assetlinks.json</code> &mdash; uses Package Name + SHA-256 fingerprint</li>
+          </ul>
+          <p class="text-xs text-blue-700 mt-2">These files are generated automatically from the values below. No code changes needed.</p>
+        </div>
+
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">iOS (Universal Links)</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <%= f.label :ios_team_id, 'Apple Team ID', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :ios_team_id, placeholder: 'ABCDE12345', disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono disabled:bg-gray-50 disabled:text-gray-500' %>
+            <p class="mt-1 text-xs text-gray-400">10-character ID from <strong>Apple Developer Account &rarr; Membership Details</strong>. This never changes.</p>
+          </div>
+          <div>
+            <%= f.label :ios_bundle_id, 'iOS Bundle ID', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :ios_bundle_id, placeholder: 'com.noralooks.shop', disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono disabled:bg-gray-50 disabled:text-gray-500' %>
+            <p class="mt-1 text-xs text-gray-400">From <strong>Xcode &rarr; Target &rarr; General &rarr; Bundle Identifier</strong>. Must match exactly.</p>
+          </div>
+        </div>
+
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mt-4">Android (App Links)</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <%= f.label :android_package_name, 'Android Package Name', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :android_package_name, placeholder: 'com.noralooks.shop', disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono disabled:bg-gray-50 disabled:text-gray-500' %>
+            <p class="mt-1 text-xs text-gray-400">The <code class="bg-gray-200 px-1 rounded">package</code> value from your app's <strong>build.gradle</strong> or <strong>AndroidManifest.xml</strong>.</p>
+          </div>
+          <div>
+            <%= f.label :android_sha256_fingerprint, 'SHA-256 Certificate Fingerprint', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :android_sha256_fingerprint, placeholder: 'AA:BB:CC:DD:EE:FF:...', disabled: true, data: { editable_section_target: "field" }, class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono disabled:bg-gray-50 disabled:text-gray-500' %>
+            <div class="mt-1 space-y-1">
+              <p class="text-xs text-gray-400">Format: colon-separated hex pairs (e.g. 61:DE:5A:4D:FA:CB:...)</p>
+              <p class="text-xs text-gray-400"><strong>For testing:</strong> Run <code class="bg-gray-200 px-1 rounded">keytool -list -v -keystore ~/.android/debug.keystore -storepass android</code> and copy the SHA256 line.</p>
+              <p class="text-xs text-gray-400"><strong>For production:</strong> Get it from <strong>Google Play Console &rarr; Setup &rarr; App signing &rarr; SHA-256 certificate fingerprint</strong>. Update this value when you publish.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-editable-section-target="actions" class="hidden flex items-center gap-3 mt-5 pt-4 border-t border-gray-100">
+        <%= f.submit 'Save Deep Linking', class: 'px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 font-medium cursor-pointer transition' %>
+        <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
+      </div>
     </div>
   <% end %>
 </div>

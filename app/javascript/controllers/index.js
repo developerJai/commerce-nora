@@ -28,6 +28,7 @@ import MobileAppSectionController from "controllers/mobile_app_section_controlle
 import CouponCelebrationController from "controllers/coupon_celebration_controller"
 import MobileSearchController from "controllers/mobile_search_controller"
 import MobileSearchTriggerController from "controllers/mobile_search_trigger_controller"
+import EditableSectionController from "controllers/editable_section_controller"
 
 application.register("sidebar", SidebarController)
 application.register("dropdown", DropdownController)
@@ -53,3 +54,4 @@ application.register("mobile-app-section", MobileAppSectionController)
 application.register("coupon-celebration", CouponCelebrationController)
 application.register("mobile-search", MobileSearchController)
 application.register("mobile-search-trigger", MobileSearchTriggerController)
+application.register("editable-section", EditableSectionController)

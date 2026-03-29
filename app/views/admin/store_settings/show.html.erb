@@ -31,17 +31,20 @@
     <!-- COMPANY DETAILS                            -->
     <!-- ═══════════════════════════════════════════ -->
     <div id="company-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-            </svg>
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Company Details</h2>
+              <p class="text-xs text-gray-500">Used on invoices and tax documents</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-sm font-semibold text-gray-900">Company Details</h2>
-            <p class="text-xs text-gray-500">Used on invoices and tax documents</p>
-          </div>
+          <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
         </div>
 
         <div class="p-5 space-y-4">
@@ -49,20 +52,26 @@
             <%= f.label :gst_number, "GST Number", class: "block text-xs font-medium text-gray-700 mb-1" %>
             <%= f.text_field :gst_number,
                 placeholder: "e.g., 27AABCU9603R1ZX",
-                class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+                disabled: true,
+                data: { editable_section_target: "field" },
+                class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500" %>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <%= f.label :company_phone, "Phone", class: "block text-xs font-medium text-gray-700 mb-1" %>
               <%= f.text_field :company_phone,
                   placeholder: "+91 98765 43210",
-                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+                  disabled: true,
+                  data: { editable_section_target: "field" },
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500" %>
             </div>
             <div>
               <%= f.label :contact_email, "Contact Email", class: "block text-xs font-medium text-gray-700 mb-1" %>
               <%= f.email_field :contact_email,
                   placeholder: "support@noralooks.com",
-                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+                  disabled: true,
+                  data: { editable_section_target: "field" },
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500" %>
             </div>
           </div>
           <div>
@@ -70,11 +79,14 @@
             <%= f.text_area :company_address,
                 rows: 1,
                 placeholder: "Company address...",
-                class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm resize-none" %>
+                disabled: true,
+                data: { editable_section_target: "field" },
+                class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm resize-none disabled:bg-gray-50 disabled:text-gray-500" %>
           </div>
         </div>
 
-        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <div data-editable-section-target="actions" class="hidden px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-3 justify-end">
+          <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-xs text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
           <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             Save
@@ -87,17 +99,20 @@
     <!-- SOCIAL MEDIA                               -->
     <!-- ═══════════════════════════════════════════ -->
     <div id="social-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
-            </svg>
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Social Media</h2>
+              <p class="text-xs text-gray-500">Shown in footer and used for SEO structured data</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-sm font-semibold text-gray-900">Social Media</h2>
-            <p class="text-xs text-gray-500">Shown in footer and used for SEO structured data</p>
-          </div>
+          <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
         </div>
 
         <div class="p-5">
@@ -109,7 +124,9 @@
               </div>
               <%= f.url_field :instagram_url,
                   placeholder: "https://instagram.com/...",
-                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+                  disabled: true,
+                  data: { editable_section_target: "field" },
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500" %>
             </div>
             <div>
               <div class="flex items-center gap-2 mb-1">
@@ -118,7 +135,9 @@
               </div>
               <%= f.url_field :youtube_url,
                   placeholder: "https://youtube.com/@...",
-                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+                  disabled: true,
+                  data: { editable_section_target: "field" },
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500" %>
             </div>
             <div>
               <div class="flex items-center gap-2 mb-1">
@@ -127,7 +146,9 @@
               </div>
               <%= f.url_field :facebook_url,
                   placeholder: "https://facebook.com/...",
-                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+                  disabled: true,
+                  data: { editable_section_target: "field" },
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500" %>
             </div>
             <div>
               <div class="flex items-center gap-2 mb-1">
@@ -136,12 +157,15 @@
               </div>
               <%= f.url_field :twitter_url,
                   placeholder: "https://x.com/...",
-                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+                  disabled: true,
+                  data: { editable_section_target: "field" },
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500" %>
             </div>
           </div>
         </div>
 
-        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <div data-editable-section-target="actions" class="hidden px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-3 justify-end">
+          <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-xs text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
           <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             Save
@@ -154,17 +178,20 @@
     <!-- ANNOUNCEMENT BANNER                        -->
     <!-- ═══════════════════════════════════════════ -->
     <div id="banner-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-            </svg>
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Announcement Banner</h2>
+              <p class="text-xs text-gray-500">Customize the top promotional bar colors</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-sm font-semibold text-gray-900">Announcement Banner</h2>
-            <p class="text-xs text-gray-500">Customize the top promotional bar colors</p>
-          </div>
+          <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
         </div>
 
         <div class="p-5 space-y-4">
@@ -184,12 +211,14 @@
               <div class="flex items-center gap-2">
                 <%= f.color_field :banner_bg_color,
                     value: @store_setting.effective_banner_bg_color,
-                    class: "h-9 w-12 rounded border border-gray-200 cursor-pointer",
-                    data: { action: "input->banner-preview#update" } %>
+                    disabled: true,
+                    data: { action: "input->banner-preview#update", editable_section_target: "field" },
+                    class: "h-9 w-12 rounded border border-gray-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" %>
                 <%= f.text_field :banner_bg_color,
                     value: @store_setting.effective_banner_bg_color,
-                    class: "flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-mono uppercase",
-                    data: { banner_preview_target: "bgInput" } %>
+                    disabled: true,
+                    data: { banner_preview_target: "bgInput", editable_section_target: "field" },
+                    class: "flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-mono uppercase disabled:bg-gray-50 disabled:text-gray-500" %>
               </div>
             </div>
             <div>
@@ -197,12 +226,14 @@
               <div class="flex items-center gap-2">
                 <%= f.color_field :banner_text_color,
                     value: @store_setting.effective_banner_text_color,
-                    class: "h-9 w-12 rounded border border-gray-200 cursor-pointer",
-                    data: { action: "input->banner-preview#update" } %>
+                    disabled: true,
+                    data: { action: "input->banner-preview#update", editable_section_target: "field" },
+                    class: "h-9 w-12 rounded border border-gray-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" %>
                 <%= f.text_field :banner_text_color,
                     value: @store_setting.effective_banner_text_color,
-                    class: "flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-mono uppercase",
-                    data: { banner_preview_target: "textInput" } %>
+                    disabled: true,
+                    data: { banner_preview_target: "textInput", editable_section_target: "field" },
+                    class: "flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-mono uppercase disabled:bg-gray-50 disabled:text-gray-500" %>
               </div>
             </div>
             <div>
@@ -210,18 +241,21 @@
               <div class="flex items-center gap-2">
                 <%= f.color_field :banner_accent_color,
                     value: @store_setting.effective_banner_accent_color,
-                    class: "h-9 w-12 rounded border border-gray-200 cursor-pointer",
-                    data: { action: "input->banner-preview#update" } %>
+                    disabled: true,
+                    data: { action: "input->banner-preview#update", editable_section_target: "field" },
+                    class: "h-9 w-12 rounded border border-gray-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" %>
                 <%= f.text_field :banner_accent_color,
                     value: @store_setting.effective_banner_accent_color,
-                    class: "flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-mono uppercase",
-                    data: { banner_preview_target: "accentInput" } %>
+                    disabled: true,
+                    data: { banner_preview_target: "accentInput", editable_section_target: "field" },
+                    class: "flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-mono uppercase disabled:bg-gray-50 disabled:text-gray-500" %>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <div data-editable-section-target="actions" class="hidden px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-3 justify-end">
+          <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-xs text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
           <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             Save
@@ -234,17 +268,20 @@
     <!-- DELIVERY SETTINGS                          -->
     <!-- ═══════════════════════════════════════════ -->
     <div id="delivery-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
-            </svg>
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Delivery Settings</h2>
+              <p class="text-xs text-gray-500">Free delivery threshold and delivery charges</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-sm font-semibold text-gray-900">Delivery Settings</h2>
-            <p class="text-xs text-gray-500">Free delivery threshold and delivery charges</p>
-          </div>
+          <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
         </div>
 
         <div class="p-5">
@@ -255,7 +292,9 @@
                   value: @store_setting.effective_free_delivery_min_amount,
                   min: 0, step: 1,
                   placeholder: "499",
-                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+                  disabled: true,
+                  data: { editable_section_target: "field" },
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500" %>
               <p class="text-[11px] text-gray-400 mt-1">Set to 0 for free delivery on all orders</p>
             </div>
             <div>
@@ -264,7 +303,9 @@
                   value: @store_setting.effective_delivery_charge_amount,
                   min: 0, step: 1,
                   placeholder: "99",
-                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
+                  disabled: true,
+                  data: { editable_section_target: "field" },
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-50 disabled:text-gray-500" %>
               <p class="text-[11px] text-gray-400 mt-1">Flat charge for orders below the minimum</p>
             </div>
           </div>
@@ -275,7 +316,8 @@
           </div>
         </div>
 
-        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <div data-editable-section-target="actions" class="hidden px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-3 justify-end">
+          <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-xs text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
           <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             Save
@@ -288,17 +330,20 @@
     <!-- COUPON SETTINGS                            -->
     <!-- ═══════════════════════════════════════════ -->
     <div id="coupon-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-            </svg>
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Coupon Settings</h2>
+              <p class="text-xs text-gray-500">Enable/disable coupon codes for customers</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-sm font-semibold text-gray-900">Coupon Settings</h2>
-            <p class="text-xs text-gray-500">Enable/disable coupon codes for customers</p>
-          </div>
+          <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
         </div>
 
         <div class="divide-y divide-gray-100">
@@ -312,9 +357,11 @@
               <%= f.label :enable_coupons, class: "relative inline-flex items-center cursor-pointer" do %>
                 <%= f.check_box :enable_coupons,
                     { checked: @store_setting.coupons_enabled?,
-                      class: "sr-only peer" },
+                      class: "sr-only peer",
+                      disabled: true,
+                      data: { editable_section_target: "field" } },
                     "1", "0" %>
-                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200 peer-disabled:opacity-50"></div>
                 <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
               <% end %>
             </div>
@@ -330,16 +377,19 @@
               <%= f.label :enable_multi_vendor_coupons, class: "relative inline-flex items-center cursor-pointer" do %>
                 <%= f.check_box :enable_multi_vendor_coupons,
                     { checked: @store_setting.multi_vendor_coupons_enabled?,
-                      class: "sr-only peer" },
+                      class: "sr-only peer",
+                      disabled: true,
+                      data: { editable_section_target: "field" } },
                     "1", "0" %>
-                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200 peer-disabled:opacity-50"></div>
                 <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
               <% end %>
             </div>
           </div>
         </div>
 
-        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <div data-editable-section-target="actions" class="hidden px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-3 justify-end">
+          <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-xs text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
           <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             Save
@@ -352,17 +402,20 @@
     <!-- PAYMENT METHODS                            -->
     <!-- ═══════════════════════════════════════════ -->
     <div id="payment-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-            </svg>
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Payment Methods</h2>
+              <p class="text-xs text-gray-500">Enable or disable checkout payment options</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-sm font-semibold text-gray-900">Payment Methods</h2>
-            <p class="text-xs text-gray-500">Enable or disable checkout payment options</p>
-          </div>
+          <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
         </div>
 
         <%
@@ -392,8 +445,10 @@
                   <%= check_box_tag "store_setting[payment_config][#{item[:key]}]", "1",
                       payment_config[item[:key]],
                       id: "payment_#{item[:key]}",
+                      disabled: true,
+                      data: { editable_section_target: "field" },
                       class: "sr-only peer" %>
-                  <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+                  <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200 peer-disabled:opacity-50"></div>
                   <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
                 </label>
               </div>
@@ -410,7 +465,8 @@
           </div>
         <% end %>
 
-        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <div data-editable-section-target="actions" class="hidden px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-3 justify-end">
+          <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-xs text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
           <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             Save
@@ -423,17 +479,20 @@
     <!-- STOREFRONT DISPLAY MANAGER                 -->
     <!-- ═══════════════════════════════════════════ -->
     <div id="display-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-      <%= form_with url: update_storefront_navbar_admin_categories_path, method: :patch do %>
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
-            </svg>
+      <%= form_with url: update_storefront_navbar_admin_categories_path, method: :patch, data: { controller: "editable-section" } do %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Categories Display</h2>
+              <p class="text-xs text-gray-500">Control categories in the nav bar and homepage hero</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-sm font-semibold text-gray-900">Categories Display</h2>
-            <p class="text-xs text-gray-500">Control categories in the nav bar and homepage hero</p>
-          </div>
+          <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
         </div>
 
         <div class="overflow-x-auto">
@@ -453,16 +512,16 @@
                   </td>
                   <td class="py-2.5 px-5 text-center">
                     <label class="inline-flex items-center justify-center cursor-pointer">
-                      <%= check_box_tag 'navbar_ids[]', category.id, category.show_in_storefront_navbar?, class: 'sr-only peer' %>
-                      <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition">
+                      <%= check_box_tag 'navbar_ids[]', category.id, category.show_in_storefront_navbar?, class: 'sr-only peer', disabled: true, data: { editable_section_target: "field" } %>
+                      <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 peer-disabled:opacity-50 transition">
                         <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                       </span>
                     </label>
                   </td>
                   <td class="py-2.5 px-5 text-center">
                     <label class="inline-flex items-center justify-center cursor-pointer">
-                      <%= check_box_tag 'hero_ids[]', category.id, category.show_in_hero_section?, class: 'sr-only peer' %>
-                      <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition">
+                      <%= check_box_tag 'hero_ids[]', category.id, category.show_in_hero_section?, class: 'sr-only peer', disabled: true, data: { editable_section_target: "field" } %>
+                      <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 peer-disabled:opacity-50 transition">
                         <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                       </span>
                     </label>
@@ -476,16 +535,16 @@
                     </td>
                     <td class="py-2 px-5 text-center">
                       <label class="inline-flex items-center justify-center cursor-pointer">
-                        <%= check_box_tag 'navbar_ids[]', child.id, child.show_in_storefront_navbar?, class: 'sr-only peer' %>
-                        <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition">
+                        <%= check_box_tag 'navbar_ids[]', child.id, child.show_in_storefront_navbar?, class: 'sr-only peer', disabled: true, data: { editable_section_target: "field" } %>
+                        <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 peer-disabled:opacity-50 transition">
                           <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                         </span>
                       </label>
                     </td>
                     <td class="py-2 px-5 text-center">
                       <label class="inline-flex items-center justify-center cursor-pointer">
-                        <%= check_box_tag 'hero_ids[]', child.id, child.show_in_hero_section?, class: 'sr-only peer' %>
-                        <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition">
+                        <%= check_box_tag 'hero_ids[]', child.id, child.show_in_hero_section?, class: 'sr-only peer', disabled: true, data: { editable_section_target: "field" } %>
+                        <span class="h-5 w-5 rounded border border-gray-300 flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 peer-disabled:opacity-50 transition">
                           <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                         </span>
                       </label>
@@ -497,7 +556,8 @@
           </table>
         </div>
 
-        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <div data-editable-section-target="actions" class="hidden px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-3 justify-end">
+          <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-xs text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
           <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             Save
@@ -510,17 +570,20 @@
     <!-- STOREFRONT FILTERS                         -->
     <!-- ═══════════════════════════════════════════ -->
     <div id="filter-section" class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch do |f| %>
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-            </svg>
+      <%= form_with model: @store_setting, url: admin_store_settings_path, method: :patch, data: { controller: "editable-section" } do |f| %>
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Product Filters</h2>
+              <p class="text-xs text-gray-500">Choose which filters customers see on the product listing page</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-sm font-semibold text-gray-900">Product Filters</h2>
-            <p class="text-xs text-gray-500">Choose which filters customers see on the product listing page</p>
-          </div>
+          <button type="button" data-editable-section-target="editButton" data-action="editable-section#edit" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
         </div>
 
         <%
@@ -560,8 +623,10 @@
                   <%= check_box_tag "store_setting[filter_config][#{item[:key]}]", "1",
                       config[item[:key]],
                       id: "filter_#{item[:key]}",
+                      disabled: true,
+                      data: { editable_section_target: "field" },
                       class: "sr-only peer" %>
-                  <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200"></div>
+                  <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors duration-200 peer-disabled:opacity-50"></div>
                   <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5"></div>
                 </label>
               </div>
@@ -569,7 +634,8 @@
           <% end %>
         </div>
 
-        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <div data-editable-section-target="actions" class="hidden px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-3 justify-end">
+          <button type="button" data-action="editable-section#cancel" class="px-4 py-2 text-xs text-gray-600 hover:text-gray-800 font-medium">Cancel</button>
           <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             Save
