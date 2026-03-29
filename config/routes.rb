@@ -286,6 +286,10 @@ Rails.application.routes.draw do
     get "mobile/check_update", to: "mobile#check_update"
   end
 
+  # Deep Links — Universal Links (iOS) & App Links (Android)
+  get ".well-known/apple-app-site-association", to: "deep_links#apple", defaults: { format: :json }
+  get ".well-known/assetlinks.json", to: "deep_links#android", defaults: { format: :json }
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end

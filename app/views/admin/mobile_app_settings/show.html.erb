@@ -105,6 +105,53 @@
       </div>
     </div>
 
+    <!-- Deep Linking Configuration -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+        <svg class="w-5 h-5 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+        </svg>
+        Deep Linking (Universal Links / App Links)
+      </h2>
+      <p class="text-sm text-gray-500 mb-4">Configure identifiers so shared URLs open directly in the native app instead of the browser</p>
+
+      <div class="space-y-4">
+        <div class="bg-gray-50 rounded-lg p-3 mb-2">
+          <p class="text-xs text-gray-600">
+            These settings power the <code class="bg-gray-200 px-1 rounded text-xs">/.well-known/apple-app-site-association</code> and
+            <code class="bg-gray-200 px-1 rounded text-xs">/.well-known/assetlinks.json</code> files that iOS and Android use to verify your app owns this domain.
+          </p>
+        </div>
+
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">iOS (Universal Links)</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <%= f.label :ios_team_id, 'Apple Team ID', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :ios_team_id, placeholder: 'ABCDE12345', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
+            <p class="mt-1 text-xs text-gray-400">Found in Apple Developer Account > Membership</p>
+          </div>
+          <div>
+            <%= f.label :ios_bundle_id, 'iOS Bundle ID', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :ios_bundle_id, placeholder: 'com.noralooks.app', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
+            <p class="mt-1 text-xs text-gray-400">Your app's bundle identifier in Xcode</p>
+          </div>
+        </div>
+
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mt-4">Android (App Links)</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <%= f.label :android_package_name, 'Android Package Name', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :android_package_name, placeholder: 'com.noralooks.app', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
+          </div>
+          <div>
+            <%= f.label :android_sha256_fingerprint, 'SHA-256 Certificate Fingerprint', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+            <%= f.text_field :android_sha256_fingerprint, placeholder: 'AA:BB:CC:DD:...', class: 'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono' %>
+            <p class="mt-1 text-xs text-gray-400">Run: <code class="bg-gray-200 px-1 rounded">keytool -list -v -keystore your.keystore</code></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Preview -->
     <div class="bg-white rounded-lg shadow-sm p-6">
       <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
