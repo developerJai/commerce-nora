@@ -243,27 +243,16 @@
         <% end %>
       </div>
 
-      <!-- Search Bar - Mobile -->
-      <div class="sm:hidden mx-auto relative z-10" data-controller="search-autocomplete" data-search-autocomplete-mobile-value="true">
-        <%= form_with url: products_path, method: :get, class: 'relative', data: { turbo_frame: '_top' } do |f| %>
-          <div class="relative">
-            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            <input type="search" name="q" value="<%= params[:q] %>"
-                   placeholder="Search jewellery, gifts..."
-                   class="w-full h-11 pl-10 pr-10 text-stone-800 bg-white/95 rounded-full border border-white/20 shadow-lg shadow-black/25 focus:bg-white focus:ring-2 focus:ring-amber-400/50 placeholder:text-stone-400 text-base"
-                   autocomplete="off"
-                   data-search-autocomplete-target="input"
-                   data-action="input->search-autocomplete#search focus->search-autocomplete#search keydown.enter->search-autocomplete#submitForm">
-            <button type="button" data-search-autocomplete-target="clearButton" data-action="click->search-autocomplete#clearInput" class="hidden absolute right-3 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-600">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-          <div data-search-autocomplete-target="results"
-               class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-stone-200 overflow-hidden hidden z-[60] text-left max-h-[60vh] overflow-y-auto">
-          </div>
-        <% end %>
+      <!-- Search Bar - Mobile (opens fullscreen overlay) -->
+      <div class="sm:hidden mx-auto relative z-10" data-controller="mobile-search-trigger">
+        <button type="button"
+                data-action="click->mobile-search-trigger#intercept"
+                class="w-full h-11 pl-10 pr-10 text-left text-stone-400 bg-white/95 rounded-full border border-white/20 shadow-lg shadow-black/25 text-base cursor-pointer relative">
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          Search jewellery, gifts...
+        </button>
       </div>
 
       <!-- Category Pills -->

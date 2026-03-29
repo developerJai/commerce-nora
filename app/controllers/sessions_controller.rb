@@ -32,6 +32,7 @@ class SessionsController < ApplicationController
 
   def destroy
     session.delete(:customer_id)
+    session.delete(:coupon_id)
     redirect_to login_path, notice: "You have been logged out"
   end
 

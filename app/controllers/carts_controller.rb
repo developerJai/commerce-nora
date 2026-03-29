@@ -83,6 +83,9 @@ class CartsController < ApplicationController
           @items_by_vendor = @cart_items.group_by { |item| item.product_variant.product.vendor }
         end
 
+        # Invalidate coupon if cart no longer meets minimum order amount
+        invalidate_coupon_if_needed
+
         streams = []
 
         # Update cart content based on whether cart is empty or not
@@ -161,6 +164,9 @@ class CartsController < ApplicationController
         if @multi_vendor
           @items_by_vendor = @cart_items.group_by { |item| item.product_variant.product.vendor }
         end
+
+        # Invalidate coupon if cart no longer meets minimum order amount
+        invalidate_coupon_if_needed
 
         streams = [
           turbo_stream.replace("cart-controls-#{@variant.id}",
@@ -314,6 +320,15 @@ class CartsController < ApplicationController
 
         render turbo_stream: streams
       end
+    end
+  end
+
+  def invalidate_coupon_if_needed
+    return unless session[:coupon_id]
+
+    coupon = Coupon.find_by(id: session[:coupon_id])
+    if coupon.nil? || !coupon.valid_for_use? || !coupon.applicable_to?(current_cart.subtotal)
+      session.delete(:coupon_id)
     end
   end
 

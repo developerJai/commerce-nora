@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_095513) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_29_070314) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -537,6 +537,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_095513) do
     t.string "banner_text_color", default: "#F5F5F5"
     t.text "company_address"
     t.string "company_phone"
+    t.string "contact_email"
     t.datetime "created_at", null: false
     t.decimal "delivery_charge_amount", precision: 10, scale: 2, default: "99.0", null: false
     t.boolean "enable_coupons", default: true

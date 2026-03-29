@@ -116,6 +116,11 @@ class StoreSetting < ApplicationRecord
     banner_accent_color.presence || BANNER_DEFAULTS[:accent_color]
   end
 
+  # Contact info
+  def has_contact_info?
+    contact_email.present? || company_phone.present?
+  end
+
   # Social media URLs
   def social_media_links
     {

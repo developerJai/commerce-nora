@@ -301,6 +301,60 @@ details[open] > summary {
 .jewel-gem:nth-child(3) { top: 50%;  left: 0;   transform: translate(-50%, -50%); background: #9f1239; }
 .jewel-gem:nth-child(4) { top: 50%;  right: 0;  transform: translate(50%, -50%);  background: #fb7185; }
 
+/* ── Mobile Fullscreen Search ──────────────────────────────────── */
+.safe-area-top {
+  padding-top: max(12px, env(safe-area-inset-top));
+}
+
+.mobile-search-overlay {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  will-change: opacity, transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: opacity 0.2s ease-out,
+              transform 0.2s ease-out;
+}
+
+.mobile-search-overlay.mobile-search-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Override global rose focus ring for search overlay input */
+#mobile-search-overlay-container input[type="search"]:focus {
+  --tw-ring-color: rgba(212, 175, 55, 0.5) !important;
+  border-color: #D4AF37 !important;
+}
+
+/* Staggered fade-in for search result rows */
+@keyframes search-result-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-result-row {
+  animation: search-result-enter 0.25s ease-out both;
+}
+
+/* Loading shimmer for search */
+@keyframes search-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.search-shimmer {
+  background: linear-gradient(90deg, #1a1a1a 0%, #2a2520 50%, #1a1a1a 100%);
+  background-size: 200% 100%;
+  animation: search-shimmer 1.5s ease-in-out infinite;
+}
+
 /* Phone Input Styles for intl-tel-input */
 .iti {
   width: 100%;
